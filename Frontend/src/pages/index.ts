@@ -6,6 +6,7 @@ import KeepPage from '@/pages/dist/KeepPage.vue'
 import PageNotFound from '@/pages/dist/PageNotFound.vue'
 import ItemPage from '@/pages/dist/ItemPage.vue'
 import ForgotPasswordPage from '@/pages/dist/ForgotPasswordPage.vue'
+import ContactPage from '@/pages/dist/ContactPage.vue';
 
 export {
     HomePage,
@@ -15,5 +16,6 @@ export {
     ProjectPage,
     KeepPage,
     ItemPage,
+    ContactPage,
     PageNotFound
 }

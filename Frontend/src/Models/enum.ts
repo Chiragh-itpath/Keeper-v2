@@ -11,6 +11,7 @@ enum RouterEnum {
     KEEP_BY_TAG = 'KeepByTag',
     KEEP = 'Keeps',
     ITEM = 'Items',
+    CONTACT = 'Contact',
     PAGE_NOT_FOUND = 'PAGE_NOT_FOUND'
 }
 

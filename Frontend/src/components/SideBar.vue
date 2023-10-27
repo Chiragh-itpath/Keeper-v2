@@ -33,7 +33,9 @@ const navigate = (name: string) => {
                 @click="navigate(RouterEnum.SHARED)">
                 <span class="mx-2">Shared</span>
             </v-list-item>
-            <v-list-item role="button" prepend-icon="mdi-contacts" class="my-2 sweep-to-right" color="primary">
+            <v-list-item role="button" prepend-icon="mdi-contacts" class="my-2 sweep-to-right" color="primary"
+                :class="route.name == RouterEnum.CONTACT ? 'bg-blue-grey-lighten-3 text-white' : 'text-black'"
+                @click="navigate(RouterEnum.CONTACT)">
                 <span class="mx-2">Contact</span>
             </v-list-item>
             <v-divider></v-divider>

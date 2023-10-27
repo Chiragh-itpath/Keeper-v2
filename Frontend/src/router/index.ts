@@ -27,7 +27,8 @@ import {
     LoginPage,
     PageNotFound,
     ProjectPage,
-    SignUpPage
+    SignUpPage,
+    ContactPage
 } from '@/pages'
 
 const IsLoggedIn = (): boolean => {
@@ -144,6 +145,16 @@ const routes: RouteRecordRaw[] = [
             SideBar: SideBar
         },
         name: RouterEnum.ITEM,
+        beforeEnter: requireLoggedIn
+    },
+    {
+        path: '/Contact',
+        components:{
+            default: ContactPage,
+            NavBar: NavBar,
+            SideBar: SideBar
+        },
+        name: RouterEnum.CONTACT,
         beforeEnter: requireLoggedIn
     }
 ]
