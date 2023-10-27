@@ -3,7 +3,6 @@ import {
     contactRules,
     emailRules,
     numberRules,
-    otpRules,
     passwordRule,
     requiredRule
 } from '@/data/ValidationRules'
@@ -21,7 +20,6 @@ const Props = withDefaults(
         isContact?: boolean
         isPassword?: boolean
         isNumber?: boolean
-        isOtp?: boolean
         icon?: string
         ValidationRules?: TRule[],
         errorMessages?: string[]
@@ -35,7 +33,6 @@ const Props = withDefaults(
         isContact: false,
         isPassword: false,
         isNumber: false,
-        isOtp: false,
         icon: '',
     }
 )
@@ -54,12 +51,7 @@ if (Props.isEmail) Rules.push(emailRules)
 if (Props.isPassword) Rules.push(passwordRule)
 
 if (Props.isNumber) Rules.push(numberRules)
-if (Props.isOtp) {
-    Rules = []
-    Rules.push(requiredRule)
-    Rules.push(otpRules)
-    type.value = 'number'
-}
+
 Rules.push(...(Props.ValidationRules || []))
 
 const changeVisibility = (): void => {
