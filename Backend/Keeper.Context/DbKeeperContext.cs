@@ -15,6 +15,9 @@ namespace Keeper.Context
         public DbSet<SharedKeepsModel> SharedKeeps { get; set; }
         public DbSet<ItemFileLinkerModel> ItemFileLinker { get; set; }
         public DbSet<CommentModel> Comment { get; set; }
+        public DbSet<ContactModel> Contact { get; set; }
+        public DbSet<GroupModel> Group { get; set; }
+        public DbSet<ContactGroupLinkerModel> ContactGroupLinkers { get; set; }
         public DbKeeperContext(DbContextOptions options) : base(options) { }
     }
 }
