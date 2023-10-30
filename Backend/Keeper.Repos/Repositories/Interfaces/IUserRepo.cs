@@ -7,6 +7,6 @@ namespace Keeper.Repos.Interfaces
         Task<UserModel?> GetByEmailAsync(string email);
         Task<UserModel?> GetById(Guid userId);
         bool UpdateUser(UserModel user);
-        Task<List<UserModel>> GetEmailList(string email);
+        Task<List<UserModel>> GetEmailList(string email, Guid userId);
     }
 }

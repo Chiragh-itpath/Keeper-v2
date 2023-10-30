@@ -7,5 +7,6 @@ namespace Keeper.Services.Interfaces
     {
         Task<ResponseModel<UserViewModel>> GetByIdAsync(Guid id);
         Task<ResponseModel<UserViewModel>> CheckEmail(string email);
+        Task<ResponseModel<List<string>>> EmailSearch(string email, Guid userId);
     }
 }

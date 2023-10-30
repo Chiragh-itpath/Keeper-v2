@@ -17,9 +17,10 @@ namespace Keeper.Services.Config
             services.AddTransient<IKeepService, KeepService>();
             services.AddTransient<IItemService, ItemService>();
             services.AddTransient<IMailService, MailService>();
-            services.AddTransient<IFileService, FileService>(); 
+            services.AddTransient<IFileService, FileService>();
             services.AddTransient<IInviteService, InviteService>();
             services.AddTransient<ICommentService, CommentService>();
+            services.AddTransient<IContactService, ContactService>();
             return services;
         }
     }

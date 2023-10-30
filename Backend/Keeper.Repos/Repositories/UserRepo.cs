@@ -21,17 +21,18 @@ namespace Keeper.Repos.Repositories
         {
             return await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
         }
-        
+
         public bool UpdateUser(UserModel user)
         {
             _db.Update(user);
             return _db.SaveChanges() == 1;
         }
-        public async Task<List<UserModel>> GetEmailList(string email)
+        public async Task<List<UserModel>> GetEmailList(string email, Guid userId)
         {
-            return await _db.Users
-                .Where(x => x.Email.StartsWith(email))
-                .ToListAsync();
+            return await (from user in _db.Users
+                          where user.Email.StartsWith(email) && user.Id != userId
+                          select user)
+                          .ToListAsync();
         }
 
         public async Task<UserModel?> GetById(Guid userId)

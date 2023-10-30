@@ -26,7 +26,14 @@ namespace Keeper.Main.Controllers
             var userId = Guid.Parse(claims.ElementAt(3).Value);
             return await _user.GetByIdAsync(userId);
         }
-
+        [HttpGet("EmailSearch")]
+        public async Task<ResponseModel<List<string>>> EmailSearch([FromQuery]string email)
+        {
+            var user = User.Identities.First();
+            var claims = user.Claims.ToList();
+            var userId = Guid.Parse(claims.ElementAt(3).Value);
+            return await _user.EmailSearch(email,userId);
+        } 
         [AllowAnonymous]
         [HttpGet("CheckMail")]
         public async Task<ResponseModel<UserViewModel>> CheckEmail(string email)

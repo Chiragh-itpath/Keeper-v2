@@ -67,5 +67,16 @@ namespace KeeperCore.Services
                 Data = UserViewModel
             };
         }
+        public async Task<ResponseModel<List<string>>> EmailSearch(string email, Guid userId)
+        {
+            var result = await _userRepo.GetEmailList(email,userId);
+            var userList = result.Select(x => x.Email).ToList();
+            return new ResponseModel<List<string>>
+            {
+                IsSuccess = true,
+                StatusName = StatusType.SUCCESS,
+                Data = userList
+            };
+        }
     }
 }
