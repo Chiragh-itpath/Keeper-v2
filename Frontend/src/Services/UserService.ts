@@ -9,4 +9,9 @@ const GetMyProfile = async (): Promise<IUser | null> => {
     const response: IUser = await http.get('User/Me')
     return response
 }
-export { GetByEmail, GetMyProfile }
+const EmailSearch = async (email: string): Promise<string[] | null> => {
+    const response: string[] = await http.get(`User/EmailSearch?email=${email}`)
+    return response
+}
+
+export { GetByEmail, GetMyProfile, EmailSearch }

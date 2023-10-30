@@ -2,7 +2,7 @@ import { reactive } from 'vue'
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import type { IUser } from '@/Models/UserModels'
-import { GetByEmail, GetMyProfile } from '@/Services/UserService'
+import { GetByEmail, GetMyProfile, EmailSearch } from '@/Services/UserService'
 import { removeToken } from '@/Services/TokenService'
 import { RouterEnum } from '@/Models/enum'
 
@@ -33,7 +33,12 @@ const UserStore = defineStore('user', () => {
         return undefined
     }
 
-    function logout() {
+    const SearchEmail = async (email: string): Promise<string[]> => {
+        const emails = await EmailSearch(email)
+        return emails ?? []
+    }
+
+    const logout = () => {
         removeToken()
         router.push({ name: RouterEnum.HOME })
     }
@@ -42,7 +47,8 @@ const UserStore = defineStore('user', () => {
         User,
         logout,
         CheckEmail,
-        myProfile
+        myProfile,
+        SearchEmail
     }
 })
 export { UserStore }
