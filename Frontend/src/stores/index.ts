@@ -6,6 +6,7 @@ import { InviteStore } from '@/stores/InviteStore'
 import { UserStore } from '@/stores/UserStore'
 import { Uitlity } from '@/stores/UtilityStore'
 import { ContactStore } from '@/stores/ContactStore'
+import { GroupStore } from '@/stores/GroupStore'
 
 export {
     AccountStore,
@@ -15,5 +16,6 @@ export {
     Uitlity,
     UserStore,
     InviteStore,
-    ContactStore
+    ContactStore,
+    GroupStore
 }
