@@ -72,5 +72,10 @@ namespace Keeper.Services.Services
                 Data = contacts
             };
         }
+        public async Task<ContactViewModel> GetById(Guid id)
+        {
+            var contact = await _contact.GetByIdAsync(id);
+            return await ContactViewModelConvertor(contact);
+        }
     }
 }

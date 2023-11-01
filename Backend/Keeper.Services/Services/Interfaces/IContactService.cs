@@ -7,5 +7,6 @@ namespace Keeper.Services.Services.Interfaces
     {
         Task<ResponseModel<ContactViewModel>> AddAsync(AddContact contact, Guid userId);
         Task<ResponseModel<List<ContactViewModel>>> GetAllContacts(Guid userId);
+        Task<ContactViewModel> GetById(Guid id);
     }
 }

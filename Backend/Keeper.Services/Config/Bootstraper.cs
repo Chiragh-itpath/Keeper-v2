@@ -21,6 +21,7 @@ namespace Keeper.Services.Config
             services.AddTransient<IInviteService, InviteService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<IGroupService, GroupService>();
             return services;
         }
     }
