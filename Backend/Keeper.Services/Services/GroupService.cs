@@ -32,12 +32,8 @@ namespace Keeper.Services.Services
                 ContactIds = addGroup.ContactId
             });
             var result = await _group.GetByIdAsync(group.Id);
-            var groupViewModel = new GroupViewModel
-            {
-                Id = result!.Id,
-                Name = result!.Name,
-                UserEmail = result!.User.Email
-            };
+
+            var groupViewModel = await this.FillContacts(result!);
             return new ResponseModel<GroupViewModel>
             {
                 IsSuccess = true,
