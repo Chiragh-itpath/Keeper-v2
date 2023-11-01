@@ -65,7 +65,7 @@ const emits = defineEmits<{
             </tr>
             <tr v-for="(contact, index) in ContactsToDisplay" :key="index">
                 <td v-if="checkbox">
-                    <v-checkbox color="primary" hide-details v-model="contact.id"
+                    <v-checkbox color="primary" hide-details :model-value="checkedContacts.includes(contact.id)"
                         @update:model-value="(x) => chcekHandler(x, contact.id)"></v-checkbox>
                 </td>
                 <td class="v-col-2 v-col-md-1">
