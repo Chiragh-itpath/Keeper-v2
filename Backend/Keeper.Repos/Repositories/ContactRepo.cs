@@ -26,5 +26,9 @@ namespace Keeper.Repos.Repositories
         {
             return await _db.Contact.Where(x => x.UserId == userId).ToListAsync();
         }
+        public async Task<ContactModel> GetByIdAsync(Guid id)
+        {
+            return await _db.Contact.FirstAsync(x => x.Id == id);
+        }
     }
 }

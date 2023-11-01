@@ -21,6 +21,8 @@ namespace Keeper.Repos.Config
             services.AddTransient<IKeepShareRepo, ShareKeepRepo>();
             services.AddTransient<ICommentRepo, CommentRepo>();
             services.AddTransient<IContactRepo, ContactRepo>();
+            services.AddTransient<IGroupRepo, GroupRepo>();
+            services.AddTransient<IGroupLinkerRepo, GroupLinkerRepo>();
             return services;
         }
     }

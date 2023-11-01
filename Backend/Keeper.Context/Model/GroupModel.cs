@@ -11,5 +11,6 @@ namespace Keeper.Context.Model
         [ForeignKey(nameof(UserModel))]
         public Guid UserId { get; set; }
         public virtual UserModel User { get; set; } = default!;
+        public virtual List<ContactGroupLinkerModel>? Linkers { get; set; }
     }
 }
