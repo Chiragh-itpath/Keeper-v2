@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { type Ref, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { type Ref, ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { RouterEnum } from '@/Models/enum'
 import { KeepStore } from '@/stores'
@@ -11,9 +11,19 @@ import InfoKeep from '@/components/keeps/InfoKeep.vue'
 import HoverEffect from '@/components/Custom/HoverEffect.vue'
 import CustomCard from '@/components/CustomCard.vue'
 import Delete from '@/components/Custom/DeletePropmt.vue'
+import type { IKeep } from '@/Models/KeepModels'
+import { dateHelper } from '@/Services/HelperFunction'
+
+const props = withDefaults(defineProps<{
+    date?: string | null
+}>(), {
+    date: null
+})
 
 const router = useRouter()
+const route = useRoute()
 const { Keeps } = storeToRefs(KeepStore())
+const KeepsToDisplay: Ref<IKeep[]> = ref([])
 const id: Ref<string> = ref('')
 const projectId: Ref<string> = ref('')
 
@@ -27,10 +37,30 @@ const deleteHandler = async (): Promise<void> => {
     await DeleteKeep(id.value)
     deleteVisible.value = false
 }
+
+watch([props, route], () => {
+    const tag = Array.isArray(route.params.tag) ? route.params.tag.join('') : route.params.tag;
+
+    const filterFunction = (keep: IKeep) => {
+        const keepDate = dateHelper(keep.createdOn);
+        return (!props.date || keepDate === dateHelper(props.date)) &&
+            (
+                route.name === RouterEnum.KEEP ||
+                (route.name === RouterEnum.KEEP_BY_TAG && keep.tag == tag)
+            )
+    }
+
+    KeepsToDisplay.value = Keeps.value.filter(filterFunction);
+})
+
+onMounted(() => {
+    KeepsToDisplay.value = Keeps.value
+})
 </script>
 <template>
-    <v-col cols="12" lg="3" md="6" sm="6" v-for="(keep, index) in Keeps" :key="index">
-        <custom-card @click="() => router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })" is-keep>
+    <v-col cols="12" lg="3" md="6" sm="6" v-for="(keep, index) in KeepsToDisplay" :key="index">
+        <custom-card @click="() => router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })"
+            is-keep>
             <template #title>{{ keep.title }}</template>
             <template #menu>
                 <v-menu location="bottom" width="250">

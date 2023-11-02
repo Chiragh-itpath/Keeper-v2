@@ -2,14 +2,12 @@ import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { IKeep, IAddKeep, IEditKeep } from '@/Models/KeepModels'
 import { Insert, GetAll, Update, Delete } from '@/Services/KeepService'
-import { dateHelper } from '@/Services/HelperFunction'
 
 const KeepStore = defineStore('KeepStore', () => {
-    const AllKeeps: Ref<IKeep[]> = ref([])
     const Keeps: Ref<IKeep[]> = ref([])
 
     const keepTags = computed(() => {
-        const tags = AllKeeps.value.map((x) => x.tag)
+        const tags = Keeps.value.map((x) => x.tag)
         return [...new Set(tags)]
     })
 
@@ -23,18 +21,16 @@ const KeepStore = defineStore('KeepStore', () => {
     const AddKeep = async (addKeep: IAddKeep): Promise<any> => {
         const response = await Insert(addKeep)
         if (response) {
-            AllKeeps.value.push(response)
-            fetchKeeps()
+            Keeps.value.push(response)
         }
     }
     const getSingle = (id: string) => {
-        return AllKeeps.value.find((x) => x.id == id)
+        return Keeps.value.find((x) => x.id == id)
     }
     const GetKeeps = async (projectId: string): Promise<any> => {
         const response = await GetAll(projectId)
         if (response) {
-            AllKeeps.value = response
-            fetchKeeps()
+            Keeps.value = response
         }
     }
     const DeleteKeep = async (keepId: string): Promise<any> => {
@@ -48,23 +44,10 @@ const KeepStore = defineStore('KeepStore', () => {
         const response = await Update(editKeep)
         if (response) {
             const index = FindIndex(editKeep.id)
-            AllKeeps.value.splice(index, 1, response)
-            fetchKeeps()
+            Keeps.value.splice(index, 1, response)
         }
     }
-    const fetchKeeps = (): void => {
-        Keeps.value = AllKeeps.value
-    }
-    const FilterByDate = (date: string) => {
-        if (date == '') {
-            fetchKeeps()
-        } else {
-            Keeps.value = AllKeeps.value.filter((x) => dateHelper(date) == dateHelper(x.createdOn))
-        }
-    }
-    const FilterByTag = (tag: string) => {
-        Keeps.value = AllKeeps.value.filter((x) => x.tag == tag)
-    }
+
     return {
         Keeps,
         keepTags,
@@ -73,9 +56,6 @@ const KeepStore = defineStore('KeepStore', () => {
         DeleteKeep,
         Updatekeep,
         getSingleKeep,
-        FilterByDate,
-        FilterByTag,
-        fetchKeeps,
         getSingle
     }
 })

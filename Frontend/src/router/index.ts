@@ -11,8 +11,6 @@ import NavBar from '@/components/NavBar.vue'
 import VerifyEmail from '@/components/VerifyEmail.vue'
 import VerifyOtp from '@/components/VerifyOtp.vue'
 import ResetPassword from '@/components/ResetPassword.vue'
-import AllKeeps from '@/components/keeps/AllKeeps.vue'
-import TagKeep from '@/components/keeps/TagKeep.vue'
 import { getToken } from '@/Services/TokenService'
 import { beforeResolve } from '@/router/RouterHelper'
 
@@ -118,18 +116,17 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/Project/:id',
-        children: [
-            {
-                path: '',
-                component: AllKeeps,
-                name: RouterEnum.KEEP
-            },
-            {
-                path: 'Tag/:tag',
-                component: TagKeep,
-                name: RouterEnum.KEEP_BY_TAG
-            }
-        ],
+        name: RouterEnum.KEEP,
+        components: {
+            default: KeepPage,
+            NavBar: NavBar,
+            SideBar: SideBar
+        },
+        beforeEnter: requireLoggedIn
+    },
+    {
+        path: '/Project/:id/Tag/:tag',
+        name: RouterEnum.KEEP_BY_TAG,
         components: {
             default: KeepPage,
             NavBar: NavBar,

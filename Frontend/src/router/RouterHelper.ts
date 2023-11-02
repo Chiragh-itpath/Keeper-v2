@@ -4,7 +4,6 @@ import { ContactStore, GroupStore, ItemStore, KeepStore, ProjectStore } from '@/
 
 const beforeResolve = async (route: RouteLocationNormalized) => {
     const id = Array.isArray(route.params.id) ? route.params.id.join('') : route.params.id
-    const tag = Array.isArray(route.params.tag) ? route.params.tag.join('') : route.params.tag
     const keepId = Array.isArray(route.params.keepId)
         ? route.params.keepId.join('')
         : route.params.keepId
@@ -19,9 +18,6 @@ const beforeResolve = async (route: RouteLocationNormalized) => {
             break
         case RouterEnum.KEEP:
             await keepStore.GetKeeps(id)
-            break
-        case RouterEnum.KEEP_BY_TAG:
-            keepStore.FilterByTag(tag)
             break
         case RouterEnum.ITEM:
             await itemStore.GetAllItems(keepId)
