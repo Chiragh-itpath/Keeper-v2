@@ -15,15 +15,7 @@ const beforeResolve = async (route: RouteLocationNormalized) => {
     const groupStore = GroupStore()
     switch (route.name) {
         case RouterEnum.PROJECT:
-            await projectStore.getProjects()
-            projectStore.FetchProjects()
-            break
-        case RouterEnum.PROJECT_BY_TAG:
-            await projectStore.getProjects()
-            projectStore.FilterByTag(tag)
-            break
-        case RouterEnum.SHARED:
-            await projectStore.FetchSharedProjects()
+            await projectStore.GetProjects()
             break
         case RouterEnum.KEEP:
             await keepStore.GetKeeps(id)

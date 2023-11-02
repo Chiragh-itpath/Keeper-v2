@@ -11,9 +11,6 @@ import NavBar from '@/components/NavBar.vue'
 import VerifyEmail from '@/components/VerifyEmail.vue'
 import VerifyOtp from '@/components/VerifyOtp.vue'
 import ResetPassword from '@/components/ResetPassword.vue'
-import AllProjects from '@/components/Project/AllProjects.vue'
-import SharedProjects from '@/components/Project/SharedProjects.vue'
-import TagProjects from '@/components/Project/TagProjects.vue'
 import AllKeeps from '@/components/keeps/AllKeeps.vue'
 import TagKeep from '@/components/keeps/TagKeep.vue'
 import { getToken } from '@/Services/TokenService'
@@ -75,8 +72,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'VerifyOtp',
                 component: VerifyOtp,
-                name: RouterEnum.VERIFY_OTP,
-                meta: { email: '' }
+                name: RouterEnum.VERIFY_OTP
             },
             {
                 path: 'ResetPassword',
@@ -92,23 +88,27 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/Project/',
-        children: [
-            {
-                path: '',
-                component: AllProjects,
-                name: RouterEnum.PROJECT
-            },
-            {
-                path: 'Shared',
-                component: SharedProjects,
-                name: RouterEnum.SHARED
-            },
-            {
-                path: 'Tag/:tag',
-                component: TagProjects,
-                name: RouterEnum.PROJECT_BY_TAG
-            }
-        ],
+        name: RouterEnum.PROJECT,
+        components: {
+            default: ProjectPage,
+            NavBar: NavBar,
+            SideBar: SideBar
+        },
+        beforeEnter: requireLoggedIn
+    },
+    {
+        path: '/Project/Shared',
+        name: RouterEnum.SHARED,
+        components: {
+            default: ProjectPage,
+            NavBar: NavBar,
+            SideBar: SideBar
+        },
+        beforeEnter: requireLoggedIn
+    },
+    {
+        path: '/Project/Tag/:tag',
+        name: RouterEnum.PROJECT_BY_TAG,
         components: {
             default: ProjectPage,
             NavBar: NavBar,
@@ -149,7 +149,7 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/Contact',
-        components:{
+        components: {
             default: ContactPage,
             NavBar: NavBar,
             SideBar: SideBar

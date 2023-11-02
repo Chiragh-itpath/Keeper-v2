@@ -22,8 +22,4 @@ const Delete = async (ProjectId: string): Promise<boolean> => {
     return res != null
 }
 
-const GetAllShared = async (): Promise<IProject[] | null> => {
-    const response: IProject[] = await http.get('Project/Shared')
-    return response
-}
-export { Insert, GetById, GetAll, Update, Delete, GetAllShared }
+export { Insert, GetById, GetAll, Update, Delete }

@@ -1,26 +1,57 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ProjectStore } from '@/stores'
 import { RouterEnum } from '@/Models/enum'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import EditProject from '@/components/Project/EditProject.vue'
 import InviteProject from '@/components/Project/InviteProject.vue'
 import InfoProject from '@/components/Project/InfoProject.vue'
 import Delete from '@/components/Custom/DeletePropmt.vue'
 import HoverEffect from '@/components/Custom/HoverEffect.vue'
 import CustomCard from '@/components/CustomCard.vue'
+import type { IProject } from '@/Models/ProjectModels'
+import { dateHelper } from '@/Services/HelperFunction'
+import { onMounted } from 'vue'
 
+const props = withDefaults(defineProps<{
+    date?: string | null
+}>(), {
+    date: null
+})
 
 const { Projects } = storeToRefs(ProjectStore())
 const { DeleteProject } = ProjectStore()
+
 const router = useRouter()
+const route = useRoute()
+
 const id: Ref<string> = ref('')
 const editVisible: Ref<boolean> = ref(false)
 const deleteVisible: Ref<boolean> = ref(false)
 const infoVisible: Ref<boolean> = ref(false)
 const inviteVisible: Ref<boolean> = ref(false)
 
+const ProjectsToDisplay: Ref<IProject[]> = ref([])
+
+watch([route, props], () => {
+    const tag = Array.isArray(route.params.tag) ? route.params.tag.join('') : route.params.tag;
+
+    const filterFunction = (project: IProject) => {
+        const projectDate = dateHelper(project.createdOn);
+        return (!props.date || projectDate === dateHelper(props.date)) &&
+            (
+                route.name === RouterEnum.PROJECT ||
+                (route.name === RouterEnum.SHARED && project.isShared) ||
+                (route.name === RouterEnum.PROJECT_BY_TAG && project.tag === tag)
+            );
+    };
+
+    ProjectsToDisplay.value = Projects.value.filter(filterFunction);
+});
+onMounted(() => {
+    ProjectsToDisplay.value = Projects.value
+})
 const deleteHandler = async (): Promise<void> => {
     await DeleteProject(id.value)
     deleteVisible.value = false
@@ -32,7 +63,7 @@ const deleteHandler = async (): Promise<void> => {
     <info-project :id="id" v-model="infoVisible"></info-project>
     <invite-project :id="id" v-model="inviteVisible"></invite-project>
 
-    <v-col cols="12" lg="3" md="4" sm="6" v-for="(project, index) in Projects" :key="index">
+    <v-col cols="12" lg="3" md="4" sm="6" v-for="(project, index) in ProjectsToDisplay" :key="index">
         <custom-card :share-icon="project.isShared"
             @click="() => router.push({ name: RouterEnum.KEEP, params: { id: project.id } })">
             <template #title>{{ project.title }}</template>

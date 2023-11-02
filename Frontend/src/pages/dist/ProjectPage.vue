@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 import AddProject from '@/components/Project/AddProject.vue'
+import AllProjects from '@/components/Project/AllProjects.vue'
 import DatePicker from '@/components/Custom/DatePicker.vue'
-import NoItem from '@/components/NoItem.vue'
-import { ProjectStore } from '@/stores'
 
-const { FilterByDate } = ProjectStore()
-const { Projects } = storeToRefs(ProjectStore())
 const date = ref('')
-
-
-watch(date, (val) => {
-    FilterByDate(val)
-
-})
 
 </script>
 <template>
-    <v-container class="overflow-auto h-screen">
-        <v-row>
+    <v-container class="overflow-auto h-screen " fluid>
+        <v-row class="mx-5">
             <v-col>
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
@@ -27,17 +17,9 @@ watch(date, (val) => {
                 <add-project />
             </v-col>
         </v-row>
-        <v-row>
-            <v-col cols="12" v-if="date != ''">
-                Filter By:
-                <v-chip color="black" closable @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
-            </v-col>
-            <no-item v-if="Projects.length == 0">
-                No record has been added yet
-            </no-item>
-            <router-view></router-view>
+        <v-row class="mx-5">
+            <all-projects :date="date"></all-projects>
         </v-row>
-
     </v-container>
 </template>
 
