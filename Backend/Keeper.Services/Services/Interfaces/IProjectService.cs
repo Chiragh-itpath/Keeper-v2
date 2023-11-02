@@ -10,6 +10,5 @@ namespace Keeper.Services.Services.Interfaces
         Task<ResponseModel<ProjectViewModel>> SaveAsync(AddProject addProject,Guid userId);
         Task<ResponseModel<ProjectViewModel>> UpdateAsync(EditProject editProject, Guid userId);
         Task<ResponseModel<string>> DeleteByIdAsync(Guid Id);
-        Task<ResponseModel<List<ProjectViewModel>>> GetShared(Guid userId);
     }
 }

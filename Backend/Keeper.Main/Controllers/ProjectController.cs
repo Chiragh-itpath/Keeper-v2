@@ -34,14 +34,6 @@ namespace Keeper.Main.Controllers
             var userId = Guid.Parse(claims.ElementAt(3).Value);
             return await _projectService.GetAllAsync(userId);
         }
-        [HttpGet("Shared")]
-        public async Task<ResponseModel<List<ProjectViewModel>>> GetShared()
-        {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _projectService.GetShared(userId);
-        }
         [HttpGet("{Id}")]
         public async Task<ResponseModel<ProjectViewModel>> GetById([FromRoute] Guid Id)
         {

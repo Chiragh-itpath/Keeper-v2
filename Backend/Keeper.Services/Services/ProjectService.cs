@@ -31,7 +31,8 @@ namespace Keeper.Services.Services
                     CreatedOn = r.CreatedOn,
                     UpdatedBy = r.UpdatedBy?.Email,
                     UpdatedOn = r.UpdatedOn,
-                    Tag = r.Tag?.Title
+                    Tag = r.Tag?.Title,
+                    IsShared = UserId != r.CreatedById
                 })
                 .ToList();
 
@@ -134,33 +135,6 @@ namespace Keeper.Services.Services
                 IsSuccess = true,
                 Message = "Project Deleted",
                 Data = id.ToString()
-            };
-        }
-        public async Task<ResponseModel<List<ProjectViewModel>>> GetShared(Guid userId)
-        {
-            var result = await _repo.GetSharedAsync(userId);
-
-            var projects = result
-                .Select(r => new ProjectViewModel
-                {
-                    Id = r.Id,
-                    Title = r.Title,
-                    Description = r.Description,
-                    CreatedBy = r.CreatedBy.Email,
-                    CreatedOn = r.CreatedOn,
-                    UpdatedBy = r.UpdatedBy?.Email,
-                    UpdatedOn = r.UpdatedOn,
-                    Tag = r.Tag?.Title,
-                    IsShared = true
-                })
-                .ToList();
-
-            return new ResponseModel<List<ProjectViewModel>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = projects
             };
         }
     }
