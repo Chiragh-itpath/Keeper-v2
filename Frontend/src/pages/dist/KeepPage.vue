@@ -36,9 +36,13 @@ const projectId = computed(() => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="12" v-if="date">
+            <v-col cols="12" v-if="date || route.name == RouterEnum.KEEP_BY_TAG">
                 Filter By:
                 <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
+                <v-chip color="black" closable v-if="route.name == RouterEnum.KEEP_BY_TAG"
+                    @click:close="router.push({ name: RouterEnum.KEEP })">
+                    Tag
+                </v-chip>
             </v-col>
             <no-item v-if="Keeps.length == 0">
                 No record has been added yet
