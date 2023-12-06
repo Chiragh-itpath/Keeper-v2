@@ -1,6 +1,7 @@
 using Keeper.Common.Enums;
 using Keeper.Common.Response;
 using Keeper.Context.Config;
+using Keeper.Main.Middleware;
 using Keeper.Repos.Config;
 using Keeper.Services.Config;
 using System.Text.Json;
@@ -30,23 +31,7 @@ if (app.Environment.IsDevelopment())
         c.DefaultModelExpandDepth(-1);
     });
 }
-app.UseExceptionHandler(e =>
-{
-    e.Run(async context =>
-    {
-        Console.WriteLine(context.Response.ToString());
-        context.Response.StatusCode = 500;
-        context.Response.ContentType = "application/json";
-        ResponseModel<string> errorResponse = new()
-        {
-            StatusName = StatusType.INTERNAL_SERVER_ERROR,
-            IsSuccess = false,
-            Message = "Something went Wrong"
-        };
-        var jsonResponse = JsonSerializer.Serialize(errorResponse);
-        await context.Response.WriteAsync(jsonResponse);
-    });
-});
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("Allow All");

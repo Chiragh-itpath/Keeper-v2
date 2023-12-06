@@ -23,7 +23,8 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _keepService.AddAsync(keep, userId);
+            var res = await _keepService.AddAsync(keep, userId);
+            return new ResponseModel<KeepViewModel> { Data = res };
         }
         [HttpGet("")]
         public async Task<ResponseModel<List<KeepViewModel>>> GetAll(Guid ProjectId)
@@ -31,12 +32,14 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _keepService.GetAllAsync(ProjectId, userId);
+            var res = await _keepService.GetAllAsync(ProjectId, userId);
+            return new ResponseModel<List<KeepViewModel>> { Data = res };
         }
         [HttpGet("{id}")]
         public async Task<ResponseModel<KeepViewModel>> GetById([FromRoute] Guid Id)
         {
-            return await _keepService.GetAsync(Id);
+            var res = await _keepService.GetAsync(Id);
+            return new ResponseModel<KeepViewModel> { Data = res };
         }
         [HttpPut]
         public async Task<ResponseModel<KeepViewModel>> Update(EditKeep keep)
@@ -44,12 +47,14 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _keepService.UpdateAsync(keep, userId);
+            var res = await _keepService.UpdateAsync(keep, userId);
+            return new ResponseModel<KeepViewModel> { Data = res };
         }
         [HttpDelete("{Id}")]
         public async Task<ResponseModel<string>> Delete(Guid Id)
         {
-            return await _keepService.DeleteAsync(Id);
+            await _keepService.DeleteAsync(Id);
+            return new ResponseModel<string>();
         }
     }
 }

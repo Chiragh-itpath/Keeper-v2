@@ -17,22 +17,32 @@ namespace Keeper.Main.Controllers
         [HttpPost("Register")]
         public async Task<ResponseModel<string>> Register(RegisterModel register)
         {
-            return await _accountService.RegisterAsync(register);
+            await _accountService.RegisterAsync(register);
+            return new ResponseModel<string>
+            {
+                Message = "Registered successfully"
+            };
         }
         [HttpPost("Login")]
         public async Task<ResponseModel<TokenModel>> Login(LoginModel loginVM)
         {
-            return await _accountService.LoginAsync(loginVM);
+            var token = await _accountService.LoginAsync(loginVM);
+            return new ResponseModel<TokenModel> { Data = token };
         }
         [HttpGet("otp")]
         public async Task<ResponseModel<string>> GetOTP(string email)
         {
-            return await _accountService.GetOTP(email);
+            var otp = await _accountService.GetOTP(email);
+            return new ResponseModel<string> { Data = otp };
         }
         [HttpPut("ResetPassword")]
         public async Task<ResponseModel<string>> ResetPassword(PasswordResetModel resetModel)
         {
-            return await _accountService.UpdatePasswordAsync(resetModel);
+            await _accountService.UpdatePasswordAsync(resetModel);
+            return new ResponseModel<string>
+            {
+                Message = "Password changed successfully!"
+            };
         }
     }
 }

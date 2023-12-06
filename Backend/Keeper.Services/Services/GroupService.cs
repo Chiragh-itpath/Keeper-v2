@@ -1,10 +1,7 @@
-﻿using Keeper.Common.Enums;
-using Keeper.Common.Response;
-using Keeper.Common.ViewModels;
+﻿using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
 using Keeper.Services.Services.Interfaces;
-using System.Xml.Schema;
 
 namespace Keeper.Services.Services
 {
@@ -19,45 +16,31 @@ namespace Keeper.Services.Services
             _linker = linker;
             _contact = contact;
         }
-        public async Task<ResponseModel<GroupViewModel>> AddAsync(AddGroup addGroup, Guid userId)
+        public async Task<GroupViewModel> AddAsync(AddGroup addGroup, Guid userId)
         {
             var group = await _group.AddAsync(new GroupModel
             {
                 Name = addGroup.Name,
                 UserId = userId
             });
-            await this.AddContacts(new AddContactsToGroup
+            await AddContacts(new AddContactsToGroup
             {
                 GroupId = group.Id,
                 ContactIds = addGroup.ContactId
             });
             var result = await _group.GetByIdAsync(group.Id);
 
-            var groupViewModel = await this.FillContacts(result!);
-            return new ResponseModel<GroupViewModel>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Message = "Group Added",
-                Data = groupViewModel
-            };
+            var groupViewModel = await FillContacts(result!);
+            return groupViewModel;
         }
-        public async Task<ResponseModel<List<GroupViewModel>>> GetAllGroup(Guid userId)
+        public async Task<List<GroupViewModel>> GetAllGroup(Guid userId)
         {
             var groups = await _group.GetAllAsync(userId);
-            List<GroupViewModel> groupList = new();
-            for (int i = 0; i < groups.Count; i++)
-            {
-                var group = groups[i];
-                var viewModel = await this.FillContacts(group);
-                groupList.Add(viewModel);
-            }
-            return new ResponseModel<List<GroupViewModel>>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Data = groupList
-            };
+
+            var fillTasks = groups.Select(FillContacts);
+            var groupViewModels = await Task.WhenAll(fillTasks);
+
+            return groupViewModels.ToList();
         }
 
         private async Task<GroupViewModel> FillContacts(GroupModel group)
@@ -68,36 +51,25 @@ namespace Keeper.Services.Services
                 Name = group.Name,
                 UserEmail = group.User.Email
             };
-            var contacts = new List<ContactViewModel>();
-
-            for (int j = 0; j < group.Linkers?.Count; j++)
-            {
-                var contact = await _contact.GetById(group.Linkers[j].ContactId);
-                contacts.Add(contact);
-            }
-            groupViewModel.Contacts = contacts;
+            var linkerTasks = group.Linkers?.Select(linker => _contact.GetById(linker.ContactId));
+            var contacts = await Task.WhenAll(linkerTasks);
+            groupViewModel.Contacts = contacts.ToList();
             return groupViewModel;
         }
-        public async Task<ResponseModel<GroupViewModel>> AddContacts(AddContactsToGroup addContacts)
+        public async Task<GroupViewModel> AddContacts(AddContactsToGroup addContacts)
         {
-            for (int i = 0; i < addContacts.ContactIds.Count; i++)
-            {
-                await _linker.AddAsync(new ContactGroupLinkerModel
+            var addTasks = addContacts.ContactIds.Select(contactId =>
+                _linker.AddAsync(new ContactGroupLinkerModel
                 {
                     GroupId = addContacts.GroupId,
-                    ContactId = addContacts.ContactIds[i]
-                });
-            }
+                    ContactId = contactId
+                }));
+
+            await Task.WhenAll(addTasks);
             var group = await _group.GetByIdAsync(addContacts.GroupId);
-
-            var viewModel = await this.FillContacts(group!);
-
-            return new ResponseModel<GroupViewModel>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Data = viewModel
-            };
+            var viewModel = await FillContacts(group!);
+            return viewModel;
         }
+
     }
 }

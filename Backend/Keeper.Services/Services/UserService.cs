@@ -1,4 +1,5 @@
 ﻿using Keeper.Common.Enums;
+using Keeper.Common.InnerException;
 using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
 using Keeper.Repos.Interfaces;
@@ -13,70 +14,34 @@ namespace KeeperCore.Services
         {
             _userRepo = userRepo;
         }
-        public async Task<ResponseModel<UserViewModel>> CheckEmail(string email)
+        public async Task<UserViewModel> GetByIdAsync(Guid id)
         {
-            var res = await _userRepo.GetByEmailAsync(email);
-            if (res == null)
+
+            var user = await _userRepo.GetById(id) ?? throw new InnerException("No User found with this id", StatusType.NOT_FOUND);
+            return new UserViewModel
             {
-                return new ResponseModel<UserViewModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = ""
-                };
-            }
-            UserViewModel user = new()
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Contact = user.Contact
+            };
+        }
+        public async Task<UserViewModel> CheckEmail(string email)
+        {
+            var res = await _userRepo.GetByEmailAsync(email) ?? throw new InnerException("", StatusType.NOT_FOUND); 
+            return new UserViewModel
             {
                 Id = res.Id,
                 UserName = res.UserName,
                 Email = res.Email,
                 Contact = res.Contact
             };
-            return new ResponseModel<UserViewModel>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = user
-            };
         }
-        public async Task<ResponseModel<UserViewModel>> GetByIdAsync(Guid id)
+        public async Task<List<string>> EmailSearch(string email, Guid userId)
         {
-            var user = await _userRepo.GetById(id);
-            if (user == null)
-            {
-                return new ResponseModel<UserViewModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = true,
-                    Message = "No User found with this id",
-                };
-            }
-            var UserViewModel = new UserViewModel()
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                Contact = user.Contact,
-            };
-            return new ResponseModel<UserViewModel>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = UserViewModel
-            };
-        }
-        public async Task<ResponseModel<List<string>>> EmailSearch(string email, Guid userId)
-        {
-            var result = await _userRepo.GetEmailList(email,userId);
+            var result = await _userRepo.GetEmailList(email, userId);
             var userList = result.Select(x => x.Email).ToList();
-            return new ResponseModel<List<string>>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Data = userList
-            };
+            return userList;
         }
     }
 }
