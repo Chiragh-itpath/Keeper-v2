@@ -33,6 +33,11 @@ namespace Keeper.Services.Services
             for (int i = 0; i < invite.Emails.Count; i++)
             {
                 var user = await _user.GetByEmailAsync(invite.Emails[i]);
+                var shared = await _projectShare.GetAsync(invite.ProjectId, user!.Id);
+                if(shared != null)
+                {
+                    continue;
+                }
                 var invitemodel = new SharedProjectsModel()
                 {
                     ProjectId = invite.ProjectId,
