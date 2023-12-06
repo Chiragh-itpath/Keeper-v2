@@ -11,9 +11,15 @@ namespace Keeper.Common.Enums
         [Description("Not Found")]
         NOT_FOUND,
         [Description("Not Authorised")]
-        NOT_AUTHORISED,
+        UNAUTHORISED,
         [Description("Not Valid")]
         NOT_VALID,
+        [Description("Email Not Found")]
+        EMAIL_NOT_FOUND,
+        [Description("Email Already Exists")]
+        EMAIL_EXISTS,
+        [Description("Password not mathced")]
+        PASSWORD_NOT_MATCHED,
         [Description("Internal Server Error")]
         INTERNAL_SERVER_ERROR
     }

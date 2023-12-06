@@ -1,5 +1,5 @@
 ﻿using Keeper.Common.Enums;
-using Keeper.Common.Response;
+using Keeper.Common.InnerException;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
@@ -20,7 +20,7 @@ namespace Keeper.Services.Services
             _projectRepo = projectRepo;
             _projectShareRepo = projectShareRepo;
         }
-        public async Task<ResponseModel<List<KeepViewModel>>> GetAllAsync(Guid projectId, Guid userId)
+        public async Task<List<KeepViewModel>> GetAllAsync(Guid projectId, Guid userId)
         {
             List<KeepModel> result;
             var project = await _projectRepo.GetByIdAsync(projectId);
@@ -30,58 +30,15 @@ namespace Keeper.Services.Services
             else
                 result = await _keepRepo.GetAllShared(projectId, userId);
 
-            var keeps = result.Select(item => new KeepViewModel
-            {
-                Id = item.Id,
-                Title = item.Title,
-                ProjectId = item.ProjectId,
-                CreatedBy = item.CreatedBy.Email,
-                CreatedOn = item.CreatedOn,
-                Updatedby = item.UpdatedBy?.Email,
-                UpdatedOn = item.UpdatedOn,
-                Tag = item.Tag?.Title,
-            }).ToList();
-
-            return new ResponseModel<List<KeepViewModel>>()
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = keeps
-            };
+            var keeps = result.Select(item => Mapper(item)).ToList();
+            return keeps;
         }
-        public async Task<ResponseModel<KeepViewModel>> GetAsync(Guid id)
+        public async Task<KeepViewModel> GetAsync(Guid id)
         {
-            var result = await _keepRepo.GetAsync(id);
-            if (result == null)
-            {
-                return new ResponseModel<KeepViewModel>()
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "No Keep Found"
-                };
-            }
-            KeepViewModel keep = new()
-            {
-                Id = result.Id,
-                Title = result.Title,
-                ProjectId = result.ProjectId,
-                CreatedBy = result.CreatedBy.Email,
-                CreatedOn = result.CreatedOn,
-                Updatedby = result.UpdatedBy?.Email,
-                UpdatedOn = result.UpdatedOn,
-                Tag = result.Tag?.Title,
-            };
-            return new ResponseModel<KeepViewModel>()
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = keep
-            };
+            var result = await _keepRepo.GetAsync(id) ?? throw new InnerException("",StatusType.NOT_FOUND);
+            return Mapper(result);            
         }
-        public async Task<ResponseModel<KeepViewModel>> AddAsync(AddKeep addKeep, Guid userId)
+        public async Task<KeepViewModel> AddAsync(AddKeep addKeep, Guid userId)
         {
             KeepModel keep = new()
             {
@@ -99,21 +56,11 @@ namespace Keeper.Services.Services
             }
             var keepId = await _keepRepo.SaveAsync(keep);
             var res = await GetAsync(keepId);
-            res.Message = "Keep Added";
             return res;
         }
-        public async Task<ResponseModel<KeepViewModel>> UpdateAsync(EditKeep editKeep, Guid userId)
+        public async Task<KeepViewModel> UpdateAsync(EditKeep editKeep, Guid userId)
         {
-            var keep = await _keepRepo.GetAsync(editKeep.Id);
-            if (keep == null)
-            {
-                return new ResponseModel<KeepViewModel>()
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "No Keep Found"
-                };
-            }
+            var keep = await _keepRepo.GetAsync(editKeep.Id) ?? throw new InnerException("",StatusType.SUCCESS);
             keep.Title = editKeep.Title;
             keep.UpdatedOn = DateTime.Now;
             keep.UpdatedById = userId;
@@ -123,35 +70,28 @@ namespace Keeper.Services.Services
                 var tag = await _tag.AddAsync(editKeep.Tag, project!.CreatedById, TagType.KEEP);
                 keep.TagId = tag?.Id;
             }
-            else
-            {
-                keep.TagId = null;
-            }
             var keepId = await _keepRepo.UpdateAsync(keep);
             var res = await GetAsync(keepId);
-            res.Message = "Keep Updated";
             return res;
-
         }
-        public async Task<ResponseModel<string>> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            var keep = await _keepRepo.GetAsync(id);
-            if (keep == null)
-            {
-                return new ResponseModel<string>()
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "No Keep Found"
-                };
-            }
+            var keep = await _keepRepo.GetAsync(id) ?? throw new InnerException("",StatusType.NOT_FOUND);
             await _keepRepo.DeleteAsync(keep);
-            return new ResponseModel<string>()
+            return true;
+        }
+        private static KeepViewModel Mapper(KeepModel keep)
+        {
+            return new KeepViewModel
             {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "Keep Deleted",
-                Data = id.ToString()
+                Id = keep.Id,
+                Title = keep.Title,
+                ProjectId = keep.ProjectId,
+                CreatedBy = keep.CreatedBy.Email,
+                CreatedOn = keep.CreatedOn,
+                Updatedby = keep.UpdatedBy?.Email,
+                UpdatedOn = keep.UpdatedOn,
+                Tag = keep.Tag?.Title,
             };
         }
     }

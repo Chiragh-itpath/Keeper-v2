@@ -1,5 +1,5 @@
 ﻿using Keeper.Common.Enums;
-using Keeper.Common.Response;
+using Keeper.Common.InnerException;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
@@ -18,73 +18,30 @@ namespace Keeper.Services.Services
             _file = file;
             _comment = comment;
         }
-        public async Task<ResponseModel<List<ItemViewModel>>> GetAllAsync(Guid keepId)
+        public async Task<List<ItemViewModel>> GetAllAsync(Guid keepId)
         {
             var data = await _repo.GetAllAsync(keepId);
-            var items = data.Select(item => new ItemViewModel
+            List<ItemViewModel> items = new();
+            for (int i = 0; i < data.Count; i++)
             {
-                Id = item.Id,
-                Title = item.Title,
-                Type = item.Type,
-                Number = item.Number,
-                URL = item.URL,
-                Description = item.Description,
-                KeepId = item.KeepId,
-                CreatedBy = item.CreatedBy.Email,
-                CreatedOn = item.CreatedOn,
-                UpdatedOn = item.UpdatedOn,
-                UpdatedBy = item.UpdatedBy?.Email,
-                To = item.To,
-                DiscussedBy = item.DiscussedBy,
-            }).ToList();
-            return new ResponseModel<List<ItemViewModel>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = items
-            };
-        }
-        public async Task<ResponseModel<ItemViewModel>> GetAsync(Guid id)
-        {
-            var data = await _repo.GetAsync(id);
-            if (data == null)
-            {
-                return new ResponseModel<ItemViewModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "Not Found",
-                };
+                var item = Mapper(data[i]);
+                item.Files = await _file.GetAllFiles(data[i].Id);
+                item.Comments = await _comment.GetAllCommnets(data[i].Id);
+                items.Add(item);
             }
+            return items;
+        }
+        public async Task<ItemViewModel> GetAsync(Guid id)
+        {
+            var data = await _repo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             var Files = await _file.GetAllFiles(data.Id);
             var comments = await _comment.GetAllCommnets(data.Id);
-            var item = new ItemViewModel()
-            {
-                Id = data.Id,
-                Title = data.Title,
-                Type = data.Type,
-                Number = data.Number,
-                URL = data.URL,
-                Description = data.Description,
-                CreatedBy = data.CreatedBy.Email,
-                CreatedOn = data.CreatedOn,
-                UpdatedOn = data.UpdatedOn,
-                UpdatedBy = data.UpdatedBy?.Email,
-                To = data.To,
-                DiscussedBy = data.DiscussedBy,
-                Files = Files,
-                Comments = comments
-            };
-            return new ResponseModel<ItemViewModel>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = item
-            };
+            var item = Mapper(data);
+            item.Files = Files;
+            item.Comments = comments;
+            return item;
         }
-        public async Task<ResponseModel<ItemViewModel>> SaveAsync(AddItem addItem, Guid userId)
+        public async Task<ItemViewModel> SaveAsync(AddItem addItem, Guid userId)
         {
             ItemModel item = new()
             {
@@ -105,21 +62,11 @@ namespace Keeper.Services.Services
                 await _file.AddAsync(userId, item.KeepId, itemId, addItem.Files);
             }
             var res = await GetAsync(itemId);
-            res.Message = "Item Added";
             return res;
         }
-        public async Task<ResponseModel<ItemViewModel>> UpdateAsync(EditItem editItem, Guid userId)
+        public async Task<ItemViewModel> UpdateAsync(EditItem editItem, Guid userId)
         {
-            var res = await _repo.GetAsync(editItem.Id);
-            if (res == null)
-            {
-                return new ResponseModel<ItemViewModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "Item Not Found",
-                };
-            }
+            var res = await _repo.GetAsync(editItem.Id) ?? throw new InnerException("",StatusType.NOT_FOUND);
             res.Title = editItem.Title;
             res.Description = editItem.Description;
             res.Type = editItem.Type;
@@ -135,28 +82,30 @@ namespace Keeper.Services.Services
                 await _file.AddAsync(res.CreatedById, res.KeepId, res.Id, editItem.Files);
             }
             var response = await GetAsync(itemId);
-            response.Message = "Item Updated";
             return response;
         }
-        public async Task<ResponseModel<string>> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            var res = await _repo.GetAsync(id);
-            if (res == null)
-            {
-                return new ResponseModel<string>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "Item Not Found",
-                };
-            }
+            var res = await _repo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             await _repo.Delete(res);
-            return new ResponseModel<string>
+            return true;
+        }
+        private static ItemViewModel Mapper(ItemModel item)
+        {
+            return new ItemViewModel
             {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "Item Deleted",
-                Data = id.ToString()
+                Id = item.Id,
+                Title = item.Title,
+                Type = item.Type,
+                Number = item.Number,
+                URL = item.URL,
+                Description = item.Description,
+                CreatedBy = item.CreatedBy.Email,
+                CreatedOn = item.CreatedOn,
+                UpdatedOn = item.UpdatedOn,
+                UpdatedBy = item.UpdatedBy?.Email,
+                To = item.To,
+                DiscussedBy = item.DiscussedBy,
             };
         }
     }
