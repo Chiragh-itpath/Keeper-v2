@@ -19,4 +19,7 @@ import Toster from '@/components/VToster.vue'
 a {
     text-decoration: none;
 }
+.h-screen {
+    height: calc(100vh - 80px) !important;
+}
 </style>

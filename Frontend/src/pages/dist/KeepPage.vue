@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { KeepStore } from '@/stores'
 
 import AddKeep from '@/components/keeps/AddKeep.vue'
 import AllKeeps from '@/components/keeps/AllKeeps.vue'
-import NoItem from '@/components/NoItem.vue'
 import DatePicker from '@/components/Custom/DatePicker.vue'
 import { RouterEnum } from '@/Models/enum'
 
-const { Keeps } = storeToRefs(KeepStore())
 const date = ref()
 const route = useRoute()
 const router = useRouter()
@@ -21,8 +17,8 @@ const projectId = computed(() => {
 })
 </script>
 <template>
-    <v-container class="overflow-auto h-screen">
-        <v-row>
+    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5" fluid>
+        <v-row class="mx-5">
             <v-col cols="12">
                 <v-btn color="primary" prepend-icon="mdi-arrow-left" @click="router.push({ name: RouterEnum.PROJECT })">
                     Back
@@ -35,7 +31,7 @@ const projectId = computed(() => {
                 <add-keep :project-id="projectId"></add-keep>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row class="mx-5">
             <v-col cols="12" v-if="date || route.name == RouterEnum.KEEP_BY_TAG">
                 Filter By:
                 <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
@@ -44,9 +40,6 @@ const projectId = computed(() => {
                     Tag
                 </v-chip>
             </v-col>
-            <no-item v-if="Keeps.length == 0">
-                No record has been added yet
-            </no-item>
             <all-keeps :date="date"></all-keeps>
         </v-row>
     </v-container>

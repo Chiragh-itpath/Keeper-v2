@@ -1,10 +1,5 @@
-<script setup lang="ts">
-
-</script>
 <template>
-    <div class="bg"></div>
-
-    <v-container fill-height fluid>
+    <v-container fill-height fluid class="bg-blue-grey-lighten-5">
         <v-row justify="center" align-content="center" class="h-screen">
             <v-col cols="12" lg="4" sm="12">
                 <v-card elevation="10" class="rounded-xl">
@@ -20,7 +15,7 @@
         </v-row>
     </v-container>
 </template>
-<style>
+<style scoped>
 .h-screen {
     height: calc(100vh - 10px) !important;
 }

@@ -27,8 +27,9 @@ watch(date, () => {
 })
 </script>
 <template>
-    <v-container class="overflow-auto h-screen">
-        <v-row>
+    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5" fluid>
+
+        <v-row class="mx-5">
             <v-col cols="12">
                 <v-btn color="primary" prepend-icon="mdi-arrow-left" @click="router.go(-1)">Back</v-btn>
             </v-col>
@@ -39,17 +40,17 @@ watch(date, () => {
                 <add-item :keep-id="keepId"></add-item>
             </v-col>
         </v-row>
-        <v-col cols="12" v-if="date">
-            Filter By:
-            <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
-        </v-col>
-        <v-row>
+        <v-row class="mx-5">
+            <v-col cols="12" v-if="date">
+                Filter By:
+                <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
+            </v-col >
+        </v-row>
+        <v-row class="mx-5"> 
             <all-items></all-items>
         </v-row>
         <no-item v-if="Items.length == 0">
             No record has been added yet
         </no-item>
-
-
     </v-container>
 </template>

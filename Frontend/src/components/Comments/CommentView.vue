@@ -26,3 +26,10 @@ defineProps<{
         </div>
     </div>
 </template>
+
+<style scoped>
+.border {
+    border: none !important;
+    border-left: 2px solid grey !important;
+}
+</style>
