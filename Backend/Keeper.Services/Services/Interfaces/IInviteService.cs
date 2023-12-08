@@ -5,13 +5,13 @@ namespace Keeper.Services.Services.Interfaces
 {
     public interface IInviteService
     {
-        Task<ResponseModel<string>> InviteToProjectAsync(ProjectInviteModel invite,Guid userId);
-        Task<ResponseModel<List<InvitedProjectModel>>> GetAllInvitedProject(Guid UserId);
-        Task<ResponseModel<string>> ResponseToProjectInvite(InviteResponseModel projectInvite,Guid userId);
-        Task<ResponseModel<string>> InviteToKeepAsync(KeepInviteModel invite,Guid userId);
-        Task<ResponseModel<List<InviteKeepModel>>> GetAllInvitedKeep(Guid UserId);
-        Task<ResponseModel<string>> ResponseToKeepInvite(InviteResponseModel keepInvite,Guid userId);
-        Task<ResponseModel<List<Collaborator>>> GetProjectCollaborators(Guid projectId);
-        Task<ResponseModel<List<Collaborator>>> GetKeepCollaborators(Guid keepId);
+        Task<bool> InviteToProjectAsync(ProjectInviteModel invite,Guid userId);
+        Task<List<InvitedProjectModel>> GetAllInvitedProject(Guid UserId);
+        Task<bool> ResponseToProjectInvite(InviteResponseModel projectInvite,Guid userId);
+        Task<bool> InviteToKeepAsync(KeepInviteModel invite,Guid userId);
+        Task<List<InviteKeepModel>> GetAllInvitedKeep(Guid UserId);
+        Task<bool> ResponseToKeepInvite(InviteResponseModel keepInvite,Guid userId);
+        Task<List<Collaborator>> GetProjectCollaborators(Guid projectId);
+        Task<List<Collaborator>> GetKeepCollaborators(Guid keepId);
     }
 }

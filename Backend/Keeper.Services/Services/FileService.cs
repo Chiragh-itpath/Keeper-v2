@@ -22,51 +22,54 @@ namespace Keeper.Services.Services
         {
             string webRoot = _env.WebRootPath;
             string userDict = Path.Combine(webRoot, "Images", UserId.ToString());
-            if (!Directory.Exists(userDict))
-            {
-                Directory.CreateDirectory(userDict);
-            }
+            EnsureDirectoryExists(userDict);
             string KeepDict = Path.Combine(userDict, KeepId.ToString());
-            if (!Directory.Exists(KeepDict))
+            EnsureDirectoryExists(KeepDict);
+            foreach (var file in files)
             {
-                Directory.CreateDirectory(KeepDict);
-            }
-            for (int i = 0; i < files.Count; i++)
-            {
-                string filename = Guid.NewGuid().ToString() + Path.GetExtension(files[i].FileName);
+                string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                 string fileStorePath = Path.Combine(UserId.ToString(), KeepId.ToString(), filename);
                 string fileToUpload = Path.Combine(KeepDict, filename);
+
                 using (var stream = new FileStream(fileToUpload, FileMode.Create))
                 {
-                    await files[i].CopyToAsync(stream);
+                    await file.CopyToAsync(stream);
                 }
 
-                var file = await _file.AddAsync(new FileModel()
+                var fileModel = await _file.AddAsync(new FileModel
                 {
                     FilePath = fileStorePath,
-                    OriginalName = files[i].FileName,
+                    OriginalName = file.FileName,
                 });
-                await _linker.AddAsync(new ItemFileLinkerModel()
+
+                await _linker.AddAsync(new ItemFileLinkerModel
                 {
-                    FileId = file.Id,
+                    FileId = fileModel.Id,
                     ItemId = ItemId
                 });
             }
         }
         public async Task<List<FileViewModel>> GetAllFiles(Guid itemId)
         {
-            List<string> ImageExtensions = new() { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG", ".JFIF" };
-
-            string ImagePath = Path.Combine("https://localhost:7134/", "Images");
-            var res = await _file.GetFilesAsync(itemId);
-            var files = res.Select(x => new FileViewModel
-            {
-                FileName = x.OriginalName,
-                FileUrl = Path.Combine(ImagePath, x.FilePath),
-                IsImage = ImageExtensions.Contains(Path.GetExtension(Path.Combine(ImagePath,x.FilePath)).ToUpperInvariant())
-            }).ToList();
+            List<string> imageExtensions = new() { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG", ".JFIF" };
+            string imagePath = "https://localhost:7134/Images";
+            var files = (await _file.GetFilesAsync(itemId))
+                .Select(x => new FileViewModel
+                {
+                    FileName = x.OriginalName,
+                    FileUrl = Path.Combine(imagePath, x.FilePath),
+                    IsImage = imageExtensions.Contains(Path.GetExtension(x.FilePath)?.ToUpperInvariant())
+                })
+                .ToList();
             return files;
         }
 
+        private static void EnsureDirectoryExists(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+        }
     }
 }

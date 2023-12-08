@@ -1,5 +1,5 @@
 ﻿using Keeper.Common.Enums;
-using Keeper.Common.Response;
+using Keeper.Common.InnerException;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
@@ -17,66 +17,21 @@ namespace Keeper.Services.Services
             _tag = tagService;
 
         }
-        public async Task<ResponseModel<List<ProjectViewModel>>> GetAllAsync(Guid UserId)
+        public async Task<List<ProjectViewModel>> GetAllAsync(Guid UserId)
         {
             var result = await _repo.GetAllAsync(UserId);
 
             var projects = result
-                .Select(r => new ProjectViewModel
-                {
-                    Id = r.Id,
-                    Title = r.Title,
-                    Description = r.Description,
-                    CreatedBy = r.CreatedBy.Email,
-                    CreatedOn = r.CreatedOn,
-                    UpdatedBy = r.UpdatedBy?.Email,
-                    UpdatedOn = r.UpdatedOn,
-                    Tag = r.Tag?.Title,
-                    IsShared = UserId != r.CreatedById
-                })
+                .Select(project => Mapper(project))
                 .ToList();
-
-            return new ResponseModel<List<ProjectViewModel>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = projects
-            };
+            return projects;
         }
-        public async Task<ResponseModel<ProjectViewModel>> GetByIdAsync(Guid Id)
+        public async Task<ProjectViewModel> GetByIdAsync(Guid Id)
         {
-            var result = await _repo.GetByIdAsync(Id);
-            if (result == null)
-            {
-                return new ResponseModel<ProjectViewModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                };
-            }
-
-            ProjectViewModel project = new()
-            {
-                Id = result.Id,
-                Title = result.Title,
-                Description = result.Description,
-                Tag = result.Tag?.Title,
-                CreatedBy = result.CreatedBy.Email,
-                UpdatedBy = result.UpdatedBy?.Email,
-                CreatedOn = result.CreatedOn,
-                UpdatedOn = result.UpdatedOn,
-
-            };
-            return new ResponseModel<ProjectViewModel>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Data = project
-            };
-
+            var result = await _repo.GetByIdAsync(Id) ?? throw new InnerException("",StatusType.NOT_FOUND);
+            return Mapper(result);
         }
-        public async Task<ResponseModel<ProjectViewModel>> SaveAsync(AddProject addProject, Guid userId)
+        public async Task<ProjectViewModel> SaveAsync(AddProject addProject, Guid userId)
         {
             ProjectModel project = new()
             {
@@ -92,21 +47,11 @@ namespace Keeper.Services.Services
             }
             var projectId = await _repo.SaveAsync(project);
             var res = await GetByIdAsync(projectId);
-            res.Message = "Project Created";
             return res;
         }
-        public async Task<ResponseModel<ProjectViewModel>> UpdateAsync(EditProject editProject, Guid userId)
+        public async Task<ProjectViewModel> UpdateAsync(EditProject editProject, Guid userId)
         {
-            var project = await _repo.GetByIdAsync(editProject.Id);
-            if (project == null)
-            {
-                return new ResponseModel<ProjectViewModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "Project Not Found"
-                };
-            }
+            var project = await _repo.GetByIdAsync(editProject.Id) ?? throw new InnerException("",StatusType.NOT_FOUND);
             project.Title = editProject.Title;
             project.Description = editProject.Description;
             project.UpdatedById = userId;
@@ -122,19 +67,26 @@ namespace Keeper.Services.Services
             }
             var projectId = await _repo.UpdateAsync(project);
             var res = await GetByIdAsync(projectId);
-            res.Message = "Project Updated";
             return res;
         }
-        public async Task<ResponseModel<string>> DeleteByIdAsync(Guid id)
+        public async Task<bool> DeleteByIdAsync(Guid id)
         {
             var project = await _repo.GetByIdAsync(id);
             await _repo.DeleteAsync(project!);
-            return new ResponseModel<string>()
+            return true;
+        }
+        private static ProjectViewModel Mapper(ProjectModel project)
+        {
+            return new ProjectViewModel
             {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "Project Deleted",
-                Data = id.ToString()
+                Id = project.Id,
+                Title = project.Title,
+                Description = project.Description,
+                Tag = project.Tag?.Title,
+                CreatedBy = project.CreatedBy.Email,
+                UpdatedBy = project.UpdatedBy?.Email,
+                CreatedOn = project.CreatedOn,
+                UpdatedOn = project.UpdatedOn,
             };
         }
     }

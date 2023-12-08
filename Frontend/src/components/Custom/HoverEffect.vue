@@ -1,17 +1,34 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
+import { ref, type Ref } from 'vue';
+
+const props = withDefaults(defineProps<{
     icon?: string,
+    iconColor?: 'edit' | 'delete' | 'info' | undefined
 }>(), {
     icon: '',
     noIcon: false
 })
+const color: Ref<string> = ref('')
+switch (props.iconColor) {
+    case 'edit':
+        color.value = 'amber-lighten-1'
+        break
+    case 'delete':
+        color.value = 'red'
+        break
+    case 'info':
+        color.value = 'light-blue'
+        break
+    default:
+        color.value = 'white'
+}
 </script> 
 <template>
-    <v-hover v-slot="{ isHovering, props }" >
+    <v-hover v-slot="{ isHovering, props }">
         <div class="d-flex align-center pe-8 ps-3 py-3 my-1 sweep-to-right"
             :class="isHovering ? 'text-white' : 'text-blue-grey-darken-2'" v-bind="props">
-            <v-icon v-if="icon != ''">mdi-{{ icon }}</v-icon>
-            <span class="ms-6 me-9">
+            <v-icon v-if="icon != ''" :color="isHovering ? color : ''">mdi-{{ icon }}</v-icon>
+            <span class="ms-6 me-9" :class="isHovering ? `text-${color}` : ''">
                 <slot></slot>
             </span>
         </div>

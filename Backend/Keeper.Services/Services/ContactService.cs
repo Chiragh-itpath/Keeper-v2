@@ -1,5 +1,5 @@
 ﻿using Keeper.Common.Enums;
-using Keeper.Common.Response;
+using Keeper.Common.InnerException;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Interfaces;
@@ -17,65 +17,40 @@ namespace Keeper.Services.Services
             _contact = contact;
             _user = user;
         }
-        private async Task<ContactViewModel> ContactViewModelConvertor(ContactModel contact)
+        private static ContactViewModel Mapper(ContactModel contact)
         {
-            var user = await _user.GetByEmailAsync(contact.Email);
             return new ContactViewModel
             {
                 Id = contact.Id,
                 Email = contact.Email,
-                UserId = user!.Id,
-                Contact = user!.Contact,
-                UserName = user!.UserName
+                UserId = contact.UserId,
+                Contact = contact.User.Contact,
+                UserName = contact.User.UserName
             };
         }
-        public async Task<ResponseModel<ContactViewModel>> AddAsync(AddContact contact, Guid userId)
+        public async Task<ContactViewModel> AddAsync(AddContact contact, Guid userId)
         {
             var res = await _contact.FindByEmailAsync(contact.Email, userId);
             if (res != null)
             {
-                return new ResponseModel<ContactViewModel>
-                {
-                    IsSuccess = false,
-                    StatusName = StatusType.ALREADY_EXISTS,
-                    Message = "Contact already exist"
-                };
+                throw new InnerException("Contact Already Exist",StatusType.ALREADY_EXISTS);
             }
             var newContact = await _contact.AddAsync(new ContactModel
             {
                 Email = contact.Email,
                 UserId = userId,
             });
-            var viewModel = await ContactViewModelConvertor(newContact);
-            return new ResponseModel<ContactViewModel>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Message = "Contact Added",
-                Data = viewModel
-            };
+            return Mapper(newContact);
         }
 
-        public async Task<ResponseModel<List<ContactViewModel>>> GetAllContacts(Guid userId)
+        public async Task<List<ContactViewModel>> GetAllContacts(Guid userId)
         {
-            var res = await _contact.GetAllAsync(userId);
-            List<ContactViewModel> contacts = new();
-            for (int i = 0; i < res.Count; i++)
-            {
-                var contact = await ContactViewModelConvertor(res[i]);
-                contacts.Add(contact);
-            }
-            return new ResponseModel<List<ContactViewModel>>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Data = contacts
-            };
+            var contacts = await _contact.GetAllAsync(userId);
+            return contacts.Select(contact => Mapper(contact)).ToList();
         }
         public async Task<ContactViewModel> GetById(Guid id)
         {
-            var contact = await _contact.GetByIdAsync(id);
-            return await ContactViewModelConvertor(contact);
+            return Mapper(await _contact.GetByIdAsync(id));
         }
     }
 }

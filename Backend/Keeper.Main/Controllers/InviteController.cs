@@ -24,7 +24,11 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _invite.InviteToProjectAsync(invite,userId);
+            await _invite.InviteToProjectAsync(invite, userId);
+            return new ResponseModel<string>
+            {
+                Message = "Invited"
+            };
         }
         [HttpGet("AllInvitedProjects")]
         public async Task<ResponseModel<List<InvitedProjectModel>>> InvitedProjects()
@@ -32,7 +36,11 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _invite.GetAllInvitedProject(userId);
+            var res = await _invite.GetAllInvitedProject(userId);
+            return new ResponseModel<List<InvitedProjectModel>>
+            {
+                Data = res
+            };
         }
         [HttpPost("ProjectInviteResponse")]
         public async Task<ResponseModel<string>> ProjectInviteResponse(InviteResponseModel response)
@@ -40,7 +48,11 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _invite.ResponseToProjectInvite(response,userId);
+            var res = await _invite.ResponseToProjectInvite(response, userId);
+            return new ResponseModel<string>
+            {
+                Message = $"Inviation {(res ? "Accepted" : "Declied")}"
+            };
         }
         [HttpPost("InviteToKeep")]
         public async Task<ResponseModel<string>> InviteToKeep(KeepInviteModel invite)
@@ -48,7 +60,11 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _invite.InviteToKeepAsync(invite,userId);
+            await _invite.InviteToKeepAsync(invite, userId);
+            return new ResponseModel<string>
+            {
+                Message = "Invited"
+            };
         }
         [HttpGet("InvitedKeeps")]
         public async Task<ResponseModel<List<InviteKeepModel>>> InvitedKeeps()
@@ -56,7 +72,11 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _invite.GetAllInvitedKeep(userId);
+            var res = await _invite.GetAllInvitedKeep(userId);
+            return new ResponseModel<List<InviteKeepModel>>
+            {
+                Data = res
+            };
         }
         [HttpPost("keepInviteResponse")]
         public async Task<ResponseModel<string>> KeepInviteResponse(InviteResponseModel response)
@@ -64,17 +84,29 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _invite.ResponseToKeepInvite(response, userId);
+            var res = await _invite.ResponseToKeepInvite(response, userId);
+            return new ResponseModel<string>
+            {
+                Message = $"Inviation {(res ? "Accepted" : "Declied")}"
+            };
         }
         [HttpGet("ProjectCollaborators")]
         public async Task<ResponseModel<List<Collaborator>>> ProjectCollaborators(Guid ProjectId)
         {
-            return await _invite.GetProjectCollaborators(ProjectId);
+            var res = await _invite.GetProjectCollaborators(ProjectId);
+            return new ResponseModel<List<Collaborator>>
+            {
+                Data = res
+            };
         }
         [HttpGet("KeepCollaborators")]
         public async Task<ResponseModel<List<Collaborator>>> KeepCollaborators(Guid keepId)
         {
-            return await _invite.GetKeepCollaborators(keepId);
+            var res = await _invite.GetKeepCollaborators(keepId);
+            return new ResponseModel<List<Collaborator>>
+            {
+                Data = res
+            };
         }
     }
 }

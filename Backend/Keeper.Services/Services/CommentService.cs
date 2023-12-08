@@ -1,6 +1,4 @@
-﻿using Keeper.Common.Enums;
-using Keeper.Common.Response;
-using Keeper.Common.ViewModels;
+﻿using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
 using Keeper.Services.Services.Interfaces;
@@ -14,7 +12,7 @@ namespace Keeper.Services.Services
         {
             _comment = comment;
         }
-        public async Task<ResponseModel<CommentViewModel>> AddCommentAsync(AddComment addComment, Guid UserId)
+        public async Task<CommentViewModel> AddCommentAsync(AddComment addComment, Guid UserId)
         {
             var comment = await _comment.AddAsync(new CommentModel
             {
@@ -24,20 +22,14 @@ namespace Keeper.Services.Services
                 CommentId = addComment.CommentId,
                 ItemId = addComment.ItemId
             });
-            var viewModel = new CommentViewModel
+            var comments = new CommentViewModel
             {
                 Id = comment.Id,
                 Content = comment.Content,
                 Date = comment.TimeStamp,
                 User = ""
             };
-            return new ResponseModel<CommentViewModel>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Message = "",
-                Data = viewModel
-            };
+            return comments;
         }
         public async Task<List<CommentViewModel>> GetAllCommnets(Guid ItemId)
         {
@@ -57,7 +49,7 @@ namespace Keeper.Services.Services
             });
             return comments;
         }
-        private void LoadReplies(CommentModel comment, CommentViewModel viewModel)
+        private static void LoadReplies(CommentModel comment, CommentViewModel viewModel)
         {
             viewModel.Comments = comment.Comments!.Select(rep => new CommentViewModel
             {
@@ -66,7 +58,7 @@ namespace Keeper.Services.Services
                 Date = rep.TimeStamp,
                 User = rep.User.UserName,
             }).ToList();
-            for(int i = 0; i< comment.Comments!.Count; i++)
+            for (int i = 0; i < comment.Comments!.Count; i++)
             {
                 LoadReplies(comment.Comments[i], viewModel.Comments[i]);
             }

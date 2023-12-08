@@ -9,7 +9,7 @@ namespace Keeper.Context.Config
         public static IServiceCollection RegisterDbContext(this IServiceCollection services, IConfiguration configuration)
         {
             string ConnectionString = configuration.GetConnectionString("DbConnection");
-            services.AddDbContext<DbKeeperContext>(option => option.UseSqlServer(ConnectionString));
+            services.AddDbContext<DbKeeperContext>(option => option.UseSqlServer(ConnectionString),ServiceLifetime.Scoped);
             return services;
         }
     }

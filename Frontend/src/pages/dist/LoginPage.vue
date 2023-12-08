@@ -21,7 +21,7 @@ const login = async (): Promise<void> => {
 }
 </script>
 <template>
-    <v-container fill-height fluid>
+    <v-container fluid class="bg-blue-grey-lighten-5">
         <v-row justify="center" align-content="center" class="h-screen">
             <v-col cols="12" lg="4" md="6" sm="8">
                 <v-card elevation="10" class="rounded-xl">

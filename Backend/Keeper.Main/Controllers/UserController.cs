@@ -24,21 +24,24 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _user.GetByIdAsync(userId);
+            var res = await _user.GetByIdAsync(userId);
+            return new ResponseModel<UserViewModel> { Data = res };
         }
         [HttpGet("EmailSearch")]
-        public async Task<ResponseModel<List<string>>> EmailSearch([FromQuery]string email)
+        public async Task<ResponseModel<List<string>>> EmailSearch([FromQuery] string email)
         {
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _user.EmailSearch(email,userId);
-        } 
+            var res = await _user.EmailSearch(email, userId);
+            return new ResponseModel<List<string>> { Data = res };
+        }
         [AllowAnonymous]
         [HttpGet("CheckMail")]
         public async Task<ResponseModel<UserViewModel>> CheckEmail(string email)
         {
-            return await _user.CheckEmail(email);
+            var res = await _user.CheckEmail(email);
+            return new ResponseModel<UserViewModel> { Data = res };
         }
     }
 }

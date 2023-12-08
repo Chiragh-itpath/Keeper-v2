@@ -58,7 +58,7 @@ onMounted(() => {
 })
 </script>
 <template>
-    <v-col cols="12" lg="3" md="6" sm="6" v-for="(keep, index) in KeepsToDisplay" :key="index">
+    <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(keep, index) in KeepsToDisplay" :key="index">
         <custom-card @click="() => router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })"
             is-keep>
             <template #title>{{ keep.title }}</template>
@@ -67,25 +67,25 @@ onMounted(() => {
                     <v-list>
                         <v-list-item role="button" class="ma-0 pa-0"
                             @click="() => { infoVisible = true; id = keep.id; projectId = keep.projectId }">
-                            <hover-effect icon="information-outline">
+                            <hover-effect icon="information-outline" icon-color="info">
                                 Info
                             </hover-effect>
                         </v-list-item>
                         <v-list-item role="button" class="ma-0 pa-0"
                             @click="() => { inviteVisible = true; id = keep.id; projectId = keep.projectId }">
-                            <hover-effect icon="account-plus-outline">
+                            <hover-effect icon="account-plus-outline" icon-color="info">
                                 Invite
                             </hover-effect>
                         </v-list-item>
                         <v-list-item role="button" class="ma-0 pa-0 mt-2"
                             @click="() => { editVisible = true; id = keep.id }">
-                            <hover-effect icon="folder-edit-outline">
+                            <hover-effect icon="folder-edit-outline" icon-color="edit">
                                 Edit
                             </hover-effect>
                         </v-list-item>
                         <v-list-item role="button" class="ma-0 pa-0 mt-2"
                             @click="() => { deleteVisible = true; id = keep.id }">
-                            <hover-effect icon="delete-outline">
+                            <hover-effect icon="delete-outline" icon-color="delete">
                                 Delete
                             </hover-effect>
                         </v-list-item>

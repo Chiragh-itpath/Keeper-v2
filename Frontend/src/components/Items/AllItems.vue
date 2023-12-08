@@ -20,13 +20,12 @@ const deleteHandler = async (): Promise<void> => {
     await DeleteItem(id.value)
     deleteVisible.value = false
 }
-
 </script>
 <template>
     <edit-item :id="id" v-model="editVisible"></edit-item>
     <info-item :id="id" v-model="infoVisible"></info-item>
     <delete v-model="deleteVisible" @click:yes="deleteHandler">Item</delete>
-    <v-col cols="12" sm="6" v-for="(item, index) of Items" :key="index">
+    <v-col cols="12" lg="4" md="6" v-for="(item, index) of Items" :key="index">
         <v-card @click="() => { infoVisible = true; id = item.id }">
             <v-card-title class="bg-primary d-flex">
                 <a :href="item.url" class="text-white" target="_blank">
@@ -41,13 +40,13 @@ const deleteHandler = async (): Promise<void> => {
                         <v-list>
                             <v-list-item role="button" class="ma-0 pa-0 mt-2"
                                 @click="() => { id = item.id; editVisible = true }">
-                                <hover-effect icon="file-document-edit-outline">
+                                <hover-effect icon="file-document-edit-outline" icon-color="edit">
                                     Edit
                                 </hover-effect>
                             </v-list-item>
                             <v-list-item role="button" class="ma-0 pa-0 mt-2"
                                 @click="() => { id = item.id; deleteVisible = true }">
-                                <hover-effect icon="delete-outline">
+                                <hover-effect icon="delete-outline" icon-color="delete">
                                     Delete
                                 </hover-effect>
                             </v-list-item>

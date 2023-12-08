@@ -17,9 +17,9 @@ namespace Keeper.Repos.Repositories
         {
             return await _db.Users.ToListAsync();
         }
-        public async Task<UserModel?> GetByEmailAsync(string email)
+        public async Task<UserModel> GetByEmailAsync(string email)
         {
-            return await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
+            return await _db.Users.AsNoTracking().FirstAsync(x => x.Email == email);
         }
 
         public bool UpdateUser(UserModel user)

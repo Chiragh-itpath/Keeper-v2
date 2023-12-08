@@ -23,7 +23,9 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _group.AddAsync(group,userId);
+
+            var res = await _group.AddAsync(group, userId);
+            return new ResponseModel<GroupViewModel> { Data = res };
         }
         [HttpGet("")]
         public async Task<ResponseModel<List<GroupViewModel>>> AllGroups()
@@ -31,12 +33,14 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _group.GetAllGroup(userId);
+            var res = await _group.GetAllGroup(userId);
+            return new ResponseModel<List<GroupViewModel>> { Data = res };
         }
         [HttpPost("AddContacts")]
         public async Task<ResponseModel<GroupViewModel>> AddContacts(AddContactsToGroup addContacts)
         {
-            return await _group.AddContacts(addContacts);
+            var res = await _group.AddContacts(addContacts);
+            return new ResponseModel<GroupViewModel> { Data = res };
         }
     }
 }

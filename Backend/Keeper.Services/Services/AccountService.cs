@@ -1,6 +1,6 @@
 ﻿using Keeper.Common.Enums;
+using Keeper.Common.InnerException;
 using Keeper.Common.OtherModels;
-using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Interfaces;
@@ -27,7 +27,7 @@ namespace Keeper.Services.Services
             _userRepo = userRepo;
             _mail = mail;
         }
-        public async Task<ResponseModel<string>> RegisterAsync(RegisterModel register)
+        public async Task<bool> RegisterAsync(RegisterModel register)
         {
             UserModel userModel = new()
             {
@@ -41,56 +41,23 @@ namespace Keeper.Services.Services
             var user = await _userRepo.GetByEmailAsync(register.Email);
             if (user != null)
             {
-                return new ResponseModel<string>
-                {
-                    IsSuccess = false,
-                    StatusName = StatusType.ALREADY_EXISTS,
-                    Message = "Email already exists"
-                };
+                throw new InnerException("Email already exists", StatusType.EMAIL_EXISTS);
             }
             userModel.Password = BCrypt.Net.BCrypt.HashPassword(register.Password);
             await _accountRepo.RegisterAsync(userModel);
-            return new ResponseModel<string>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Message = "Registered successfully"
-            };
+            return true;
         }
-        public async Task<ResponseModel<TokenModel>> LoginAsync(LoginModel login)
+        public async Task<TokenModel> LoginAsync(LoginModel login)
         {
-            var user = await _userRepo.GetByEmailAsync(login.Email);
-            if (user == null)
-            {
-                return new ResponseModel<TokenModel>
-                {
-                    StatusName = StatusType.NOT_FOUND,
-                    IsSuccess = false,
-                    Message = "Email is not registered"
-                };
-            }
+            var user = await _userRepo.GetByEmailAsync(login.Email) ?? throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
             if (!BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
-            {
-                return new ResponseModel<TokenModel>
-                {
-                    StatusName = StatusType.NOT_VALID,
-                    IsSuccess = false,
-                    Message = "Password does not match"
-                };
-            }
-            var Token = new TokenModel
+                throw new InnerException("Password does not match", StatusType.PASSWORD_NOT_MATCHED);
+            return new TokenModel()
             {
                 Token = GenerateToken(user)
             };
-            return new ResponseModel<TokenModel>
-            {
-                IsSuccess = true,
-                StatusName = StatusType.SUCCESS,
-                Message = "",
-                Data = Token
-            };
         }
-        public async Task<ResponseModel<string>> GetOTP(string email)
+        public async Task<string> GetOTP(string email)
         {
             string otp = OtpGenerator;
             await _mail.SendEmailAsync(new MailModel
@@ -101,36 +68,14 @@ namespace Keeper.Services.Services
                 Subject = "Email Verification",
                 Message = otp
             });
-            return new ResponseModel<string>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = otp
-            };
+            return otp;
         }
-        public async Task<ResponseModel<string>> UpdatePasswordAsync(PasswordResetModel resetModel)
+        public async Task<bool> UpdatePasswordAsync(PasswordResetModel resetModel)
         {
-            var user = await _userRepo.GetByEmailAsync(resetModel.Email);
-            if (user != null)
-            {
-                user.Password = BCrypt.Net.BCrypt.HashPassword(resetModel.Password);
-                if (await _accountRepo.UpdatePasswordAsync(user))
-                {
-                    return new ResponseModel<string>()
-                    {
-                        StatusName = StatusType.SUCCESS,
-                        IsSuccess = true,
-                        Message = "Password changed successfully!"
-                    };
-                }
-            }
-            return new ResponseModel<string>()
-            {
-                StatusName = StatusType.NOT_VALID,
-                IsSuccess = false,
-                Message = "Password is not changed!"
-            };
+            var user = await _userRepo.GetByEmailAsync(resetModel.Email) ?? throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
+            user.Password = BCrypt.Net.BCrypt.HashPassword(resetModel.Password);
+            await _accountRepo.UpdatePasswordAsync(user);
+            return true;
         }
         private string GenerateToken(UserModel user)
         {
@@ -156,8 +101,8 @@ namespace Keeper.Services.Services
         {
             get
             {
-                const string firstCharacter = "123456789";  
-                const string restCharacters = "0123456789";  
+                const string firstCharacter = "123456789";
+                const string restCharacters = "0123456789";
                 const int otpLength = 6;
                 Random random = new();
                 string otp = new string(Enumerable.Repeat(restCharacters, otpLength - 1)

@@ -1,8 +1,8 @@
 ﻿using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
 using Keeper.Services.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Keeper.Main.Controllers
 {
@@ -21,13 +21,15 @@ namespace Keeper.Main.Controllers
         [HttpGet("{id}")]
         public async Task<ResponseModel<ItemViewModel>> GetById([FromRoute] Guid id)
         {
-            return await _itemService.GetAsync(id);
+            var res = await _itemService.GetAsync(id);
+            return new ResponseModel<ItemViewModel> { Data = res };
         }
 
         [HttpGet("")]
         public async Task<ResponseModel<List<ItemViewModel>>> GetAll(Guid keepId)
         {
-            return await _itemService.GetAllAsync(keepId);
+            var res = await _itemService.GetAllAsync(keepId);
+            return new ResponseModel<List<ItemViewModel>> { Data = res };
         }
 
         [HttpPost("")]
@@ -36,7 +38,8 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _itemService.SaveAsync(addItem, userId);
+            var res = await _itemService.SaveAsync(addItem, userId);
+            return new ResponseModel<ItemViewModel> { Data = res };
         }
         [HttpPut("")]
         public async Task<ResponseModel<ItemViewModel>> Put([FromForm] EditItem editItem)
@@ -44,12 +47,14 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _itemService.UpdateAsync(editItem, userId);
+            var res = await _itemService.UpdateAsync(editItem, userId);
+            return new ResponseModel<ItemViewModel> { Data = res };
         }
         [HttpDelete("{Id}")]
         public async Task<ResponseModel<string>> Delete(Guid id)
         {
-            return await _itemService.DeleteAsync(id);
+            await _itemService.DeleteAsync(id);
+            return new ResponseModel<string>();
         }
         [HttpPost("AddComment")]
         public async Task<ResponseModel<CommentViewModel>> AddComment(AddComment addComment)
@@ -57,7 +62,8 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            return await _comment.AddCommentAsync(addComment, userId);
+            var res = await _comment.AddCommentAsync(addComment, userId);
+            return new ResponseModel<CommentViewModel> { Data = res };
         }
     }
 }

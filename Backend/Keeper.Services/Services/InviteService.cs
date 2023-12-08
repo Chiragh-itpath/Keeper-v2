@@ -1,6 +1,5 @@
 ﻿using Keeper.Common.Enums;
 using Keeper.Common.OtherModels;
-using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Interfaces;
@@ -26,7 +25,7 @@ namespace Keeper.Services.Services
             _keep = keep;
             _mail = mail;
         }
-        public async Task<ResponseModel<string>> InviteToProjectAsync(ProjectInviteModel invite, Guid userId)
+        public async Task<bool> InviteToProjectAsync(ProjectInviteModel invite, Guid userId)
         {
             var sender = await _user.GetById(userId);
             var project = await _project.GetByIdAsync(invite.ProjectId);
@@ -34,16 +33,16 @@ namespace Keeper.Services.Services
             {
                 var user = await _user.GetByEmailAsync(invite.Emails[i]);
                 var shared = await _projectShare.GetAsync(invite.ProjectId, user!.Id);
-                if(shared != null)
+                if (shared != null)
                 {
                     continue;
                 }
-                var invitemodel = new SharedProjectsModel()
+                var inviteModel = new SharedProjectsModel()
                 {
                     ProjectId = invite.ProjectId,
-                    UserId = user!.Id
+                    UserId = user.Id
                 };
-                await _projectShare.AddAsync(invitemodel);
+                await _projectShare.AddAsync(inviteModel);
                 await _mail.SendEmailAsync(new MailModel
                 {
                     Category = MailCategory.SendInvitation,
@@ -53,37 +52,36 @@ namespace Keeper.Services.Services
                     Message = project?.Title ?? string.Empty
                 });
             }
-            return new ResponseModel<string>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "Users Invited"
-            };
+            return true;
         }
-        public async Task<ResponseModel<List<InvitedProjectModel>>> GetAllInvitedProject(Guid UserId)
+        public async Task<List<InvitedProjectModel>> GetAllInvitedProject(Guid userId)
         {
-            var invited = await _projectShare.GetAllInvited(UserId);
-            invited = invited.Where(x => !x.IsAccepted).ToList();
-            List<InvitedProjectModel> invitedProjects = new();
-            for (int i = 0; i < invited.Count; i++)
+            var invited = (await _projectShare.GetAllInvited(userId))
+                .Where(x => !x.IsAccepted)
+                .ToList();
+
+            var tasks = invited.Select(async invitation =>
             {
-                var project = await _project.GetByIdAsync(invited[i].ProjectId);
-                var user = await _user.GetById(project!.CreatedById);
-                invitedProjects.Add(new InvitedProjectModel
+                var project = await _project.GetByIdAsync(invitation.ProjectId);
+                var user = await _user.GetById(project?.CreatedById ?? Guid.Empty);
+
+                if (project != null && user != null)
                 {
-                    ProjectId = invited[i].Id,
-                    Name = project!.Title,
-                    Email = user!.Email
-                });
-            }
-            return new ResponseModel<List<InvitedProjectModel>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Data = invitedProjects
-            };
+                    return new InvitedProjectModel
+                    {
+                        ProjectId = invitation.Id,
+                        Name = project.Title,
+                        Email = user.Email
+                    };
+                }
+                return null;
+            }).ToList();
+            var results = await Task.WhenAll(tasks);
+            var invitedProjects = results.Where(result => result != null).ToList();
+            return invitedProjects!;
         }
-        public async Task<ResponseModel<string>> ResponseToProjectInvite(InviteResponseModel projectInvite, Guid userId)
+
+        public async Task<bool> ResponseToProjectInvite(InviteResponseModel projectInvite, Guid userId)
         {
             var shared = await _projectShare.GetAsync(projectInvite.InviteId);
             var project = await _project.GetByIdAsync(shared.ProjectId);
@@ -103,16 +101,11 @@ namespace Keeper.Services.Services
                 Category = projectInvite.Response ? MailCategory.AcceptInvitation : MailCategory.RejectInvitation,
                 From = sender?.Email ?? "",
                 To = user?.Email ?? "",
-                Subject = string.Concat("Invitation " + (projectInvite.Response ? "Accepted" : "Rejected"))
+                Subject = $"Invitation {(projectInvite.Response ? "Accepted" : "Rejected")}"
             });
-            return new ResponseModel<string>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = string.Concat("Invitation " + (projectInvite.Response ? "Accepted" : "Rejected"))
-            };
+            return projectInvite.Response;
         }
-        public async Task<ResponseModel<string>> InviteToKeepAsync(KeepInviteModel invite, Guid userId)
+        public async Task<bool> InviteToKeepAsync(KeepInviteModel invite, Guid userId)
         {
             var sender = await _user.GetById(userId);
             var keep = await _keep.GetAsync(invite.KeepId);
@@ -135,14 +128,9 @@ namespace Keeper.Services.Services
                     Message = keep?.Title ?? ""
                 });
             }
-            return new ResponseModel<string>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "Users Invited"
-            };
+            return true;
         }
-        public async Task<ResponseModel<List<InviteKeepModel>>> GetAllInvitedKeep(Guid UserId)
+        public async Task<List<InviteKeepModel>> GetAllInvitedKeep(Guid UserId)
         {
             var invited = await _shareKeep.GetAllInvited(UserId);
             invited = invited.Where(x => !x.IsAccepted).ToList();
@@ -158,14 +146,9 @@ namespace Keeper.Services.Services
                     Email = user!.Email
                 });
             }
-            return new ResponseModel<List<InviteKeepModel>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Data = inviteKeeps
-            };
+            return inviteKeeps;
         }
-        public async Task<ResponseModel<string>> ResponseToKeepInvite(InviteResponseModel keepInvite, Guid userId)
+        public async Task<bool> ResponseToKeepInvite(InviteResponseModel keepInvite, Guid userId)
         {
             var shared = await _shareKeep.GetAsync(keepInvite.InviteId);
             var project = await _project.GetByIdAsync(shared.ProjectId);
@@ -185,16 +168,11 @@ namespace Keeper.Services.Services
                 Category = keepInvite.Response ? MailCategory.AcceptInvitation : MailCategory.RejectInvitation,
                 From = sender?.Email ?? "",
                 To = user?.Email ?? "",
-                Subject = string.Concat("Invitation " + (keepInvite.Response ? "Accepted" : "Rejected"))
+                Subject = $"Invitation {(keepInvite.Response ? "Accepted" : "Rejected")}"
             });
-            return new ResponseModel<string>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = string.Concat("Invitation " + (keepInvite.Response ? "Accepted" : "Rejected"))
-            };
+            return keepInvite.Response;
         }
-        public async Task<ResponseModel<List<Collaborator>>> GetProjectCollaborators(Guid projectId)
+        public async Task<List<Collaborator>> GetProjectCollaborators(Guid projectId)
         {
             var SharedProject = await _projectShare.GetAllAsync(projectId);
             var collaborator = SharedProject.Select(x => new Collaborator
@@ -204,15 +182,9 @@ namespace Keeper.Services.Services
                 HasAccepted = x.IsAccepted
             }).ToList();
 
-            return new ResponseModel<List<Collaborator>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = collaborator
-            };
+            return collaborator;
         }
-        public async Task<ResponseModel<List<Collaborator>>> GetKeepCollaborators(Guid keepId)
+        public async Task<List<Collaborator>> GetKeepCollaborators(Guid keepId)
         {
             var sharedkeep = await _shareKeep.GetAllAsync(keepId);
             var collaborator = sharedkeep.Select(x => new Collaborator
@@ -221,14 +193,7 @@ namespace Keeper.Services.Services
                 Email = x.User.Email,
                 HasAccepted = x.IsAccepted
             }).ToList();
-            await Task.CompletedTask;
-            return new ResponseModel<List<Collaborator>>
-            {
-                StatusName = StatusType.SUCCESS,
-                IsSuccess = true,
-                Message = "",
-                Data = collaborator
-            };
+            return collaborator;
         }
     }
 }

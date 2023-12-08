@@ -31,7 +31,7 @@ async function register(): Promise<void> {
 
 </script>
 <template>
-    <v-container fill-height fluid class="overflow-hidden">
+    <v-container fill-height fluid class="bg-blue-grey-lighten-5">
         <v-row justify="center" align-content="center" class="h-screen">
             <v-col cols="12" sm="9" md="6" lg="4">
                 <v-card class="pa-4 elevation-12 rounded-xl">
