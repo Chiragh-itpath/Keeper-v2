@@ -33,7 +33,6 @@ namespace Keeper.Repos.Repositories
                               UserId = userId,
                               User = user
                           }).ToListAsync();
-            //return await _db.Contact.AsNoTracking().Where(x => x.UserId == userId).ToListAsync();
         }
         public async Task<ContactModel> GetByIdAsync(Guid id)
         {

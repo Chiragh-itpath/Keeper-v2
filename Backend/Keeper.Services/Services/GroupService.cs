@@ -36,24 +36,26 @@ namespace Keeper.Services.Services
         public async Task<List<GroupViewModel>> GetAllGroup(Guid userId)
         {
             var groups = await _group.GetAllAsync(userId);
-
-            var fillTasks = groups.Select(async group => await FillContacts(group)).ToList();
-            var groupViewModels = await Task.WhenAll(fillTasks);
-
-            return groupViewModels.ToList();
+            List<GroupViewModel> viewModels = new();
+            foreach (var group in groups)
+            {
+                viewModels.Add(await FillContacts(group));
+            }
+            return viewModels;
         }
-
         private async Task<GroupViewModel> FillContacts(GroupModel group)
         {
             var groupViewModel = new GroupViewModel
             {
                 Id = group.Id,
                 Name = group.Name,
-                UserEmail = group.User.Email
+                UserEmail = group.User.Email,
+                Contacts = new()
             };
-            var linkerTasks = group.Linkers?.Select(async linker => await _contact.GetById(linker.ContactId)).ToList();
-            var contacts = await Task.WhenAll(linkerTasks);
-            groupViewModel.Contacts = contacts.ToList();
+            foreach(var linker in group.Linkers)
+            {
+                groupViewModel.Contacts.Add(await _contact.GetById(linker.ContactId));
+            }
             return groupViewModel;
         }
         public async Task<GroupViewModel> AddContacts(AddContactsToGroup addContacts)
