@@ -6,7 +6,7 @@ import { Colors } from '@/Models/enum'
 import type { IResponse } from '@/Models/ResponseModel'
 
 const http = axios.create({
-    baseURL: 'https://localhost:7134/api/'
+    baseURL: 'http://192.168.0.24:80/api/'
 })
 
 const loadingEffect = (arg: boolean): void => {
