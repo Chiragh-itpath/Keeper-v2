@@ -19,14 +19,14 @@ namespace Keeper.Services.Services
         }
         private async Task<ContactViewModel> Mapper(ContactModel contact)
         {
-            var user = await _user.GetByEmailAsync(contact.Email);
+            //var user = await _user.GetByEmailAsync(contact.Email);
             return new ContactViewModel
             {
                 Id = contact.Id,
                 Email = contact.Email,
-                UserId = user!.Id,
-                Contact = user!.Contact,
-                UserName = user!.UserName
+                UserId = contact.UserId,
+                Contact = contact.User.Contact,
+                UserName = contact.User.UserName
             };
         }
         public async Task<ContactViewModel> AddAsync(AddContact contact, Guid userId)
@@ -47,7 +47,7 @@ namespace Keeper.Services.Services
         public async Task<List<ContactViewModel>> GetAllContacts(Guid userId)
         {
             var contacts = await _contact.GetAllAsync(userId);
-            var task = contacts.Select(Mapper).ToList();
+            var task = contacts.Select(async contact => await Mapper(contact)).ToList();
             var contactArray = await Task.WhenAll(task);
             return contactArray.ToList();
         }

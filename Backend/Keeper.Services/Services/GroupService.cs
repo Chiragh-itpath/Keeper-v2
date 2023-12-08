@@ -37,7 +37,7 @@ namespace Keeper.Services.Services
         {
             var groups = await _group.GetAllAsync(userId);
 
-            var fillTasks = groups.Select(FillContacts);
+            var fillTasks = groups.Select(async group => await FillContacts(group)).ToList();
             var groupViewModels = await Task.WhenAll(fillTasks);
 
             return groupViewModels.ToList();
@@ -51,7 +51,7 @@ namespace Keeper.Services.Services
                 Name = group.Name,
                 UserEmail = group.User.Email
             };
-            var linkerTasks = group.Linkers?.Select(linker => _contact.GetById(linker.ContactId));
+            var linkerTasks = group.Linkers?.Select(async linker => await _contact.GetById(linker.ContactId)).ToList();
             var contacts = await Task.WhenAll(linkerTasks);
             groupViewModel.Contacts = contacts.ToList();
             return groupViewModel;

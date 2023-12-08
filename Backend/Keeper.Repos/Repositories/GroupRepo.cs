@@ -28,6 +28,7 @@ namespace Keeper.Repos.Repositories
         public async Task<List<GroupModel>> GetAllAsync(Guid userId)
         {
             return await _db.Group
+                .AsNoTracking()
                 .Include(x => x.User)
                 .Include(x => x.Linkers)
                 .Where(x => x.UserId == userId).ToListAsync();

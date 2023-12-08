@@ -24,11 +24,28 @@ namespace Keeper.Repos.Repositories
         }
         public async Task<List<ContactModel>> GetAllAsync(Guid userId)
         {
-            return await _db.Contact.Where(x => x.UserId == userId).ToListAsync();
+            return await (from contact in _db.Contact.AsNoTracking()
+                          join user in _db.Users.AsNoTracking() on contact.Email equals user.Email
+                          select new ContactModel
+                          {
+                              Id = contact.Id,
+                              Email = contact.Email,
+                              UserId = userId,
+                              User = user
+                          }).ToListAsync();
+            //return await _db.Contact.AsNoTracking().Where(x => x.UserId == userId).ToListAsync();
         }
         public async Task<ContactModel> GetByIdAsync(Guid id)
         {
-            return await _db.Contact.FirstAsync(x => x.Id == id);
+            return await (from contact in _db.Contact.AsNoTracking()
+                          join user in _db.Users.AsNoTracking() on contact.Email equals user.Email
+                          select new ContactModel
+                          {
+                              Id = contact.Id,
+                              Email = contact.Email,
+                              UserId = id,
+                              User = user
+                          }).FirstAsync(x => x.Id == id);
         }
     }
 }
