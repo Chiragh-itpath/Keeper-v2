@@ -23,6 +23,7 @@ builder.Services
     .AddMailServices(builder.Configuration);
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -31,13 +32,18 @@ if (app.Environment.IsDevelopment())
         c.DefaultModelExpandDepth(-1);
     });
 }
+app.UseRouting();
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseStaticFiles();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("Allow All");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoint =>
+{
+    endpoint.MapControllers();
+    endpoint.MapFallbackToFile("index.html");
+});
 
-app.MapControllers();
 
 app.Run();
