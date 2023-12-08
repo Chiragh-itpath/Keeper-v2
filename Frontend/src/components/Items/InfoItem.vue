@@ -6,7 +6,7 @@ import { dateHelper } from '@/Services/HelperFunction'
 import AllComments from '@/components/Comments/AllComments.vue'
 
 const { GetById } = ItemStore()
-const tab: Ref<'info' | 'comments' | 'others'> = ref('info')
+const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
 const Item: Ref<IItem | null> = ref(null)
 const props = withDefaults(defineProps<{
@@ -56,9 +56,9 @@ const emits = defineEmits<{
                     </v-card-title>
                     <v-card-text class="">
                         <v-tabs v-model="tab" color="primary">
-                            <v-tab value="info" class="v-col">Info</v-tab>
-                            <v-tab value="comments" class="v-col">Comments</v-tab>
-                            <v-tab value="others" class="v-col">Others</v-tab>
+                            <v-tab value="info">Info</v-tab>
+                            <v-tab value="comments">Comments</v-tab>
+                            <v-tab value="logs">logs</v-tab>
                         </v-tabs>
                         <v-window v-model="tab" class="mt-5">
                             <v-window-item value="info">
@@ -85,7 +85,7 @@ const emits = defineEmits<{
                             <v-window-item value="comments">
                                 <all-comments :item-id="Item.id" :comments="Item.comments"></all-comments>
                             </v-window-item>
-                            <v-window-item value="others">
+                            <v-window-item value="logs">
                                 <v-row>
                                     <v-col cols="6">created by:</v-col>
                                     <v-col cols="6">{{ Item.createdBy }}</v-col>
