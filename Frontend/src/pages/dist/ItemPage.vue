@@ -18,7 +18,7 @@ const date = ref()
 
 
 const keepId = computed(() => {
-    const id = route.params.id
+    const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
 })
 
@@ -44,9 +44,9 @@ watch(date, () => {
             <v-col cols="12" v-if="date">
                 Filter By:
                 <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
-            </v-col >
+            </v-col>
         </v-row>
-        <v-row class="mx-5"> 
+        <v-row class="mx-5">
             <all-items></all-items>
         </v-row>
         <no-item v-if="Items.length == 0">
