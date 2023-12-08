@@ -53,8 +53,8 @@ namespace Keeper.Main.Controllers
         [HttpDelete("{Id}")]
         public async Task<ResponseModel<string>> Delete(Guid Id)
         {
-            await _keepService.DeleteAsync(Id);
-            return new ResponseModel<string>();
+            var res = await _keepService.DeleteAsync(Id);
+            return new ResponseModel<string>() { Data = res.ToString() };
         }
     }
 }

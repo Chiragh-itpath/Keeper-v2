@@ -17,16 +17,15 @@ namespace Keeper.Services.Services
             _contact = contact;
             _user = user;
         }
-        private async Task<ContactViewModel> Mapper(ContactModel contact)
+        private static ContactViewModel Mapper(ContactModel contact)
         {
-            var user = await _user.GetByEmailAsync(contact.Email);
             return new ContactViewModel
             {
                 Id = contact.Id,
                 Email = contact.Email,
-                UserId = user!.Id,
-                Contact = user!.Contact,
-                UserName = user!.UserName
+                UserId = contact.UserId,
+                Contact = contact.User.Contact,
+                UserName = contact.User.UserName
             };
         }
         public async Task<ContactViewModel> AddAsync(AddContact contact, Guid userId)
@@ -41,20 +40,17 @@ namespace Keeper.Services.Services
                 Email = contact.Email,
                 UserId = userId,
             });
-            return await Mapper(newContact);
+            return Mapper(newContact);
         }
 
         public async Task<List<ContactViewModel>> GetAllContacts(Guid userId)
         {
             var contacts = await _contact.GetAllAsync(userId);
-            var task = contacts.Select(Mapper).ToList();
-            var contactArray = await Task.WhenAll(task);
-            return contactArray.ToList();
+            return contacts.Select(contact => Mapper(contact)).ToList();
         }
         public async Task<ContactViewModel> GetById(Guid id)
         {
-            var contact = await _contact.GetByIdAsync(id);
-            return await Mapper(contact);
+            return Mapper(await _contact.GetByIdAsync(id));
         }
     }
 }

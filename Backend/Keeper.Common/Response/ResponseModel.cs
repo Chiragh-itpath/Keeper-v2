@@ -7,6 +7,6 @@ namespace Keeper.Common.Response
         public StatusType StatusName { get; set; } = StatusType.SUCCESS;
         public bool IsSuccess { get; set; } = true;
         public string Message { get; set; } = default!;
-        public T? Data { get; set; }
+        public T? Data { get; set; } = default!;
     }
 }
