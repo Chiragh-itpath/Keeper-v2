@@ -60,8 +60,8 @@ const emits = defineEmits<{
             </tr>
         </thead>
         <tbody>
-            <tr v-if="ContactsToDisplay.length == 0" class="bg-grey-lighten-4">
-                <td class="text-center" colspan="3">No Contacts</td>
+            <tr v-if="ContactsToDisplay.length == 0">
+                <td class="text-center text-grey" colspan="3">No Contacts</td>
             </tr>
             <tr v-for="(contact, index) in ContactsToDisplay" :key="index">
                 <td v-if="checkbox">
@@ -86,5 +86,9 @@ const emits = defineEmits<{
 <style>
 .high-light {
     background: #BDBDBD;
+}
+
+tr>th {
+    color: black !important;
 }
 </style>

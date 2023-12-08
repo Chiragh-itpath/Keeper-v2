@@ -9,7 +9,7 @@ const tabs = ref()
 const searchText: Ref<string> = ref('')
 </script>
 <template>
-    <v-container class="overflow-auto h-screen">
+    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5" fluid>
         <v-row class="mt-10 align-center">
             <v-col cols="12" md="8">
                 <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable hide-details
@@ -24,10 +24,12 @@ const searchText: Ref<string> = ref('')
         </v-row>
         <v-row class="mt-10">
             <v-col cols="12">
-                <v-tabs color="primary" v-model="tabs">
-                    <v-tab value="contact" class="w-50">Contacts</v-tab>
-                    <v-tab value="group" class="w-50">Groups</v-tab>
-                </v-tabs>
+                <v-card elevation="8">
+                    <v-tabs color="primary" v-model="tabs">
+                        <v-tab value="contact" class="w-50">Contacts</v-tab>
+                        <v-tab value="group" class="w-50">Groups</v-tab>
+                    </v-tabs>
+                </v-card>
             </v-col>
             <v-col cols="12">
                 <v-window v-model="tabs">
