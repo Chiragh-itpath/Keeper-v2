@@ -29,28 +29,29 @@ namespace Keeper.Services.Services
         {
             var sender = await _user.GetById(userId);
             var project = await _project.GetByIdAsync(invite.ProjectId);
-            var inviteTasks = invite.Emails.Select(async email =>
+            for (int i = 0; i < invite.Emails.Count; i++)
             {
-                var user = await _user.GetByEmailAsync(email);
-                if (user != null)
+                var user = await _user.GetByEmailAsync(invite.Emails[i]);
+                var shared = await _projectShare.GetAsync(invite.ProjectId, user!.Id);
+                if (shared != null)
                 {
-                    var inviteModel = new SharedProjectsModel
-                    {
-                        ProjectId = invite.ProjectId,
-                        UserId = user.Id
-                    };
-                    await _projectShare.AddAsync(inviteModel);
-                    await _mail.SendEmailAsync(new MailModel
-                    {
-                        Category = MailCategory.SendInvitation,
-                        From = sender?.Email ?? string.Empty,
-                        To = user.Email,
-                        Subject = "Project Invitation",
-                        Message = project?.Title ?? string.Empty
-                    });
+                    continue;
                 }
-            }).ToList();
-            await Task.WhenAll(inviteTasks);
+                var inviteModel = new SharedProjectsModel()
+                {
+                    ProjectId = invite.ProjectId,
+                    UserId = user.Id
+                };
+                await _projectShare.AddAsync(inviteModel);
+                await _mail.SendEmailAsync(new MailModel
+                {
+                    Category = MailCategory.SendInvitation,
+                    From = sender?.Email ?? string.Empty,
+                    To = user.Email,
+                    Subject = "Project Invitation",
+                    Message = project?.Title ?? string.Empty
+                });
+            }
             return true;
         }
         public async Task<List<InvitedProjectModel>> GetAllInvitedProject(Guid userId)
