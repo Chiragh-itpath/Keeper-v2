@@ -55,11 +55,14 @@ const emits = defineEmits<{
 
                     </v-card-title>
                     <v-card-text class="">
-                        <v-tabs v-model="tab" color="primary">
-                            <v-tab value="info">Info</v-tab>
-                            <v-tab value="comments">Comments</v-tab>
-                            <v-tab value="logs">logs</v-tab>
-                        </v-tabs>
+                        <div class="d-flex flex-row-reverse">
+
+                            <v-tabs v-model="tab" color="primary" class="">
+                                <v-tab value="info">Info</v-tab>
+                                <v-tab value="comments">Comments</v-tab>
+                                <v-tab value="logs">logs</v-tab>
+                            </v-tabs>
+                        </div>
                         <v-window v-model="tab" class="mt-5">
                             <v-window-item value="info">
                                 <div v-if="Item.url" class="mb-3">
