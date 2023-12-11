@@ -7,7 +7,7 @@ const KeepStore = defineStore('KeepStore', () => {
     const Keeps: Ref<IKeep[]> = ref([])
 
     const keepTags = computed(() => {
-        const tags = Keeps.value.map((x) => x.tag)
+        const tags = Keeps.value.map((x) => x.tag).filter(x => x != '' && x != null)
         return [...new Set(tags)]
     })
 

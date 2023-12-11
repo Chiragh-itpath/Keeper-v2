@@ -1,10 +1,7 @@
-using Keeper.Common.Enums;
-using Keeper.Common.Response;
 using Keeper.Context.Config;
 using Keeper.Main.Middleware;
 using Keeper.Repos.Config;
 using Keeper.Services.Config;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,11 +36,11 @@ app.UseStaticFiles();
 app.UseCors("Allow All");
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseEndpoints(endpoint =>
 {
     endpoint.MapControllers();
     endpoint.MapFallbackToFile("index.html");
 });
-
 
 app.Run();
