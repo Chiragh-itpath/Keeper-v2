@@ -10,8 +10,8 @@ const errorMessage: Ref<string[]> = ref([])
 
 const form = ref()
 const loginForm = reactive<ILogin>({
-    email: 'keeper@yopmail.com',
-    password: 'admin123'
+    email: '',
+    password: ''
 })
 
 const login = async (): Promise<void> => {
