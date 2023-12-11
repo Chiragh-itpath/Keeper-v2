@@ -1,4 +1,5 @@
 ﻿using Keeper.Common.Enums;
+using Keeper.Common.InnerException;
 using Keeper.Common.OtherModels;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
@@ -29,12 +30,14 @@ namespace Keeper.Services.Services
         {
             var sender = await _user.GetById(userId);
             var project = await _project.GetByIdAsync(invite.ProjectId);
+            int skipCount = 0;
             for (int i = 0; i < invite.Emails.Count; i++)
             {
                 var user = await _user.GetByEmailAsync(invite.Emails[i]);
                 var shared = await _projectShare.GetAsync(invite.ProjectId, user!.Id);
                 if (shared != null)
                 {
+                    skipCount++;
                     continue;
                 }
                 var inviteModel = new SharedProjectsModel()
@@ -52,6 +55,7 @@ namespace Keeper.Services.Services
                     Message = project?.Title ?? string.Empty
                 });
             }
+            if (skipCount == invite.Emails.Count) throw new InnerException("All User already invited", StatusType.NOT_VALID);
             return true;
         }
         public async Task<List<InvitedProjectModel>> GetAllInvitedProject(Guid userId)
@@ -109,9 +113,16 @@ namespace Keeper.Services.Services
         {
             var sender = await _user.GetById(userId);
             var keep = await _keep.GetAsync(invite.KeepId);
+            int skipcount = 0;
             for (int i = 0; i < invite.Emails.Count; i++)
             {
                 var user = await _user.GetByEmailAsync(invite.Emails[i]);
+                var shared = await _shareKeep.GetAsync(keep!.Id, user!.Id);
+                if (shared != null)
+                {
+                    skipcount++;
+                    continue;
+                }
                 var inviteModel = new SharedKeepsModel()
                 {
                     KeepId = invite.KeepId,
@@ -128,6 +139,7 @@ namespace Keeper.Services.Services
                     Message = keep?.Title ?? ""
                 });
             }
+            if (skipcount == invite.Emails.Count) throw new InnerException("All User already Invited", StatusType.NOT_VALID);
             return true;
         }
         public async Task<List<InviteKeepModel>> GetAllInvitedKeep(Guid UserId)

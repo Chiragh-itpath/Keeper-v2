@@ -8,6 +8,7 @@ namespace Keeper.Repos.Repositories.Interfaces
         Task<List<SharedKeepsModel>> GetAllAsync(Guid keepId);
         Task<List<SharedKeepsModel>> GetAllInvited(Guid UserId);
         Task<SharedKeepsModel> GetAsync(Guid id);
+        Task<SharedKeepsModel?> GetAsync(Guid keepId,Guid userId);
         Task<SharedKeepsModel> UpdateAsync(SharedKeepsModel share);
         Task<int> DeleteAsync(SharedKeepsModel share);
     }
