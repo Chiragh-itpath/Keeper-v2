@@ -15,7 +15,7 @@ const date = ref('')
             <v-col>
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
-            <v-col cols="12" lg="3" sm="4" class="my-auto d-flex justify-end" v-if="route.name != RouterEnum.SHARED">
+            <v-col cols="12" lg="3" sm="4" xl="2" class="my-auto d-flex justify-end" v-if="route.name != RouterEnum.SHARED">
                 <add-project />
             </v-col>
         </v-row>

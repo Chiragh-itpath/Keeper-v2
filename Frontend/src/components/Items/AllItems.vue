@@ -26,45 +26,48 @@ const deleteHandler = async (): Promise<void> => {
     <info-item :id="id" v-model="infoVisible"></info-item>
     <delete v-model="deleteVisible" @click:yes="deleteHandler">Item</delete>
     <v-col cols="12" lg="4" md="6" v-for="(item, index) of Items" :key="index">
-        <v-card @click="() => { infoVisible = true; id = item.id }">
-            <v-card-title class="bg-primary d-flex">
-                <a :href="item.url" class="text-white" target="_blank">
-                    <v-chip class="me-4 cursor-pointer">
-                        {{ item.type == ItemType.TICKET ? '#' : '!' }} {{ item.number }}
-                    </v-chip>
-                </a>
-                <span class="text-white">{{ item.title }}</span>
-                <v-spacer></v-spacer>
-                <div>
-                    <v-menu location="bottom" width="250">
-                        <v-list>
-                            <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                @click="() => { id = item.id; editVisible = true }">
-                                <hover-effect icon="file-document-edit-outline" icon-color="edit">
-                                    Edit
-                                </hover-effect>
-                            </v-list-item>
-                            <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                @click="() => { id = item.id; deleteVisible = true }">
-                                <hover-effect icon="delete-outline" icon-color="delete">
-                                    Delete
-                                </hover-effect>
-                            </v-list-item>
-                        </v-list>
-                        <template v-slot:activator="{ props }">
-                            <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
-                        </template>
-                    </v-menu>
-                </div>
-            </v-card-title>
-            <v-card-text class="">
-                <v-sheet height="100" class="pa-4 text-truncate">
-                    <div v-if="item.description">
-                        <div v-html="item.description"></div>
+        <v-hover v-slot="{ isHovering, props }">
+            <v-card v-bind="props" :class="isHovering ? 'fill' : ''" @click="() => { infoVisible = true; id = item.id }">
+                <v-card-title class="bg-primary d-flex">
+
+                    <a :href="item.url" class="text-white" target="_blank">
+                        <v-chip class="me-4 cursor-pointer">
+                            {{ item.type == ItemType.TICKET ? '#' : '!' }} {{ item.number }}
+                        </v-chip>
+                    </a>
+                    <span class="text-white text-truncate">{{ item.title }}</span>
+                    <v-spacer></v-spacer>
+                    <div>
+                        <v-menu location="bottom" width="250">
+                            <v-list>
+                                <v-list-item role="button" class="ma-0 pa-0 mt-2"
+                                    @click="() => { id = item.id; editVisible = true }">
+                                    <hover-effect icon="file-document-edit-outline" icon-color="edit">
+                                        Edit
+                                    </hover-effect>
+                                </v-list-item>
+                                <v-list-item role="button" class="ma-0 pa-0 mt-2"
+                                    @click="() => { id = item.id; deleteVisible = true }">
+                                    <hover-effect icon="delete-outline" icon-color="delete">
+                                        Delete
+                                    </hover-effect>
+                                </v-list-item>
+                            </v-list>
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
+                            </template>
+                        </v-menu>
                     </div>
-                    <div v-else class="text-grey">No Description</div>
-                </v-sheet>
-            </v-card-text>
-        </v-card>
+                </v-card-title>
+                <v-card-text class="">
+                    <v-sheet height="100" class="pa-4 text-truncate">
+                        <div v-if="item.description">
+                            <div v-html="item.description"></div>
+                        </div>
+                        <div v-else class="text-grey">No Description</div>
+                    </v-sheet>
+                </v-card-text>
+            </v-card>
+        </v-hover>
     </v-col>
 </template>

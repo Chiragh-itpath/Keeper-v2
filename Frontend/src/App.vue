@@ -22,4 +22,9 @@ a {
 .h-screen {
     height: calc(100vh - 80px) !important;
 }
+.fill {
+    transform: scale(1.05);
+    transition: transform 600ms ease-in;
+    z-index: 9;
+}
 </style>

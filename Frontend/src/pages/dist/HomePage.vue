@@ -1,46 +1,52 @@
 <script setup lang="ts">
 import homeimg from '@/assests/images/Home.jpg'
 import { RouterEnum } from '@/Models/enum'
+import { useDisplay } from 'vuetify'
+const { smAndDown, xxl } = useDisplay()
 </script>
 <template>
-    <v-row class="flex-wrap-reverse align-center h-screen ma-0">
+    <v-row class="flex-wrap-reverse" :class="!smAndDown ? 'h-screen' : ''">
         <v-col cols="12" md="6">
-            <v-sheet class="text-center">
-                <v-row class="mt-md-6 mt-lg-10">
-                    <v-col cols="12" class="text-md-h2 text-sm-h3 text-h4">
+            <v-sheet :height="smAndDown ? '400' : '100%'" class="w-100 d-flex align-center">
+                <v-row justify="center">
+                    <v-col cols="12" class="text-center text-xl-h1 text-sm-h3 text-h4" :class="xxl ? 'my-2' : ''">
                         <span class="text-primary">Create.</span>
                         <span class="">Organize.</span>
                     </v-col>
-                </v-row>
-                <v-row class="mt-3 mt-md-6 mt-lg-10">
-                    <v-col cols="12" class="text-md-h2 text-sm-h3 text-h4">
+                    <v-col cols="12" class="text-center text-xl-h1 text-sm-h3 text-h4" :class="xxl ? 'my-2' : ''">
                         <span>Share.</span>
                         <span class="text-primary">Easy.</span>
                     </v-col>
-                </v-row>
-                <v-row class="mt-3 mt-md-6 mt-lg-10 text-md-h6 text-body-2 justify-center text-left">
-                    <v-col cols="12" lg="8">
-                        <p>
-                            Keeper is the best place to note down quick thoughts or to save longer
-                            notes filled with checklist, images ,web links, docs.
-                        </p>
+                    <v-col cols="10" class="text-center text-xl-h4 text-body-2" :class="xxl ? 'my-2' : ''">
+                        Keeper is the best place to note down quick thoughts or to save longer
+                        notes filled with checklist, images ,web links, docs.
+                    </v-col>
+                    <v-col cols="8" xl="4" lg="6" md="9" sm="5" :class="xxl ? 'my-2 mt-5' : ''">
+                        <div class="d-flex justify-space-around">
+                            <router-link :to="{ name: RouterEnum.LOGIN }">
+                                <v-btn variant="outlined" color="primary" class="rounded-xl text-xl-h6 ma-0"
+                                    :width="xxl ? 150 : 110" :height="xxl ? 50 : 40">
+                                    Login
+                                </v-btn>
+                            </router-link>
+                            <router-link :to="{ name: RouterEnum.SIGNUP }">
+                                <v-btn variant="elevated" color="primary" class="rounded-xl text-xl-h6 ma-0"
+                                    :width="xxl ? 150 : 110" :height="xxl ? 50 : 40">
+                                    Signup
+                                </v-btn>
+                            </router-link>
+                        </div>
                     </v-col>
                 </v-row>
-                <div class="d-flex mt-5 justify-center">
-                    <router-link :to="{ name: RouterEnum.LOGIN }">
-                        <v-btn variant="outlined" color="primary" class="mx-4 rounded-xl" width="110" height="40">
-                            Login
-                        </v-btn>
-                    </router-link>
-                    <router-link :to="{ name: RouterEnum.SIGNUP }">
-                        <v-btn variant="elevated" color="primary" class="mx-4 rounded-xl" width="110"
-                            height="40">Signup</v-btn>
-                    </router-link>
-                </div>
             </v-sheet>
         </v-col>
         <v-col cols="12" md="6">
-            <v-img :src="homeimg" width="100%" cover :aspect-ratio="1"></v-img>
+            <v-img :src="homeimg" class="w-100 h-100" :aspect-ratio="0" cover></v-img>
         </v-col>
     </v-row>
 </template>
+<style scoped>
+.h-screen {
+    height: 100vh !important;
+}
+</style>
