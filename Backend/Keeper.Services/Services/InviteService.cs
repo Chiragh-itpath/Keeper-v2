@@ -117,8 +117,14 @@ namespace Keeper.Services.Services
             for (int i = 0; i < invite.Emails.Count; i++)
             {
                 var user = await _user.GetByEmailAsync(invite.Emails[i]);
-                var shared = await _shareKeep.GetAsync(keep!.Id, user!.Id);
-                if (shared != null)
+                var projectShared = (await _projectShare.GetAsync(invite.ProjectId, user!.Id)) != null;
+                if (projectShared)
+                {
+                    skipcount++;
+                    continue;
+                }
+                var keepShared = (await _shareKeep.GetAsync(keep!.Id, user!.Id)) !=null;
+                if (keepShared)
                 {
                     skipcount++;
                     continue;
