@@ -20,7 +20,7 @@ namespace Keeper.Repos.Repositories
             await _db.SaveChangesAsync();
             return share;
         }
-        
+
         public async Task<List<SharedKeepsModel>> GetAllAsync(Guid keepId)
         {
             return await _db.SharedKeeps
@@ -32,25 +32,33 @@ namespace Keeper.Repos.Repositories
         {
             return await _db.SharedKeeps.Where(x => x.UserId == UserId).ToListAsync();
         }
-        
+
         public async Task<SharedKeepsModel> GetAsync(Guid id)
         {
             return await _db.SharedKeeps
                 .Where(x => x.Id == id)
                 .FirstAsync();
         }
-        
+
         public async Task<SharedKeepsModel> UpdateAsync(SharedKeepsModel share)
         {
             _db.Entry(share).State = EntityState.Modified;
             await _db.SaveChangesAsync();
             return share;
         }
-        
+
         public async Task<int> DeleteAsync(SharedKeepsModel share)
         {
             _db.SharedKeeps.Remove(share);
             return await _db.SaveChangesAsync();
+        }
+
+        public async Task<SharedKeepsModel?> GetAsync(Guid keepId, Guid userId)
+        {
+            return await _db.SharedKeeps
+                .AsNoTracking()
+                .Where(x => x.KeepId == keepId && x.UserId == userId)
+                .FirstOrDefaultAsync();
         }
     }
 }

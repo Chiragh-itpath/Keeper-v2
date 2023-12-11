@@ -1,6 +1,5 @@
 ﻿using Keeper.Common.Enums;
 using Keeper.Common.InnerException;
-using Keeper.Common.Response;
 using System.Text.Json;
 
 namespace Keeper.Main.Middleware
@@ -22,11 +21,11 @@ namespace Keeper.Main.Middleware
             catch(InnerException ex)
             {
                 httpContext.Response.ContentType = "application/json";
-                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new ResponseModel<string>
+                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new 
                 {
-                    IsSuccess = false,
-                    StatusName = ex.Status,
-                    Message = ex.Message
+                    isSuccess = false,
+                    statusName = ex.Status,
+                    message = ex.Message
                 }));
             }
             catch (Exception ex)
@@ -34,11 +33,11 @@ namespace Keeper.Main.Middleware
                 await Console.Out.WriteLineAsync(ex.Message);
                 httpContext.Response.StatusCode = 500;
                 httpContext.Response.ContentType = "application/json";
-                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new ResponseModel<string>
+                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new 
                 {
-                    StatusName = StatusType.INTERNAL_SERVER_ERROR,
-                    IsSuccess = false,
-                    Message = "Something went Wrong"
+                    statusName = StatusType.INTERNAL_SERVER_ERROR,
+                    isSuccess = false,
+                    message = "Something went Wrong"
                 }));
             }
         }
