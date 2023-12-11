@@ -9,7 +9,6 @@ import EditKeep from '@/components/keeps/EditKeep.vue'
 import InviteKeep from '@/components/keeps/InviteKeep.vue'
 import InfoKeep from '@/components/keeps/InfoKeep.vue'
 import HoverEffect from '@/components/Custom/HoverEffect.vue'
-import CustomCard from '@/components/CustomCard.vue'
 import Delete from '@/components/Custom/DeletePropmt.vue'
 import type { IKeep } from '@/Models/KeepModels'
 import { dateHelper } from '@/Services/HelperFunction'
@@ -59,49 +58,54 @@ onMounted(() => {
 </script>
 <template>
     <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(keep, index) in KeepsToDisplay" :key="index">
-        <custom-card @click="() => router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })"
-            is-keep>
-            <template #title>{{ keep.title }}</template>
-            <template #menu>
-                <v-menu location="bottom" width="250">
-                    <v-list>
-                        <v-list-item role="button" class="ma-0 pa-0"
-                            @click="() => { infoVisible = true; id = keep.id; projectId = keep.projectId }">
-                            <hover-effect icon="information-outline" icon-color="info">
-                                Info
-                            </hover-effect>
-                        </v-list-item>
-                        <v-list-item role="button" class="ma-0 pa-0"
-                            @click="() => { inviteVisible = true; id = keep.id; projectId = keep.projectId }">
-                            <hover-effect icon="account-plus-outline" icon-color="info">
-                                Invite
-                            </hover-effect>
-                        </v-list-item>
-                        <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                            @click="() => { editVisible = true; id = keep.id }">
-                            <hover-effect icon="folder-edit-outline" icon-color="edit">
-                                Edit
-                            </hover-effect>
-                        </v-list-item>
-                        <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                            @click="() => { deleteVisible = true; id = keep.id }">
-                            <hover-effect icon="delete-outline" icon-color="delete">
-                                Delete
-                            </hover-effect>
-                        </v-list-item>
-                    </v-list>
-                    <template v-slot:activator="{ props }">
-                        <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
-                    </template>
-                </v-menu>
-            </template>
-            <template #tagTitle v-if="keep.tag">{{ keep.tag }}</template>
-        </custom-card>
-        <edit-keep v-model="editVisible" :id="id" :project-id="projectId"></edit-keep>
-        <delete v-model="deleteVisible" @click:yes="deleteHandler">Keep</delete>
-        <invite-keep v-model="inviteVisible" :id="id" :project-id="projectId"></invite-keep>
-        <info-keep v-model="infoVisible" :id="id"></info-keep>
+        <v-hover v-slot="{ props, isHovering }">
+            <v-card v-bind="props" elevation="7" :class="isHovering ? 'fill' : ''" class="cursor-pointer"
+                @click="router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })">
+                <v-card-title class="bg-primary d-flex">
+                    <span class="text-truncate">{{ keep.title }}</span>
+                    <v-spacer></v-spacer>
+                    <v-menu location="bottom" width="250">
+                        <v-list>
+                            <v-list-item role="button" class="ma-0 pa-0"
+                                @click="() => { infoVisible = true; id = keep.id; projectId = keep.projectId }">
+                                <hover-effect icon="information-outline" icon-color="info">
+                                    Info
+                                </hover-effect>
+                            </v-list-item>
+                            <v-list-item role="button" class="ma-0 pa-0"
+                                @click="() => { inviteVisible = true; id = keep.id; projectId = keep.projectId }">
+                                <hover-effect icon="account-plus-outline" icon-color="info">
+                                    Invite
+                                </hover-effect>
+                            </v-list-item>
+                            <v-list-item role="button" class="ma-0 pa-0 mt-2"
+                                @click="() => { editVisible = true; id = keep.id }">
+                                <hover-effect icon="folder-edit-outline" icon-color="edit">
+                                    Edit
+                                </hover-effect>
+                            </v-list-item>
+                            <v-list-item role="button" class="ma-0 pa-0 mt-2"
+                                @click="() => { deleteVisible = true; id = keep.id }">
+                                <hover-effect icon="delete-outline" icon-color="delete">
+                                    Delete
+                                </hover-effect>
+                            </v-list-item>
+                        </v-list>
+                        <template v-slot:activator="{ props }">
+                            <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
+                        </template>
+                    </v-menu>
+                </v-card-title>
+                <v-card-actions>
+                    <v-chip v-if="keep.tag" class="bg-primary">#{{ keep.tag }}</v-chip>
+                </v-card-actions>
+            </v-card>
+        </v-hover>
     </v-col>
+    <edit-keep v-model="editVisible" :id="id" :project-id="projectId"></edit-keep>
+    <delete v-model="deleteVisible" @click:yes="deleteHandler">Keep</delete>
+    <invite-keep v-model="inviteVisible" :id="id" :project-id="projectId"></invite-keep>
+    <info-keep v-model="infoVisible" :id="id"></info-keep>
 </template>
 <style scoped>
 .v-list-item {
