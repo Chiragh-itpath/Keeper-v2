@@ -1,10 +1,7 @@
-using Keeper.Common.Enums;
-using Keeper.Common.Response;
 using Keeper.Context.Config;
 using Keeper.Main.Middleware;
 using Keeper.Repos.Config;
 using Keeper.Services.Config;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,13 +28,17 @@ if (app.Environment.IsDevelopment())
         c.DefaultModelExpandDepth(-1);
     });
 }
+app.UseRouting();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("Allow All");
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllers();
+app.UseEndpoints(endpoint =>
+{
+    endpoint.MapControllers();
+    endpoint.MapFallbackToFile("index.html");
+});
 
 app.Run();
