@@ -27,7 +27,7 @@ const projectId = computed(() => {
             <v-col>
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
-            <v-col cols="12" lg="2" sm="3" class="my-auto d-flex justify-end">
+            <v-col cols="12" lg="2" sm="3" xl="2" class="my-auto d-flex justify-end">
                 <add-keep :project-id="projectId"></add-keep>
             </v-col>
         </v-row>
