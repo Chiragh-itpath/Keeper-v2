@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AddItem from '@/components/Items/AddItem.vue'
 import AllItems from '@/components/Items/AllItems.vue'
 import NoItem from '@/components/NoItem.vue'
 import DatePicker from '@/components/Custom/DatePicker.vue'
-import { ItemStore } from '@/stores'
+import { ItemStore, ContactStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 
@@ -24,6 +24,9 @@ const keepId = computed(() => {
 
 watch(date, () => {
     FilterByDate(date.value)
+})
+onMounted(async () => {
+    await ContactStore().GetContacts()
 })
 </script>
 <template>
