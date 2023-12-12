@@ -49,7 +49,8 @@ namespace Keeper.Services.Services
         }
         public async Task<TokenModel> LoginAsync(LoginModel login)
         {
-            var user = await _userRepo.GetByEmailAsync(login.Email) ?? throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
+            var user = await _userRepo.GetByEmailAsync(login.Email);
+            if (user == null) throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
             if (!BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
                 throw new InnerException("Password does not match", StatusType.PASSWORD_NOT_MATCHED);
             return new TokenModel()
@@ -72,7 +73,8 @@ namespace Keeper.Services.Services
         }
         public async Task<bool> UpdatePasswordAsync(PasswordResetModel resetModel)
         {
-            var user = await _userRepo.GetByEmailAsync(resetModel.Email) ?? throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
+            var user = await _userRepo.GetByEmailAsync(resetModel.Email);
+            if (user == null) throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
             user.Password = BCrypt.Net.BCrypt.HashPassword(resetModel.Password);
             await _accountRepo.UpdatePasswordAsync(user);
             return true;
