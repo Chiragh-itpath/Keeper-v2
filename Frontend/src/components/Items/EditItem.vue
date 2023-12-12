@@ -104,7 +104,7 @@ const emits = defineEmits<{
                             <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to" />
                         </v-col>
                         <v-col cols="12" sm="6">
-                            <contact-drop-down label="Discussed by" v-model:email="editItem.discussedBy"
+                            <contact-drop-down label="Discussed by" v-model="editItem.discussedBy" v-model:email="editItem.discussedBy"
                                 :multiple="false"></contact-drop-down>
                         </v-col>
                     </v-row>
