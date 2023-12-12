@@ -4,7 +4,8 @@ import {
     emailRules,
     numberRules,
     passwordRule,
-    requiredRule
+    requiredRule,
+    urlRules
 } from '@/data/ValidationRules'
 import { ref, type Ref } from 'vue'
 
@@ -20,6 +21,7 @@ const Props = withDefaults(
         isContact?: boolean
         isPassword?: boolean
         isNumber?: boolean
+        isUrl?: boolean
         icon?: string
         ValidationRules?: TRule[],
         errorMessages?: string[]
@@ -33,6 +35,7 @@ const Props = withDefaults(
         isContact: false,
         isPassword: false,
         isNumber: false,
+        isUrl: false,
         icon: '',
     }
 )
@@ -51,6 +54,8 @@ if (Props.isEmail) Rules.push(emailRules)
 if (Props.isPassword) Rules.push(passwordRule)
 
 if (Props.isNumber) Rules.push(numberRules)
+
+if (Props.isUrl) Rules.push(urlRules)
 
 Rules.push(...(Props.ValidationRules || []))
 

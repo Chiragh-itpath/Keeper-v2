@@ -13,4 +13,11 @@ const contactRules = (val: string): boolean | string =>
 const numberRules = (val: string): boolean | string =>
     /^[0-9]{0,5}$/.test(val) || val == '' ? true : 'Number must be valid'
 
-export { requiredRule, emailRules, passwordRule, contactRules, numberRules }
+const urlRules = (val: string): boolean | string => {
+    return val == null ||
+        val.trim() === '' ||
+        /^(https?|ftp|ftps?|ws|wss):\/\/([a-zA-Z0-9-]+\.?)+[^\s/$.?#].[^\s]*$/.test(val)
+        ? true
+        : 'URL must be valid'
+}
+export { requiredRule, emailRules, passwordRule, contactRules, numberRules, urlRules }
