@@ -2,6 +2,7 @@
 import { ref, watch, type Ref, reactive } from 'vue'
 import TextField from '@/components/Custom/TextField.vue'
 import TextEditor from '@/components/Custom/TextEditor.vue'
+import ContactDropDown from '../Contact/ContactDropDown.vue'
 import { ItemType } from '@/Models/enum'
 import { ItemStore } from '@/stores'
 import type { IAddItem } from '@/Models/ItemModels'
@@ -71,7 +72,7 @@ watch(visible, () => {
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <text-field label="URL" v-model="addItem.url" icon="mdi-link-box-variant-outline" />
+                            <text-field label="URL" is-url v-model="addItem.url" icon="mdi-link-box-variant-outline" />
                         </v-col>
                         <v-col cols="12">
                             <text-editor v-model="addItem.description"></text-editor>
@@ -83,10 +84,11 @@ watch(visible, () => {
                     </v-row>
                     <v-row>
                         <v-col cols="12" sm="6">
-                            <text-field label="To" v-model="addItem.to" />
+                            <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to" />
                         </v-col>
                         <v-col cols="12" sm="6">
-                            <text-field label="Discussed by" v-model="addItem.discussedBy" />
+                            <contact-drop-down label="Discussed by" v-model:email="addItem.discussedBy"
+                                :multiple="false"></contact-drop-down>
                         </v-col>
                     </v-row>
                 </v-form>
