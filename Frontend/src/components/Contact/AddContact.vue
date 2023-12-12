@@ -2,18 +2,20 @@
 import { ref, watch, type Ref } from 'vue'
 import { UserStore } from '@/stores'
 import { ContactStore } from '@/stores'
-
+import { debounce } from 'lodash'
 const visible: Ref<boolean> = ref(false)
 const email: Ref<string> = ref('')
 const emailList: Ref<string[]> = ref([])
 const error: Ref<string> = ref('')
 const { SearchEmail } = UserStore()
 const { AddContact } = ContactStore()
-const inputHandler = async (): Promise<void> => {
+
+const inputHandler = debounce(async (): Promise<void> => {
     error.value = ''
+    if(email.value && email.value.trim() == '') return
     const res = await SearchEmail(email.value)
     emailList.value = res;
-}
+}, 1000)
 const submitHandler = async () => {
     const find = emailList.value.find(x => x == email.value)
     if (!find) {
