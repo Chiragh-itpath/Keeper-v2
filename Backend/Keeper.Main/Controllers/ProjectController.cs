@@ -39,7 +39,10 @@ namespace Keeper.Main.Controllers
         [HttpGet("{Id}")]
         public async Task<ResponseModel<ProjectViewModel>> GetById([FromRoute] Guid Id)
         {
-            var res = await _projectService.GetByIdAsync(Id);
+            var user = User.Identities.First();
+            var claims = user.Claims.ToList();
+            var userId = Guid.Parse(claims.ElementAt(3).Value);
+            var res = await _projectService.GetByIdAsync(Id, userId);
             return new ResponseModel<ProjectViewModel> { Data = res };
         }
         [HttpPut]
