@@ -38,7 +38,7 @@ const emits = defineEmits<{
             <v-card-title class="bg-primary d-flex">
                 <span>
                     <v-chip>
-                        <a :href="Item.url" class="text-decoration-none text-white">
+                        <a :href="Item.url" class="text-decoration-none text-white" target="_blank">
                             {{ Item.type == 0 ? '#' : '!' }}
                             {{ Item.number }}
                         </a>

@@ -7,7 +7,8 @@ const props = withDefaults(defineProps<{
     contactId?: string[],
     multiple?: boolean,
     display?: 'email' | 'user',
-    errors?: string
+    errors?: string,
+    label?: string
 }>(), {
     contactId: () => new Array<string>(),
     multiple: true,
@@ -50,8 +51,8 @@ const emits = defineEmits<{
 </script>
 
 <template>
-    <v-combobox :items="items" :multiple="multiple" chips color="primary" label="Email" placeholder="Select Contacts"
-        v-model="modelValue" :error-messages="errors">
+    <v-combobox :items="items" :multiple="multiple" chips color="primary" :label="label ? label : 'Email'"
+        placeholder="Select Contacts" v-model="modelValue" :error-messages="errors">
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.value }}</v-chip>
         </template>
