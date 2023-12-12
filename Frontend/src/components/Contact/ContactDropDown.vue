@@ -51,10 +51,13 @@ const emits = defineEmits<{
 </script>
 
 <template>
-    <v-combobox :items="items" :multiple="multiple" chips color="primary" :label="label ? label : 'Email'"
+    <v-select :items="items" :multiple="multiple" chips color="primary" :label="label ? label : 'Email'"
         placeholder="Select Contacts" v-model="modelValue" :error-messages="errors">
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.value }}</v-chip>
         </template>
-    </v-combobox>
+        <template v-slot:no-data>
+            <v-list-item class="text-grey">No Contacts</v-list-item>
+        </template>
+    </v-select>
 </template>

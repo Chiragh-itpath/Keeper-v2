@@ -40,7 +40,7 @@ namespace Keeper.Services.Services
                 Email = contact.Email,
                 UserId = userId,
             });
-            return Mapper(newContact);
+            return await GetById(newContact.Id);
         }
 
         public async Task<List<ContactViewModel>> GetAllContacts(Guid userId)
