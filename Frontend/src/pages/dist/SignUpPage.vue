@@ -4,9 +4,11 @@ import { RouterEnum } from '@/Models/enum'
 import TextField from '@/components/Custom/TextField.vue'
 import { AccountStore } from '@/stores'
 import type { IRegister } from '@/Models/UserModels'
+import { useRouter } from 'vue-router'
 const { registerUser } = AccountStore()
 
 const form = ref()
+const router = useRouter();
 const SignUpForm = reactive<IRegister>({
     userName: '',
     email: '',
@@ -27,6 +29,7 @@ async function register(): Promise<void> {
     if (!valid) return
 
     await registerUser(SignUpForm)
+    router.push({ name: RouterEnum.LOGIN })
 }
 
 </script>
