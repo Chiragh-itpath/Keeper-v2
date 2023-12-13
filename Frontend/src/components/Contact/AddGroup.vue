@@ -43,7 +43,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-btn color="primary" append-icon="mdi-plus" class="rounded" @click="visible = !visible" width="100%">
+    <v-btn color="primary" prepend-icon="mdi-plus" class="rounded" @click="visible = !visible" width="100%">
         New Group
     </v-btn>
     <v-dialog v-model="visible" max-width="600" class="">

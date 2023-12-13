@@ -5,7 +5,7 @@ import { ContactStore } from '@/stores'
 import { debounce } from 'lodash'
 const visible: Ref<boolean> = ref(false)
 const email: Ref<string> = ref('')
-const selectedEmail: Ref<string> = ref('')
+const selectedEmail: Ref<string | undefined> = ref()
 const items: Ref<string[]> = ref([])
 const error: Ref<string> = ref('')
 const { SearchEmail } = UserStore()
@@ -27,8 +27,11 @@ const submitHandler = async () => {
         error.value = 'Please enter valid email'
         return
     }
-    await AddContact(email.value)
+    await AddContact(selectedEmail.value)
     visible.value = false
+    items.value = []
+    email.value = ''
+    selectedEmail.value = ''
 }
 watch(visible, () => {
     if (visible.value) {
@@ -39,7 +42,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-btn color="primary" append-icon="mdi-plus" @click="visible = !visible" width="100%">New Contact</v-btn>
+    <v-btn color="primary" prepend-icon="mdi-plus" @click="visible = !visible" width="100%">New Contact</v-btn>
     <v-dialog v-model="visible" max-width="600">
         <v-card class="rounded-lg">
             <v-card-title class="bg-primary text-center">

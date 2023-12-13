@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Uitlity, InviteStore } from '@/stores'
+import { GlobalStore, InviteStore } from '@/stores'
 
-const { NotificationCount } = storeToRefs(Uitlity())
+const { NotificationCount } = storeToRefs(GlobalStore())
 const { InvitedProjectList, InvitedKeepList } = storeToRefs(InviteStore())
 const { ProjectInviteResponse, keepInviteResponse, FetchInvitedProjects, FetchInvitedKeeps } = InviteStore()
 

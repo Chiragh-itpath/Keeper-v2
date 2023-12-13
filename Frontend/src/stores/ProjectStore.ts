@@ -52,7 +52,9 @@ const ProjectStore = defineStore('ProjectStore', () => {
         }
     }
 
-    const SingleProject = (id: string) => Projects.value.find((x) => x.id == id)
+    const SingleProject = (id: string) => {
+        return Projects.value.find((x) => x.id == id)
+    }
 
     return {
         Projects,

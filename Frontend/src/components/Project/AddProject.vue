@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref } from 'vue'
-import { ProjectStore } from '@/stores'
+import { GlobalStore, ProjectStore } from '@/stores'
 import TextField from '@/components/Custom/TextField.vue'
 import type { IAddProject } from '@/Models/ProjectModels'
+import { storeToRefs } from 'pinia';
 
 const visible: Ref<boolean> = ref(false)
 const form = ref()
 const { AddProject } = ProjectStore()
-
+const { Loading } = storeToRefs(GlobalStore())
 const addProject: IAddProject = reactive({
     title: '',
     description: '',
@@ -27,10 +28,10 @@ const close = () => {
 }
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" append-icon="mdi-plus" width="100%" @click="visible = true">
+    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" width="100%" @click="visible = true">
         New Project
     </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700">
+    <v-dialog transition="scale-transition" v-model="visible" width="700">
         <v-card>
             <v-card-title class="text-center bg-primary">
                 New Project
@@ -54,7 +55,8 @@ const close = () => {
                 </v-form>
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
-                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl">
+                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl"
+                    :loading="Loading">
                     Add
                 </v-btn>
             </v-card-actions>
