@@ -22,7 +22,6 @@ export const GroupStore = defineStore('group', () => {
         const res = await groupService.AddContacts(contacts)
         if (res) {
             const index = Groups.value.findIndex((x) => x.id == res.id)
-            console.log(index)
             Groups.value.splice(index, 1, res)
         }
     }

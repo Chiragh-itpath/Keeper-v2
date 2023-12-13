@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { UserStore } from '@/stores'
+import { GlobalStore, UserStore } from '@/stores'
 import { ContactStore } from '@/stores'
 import { debounce } from 'lodash'
+import { storeToRefs } from 'pinia';
 const visible: Ref<boolean> = ref(false)
 const email: Ref<string> = ref('')
 const selectedEmail: Ref<string | undefined> = ref()
@@ -12,6 +13,7 @@ const { SearchEmail } = UserStore()
 const { AddContact } = ContactStore()
 const isLoading: Ref<boolean> = ref(false)
 
+const { Loading } = storeToRefs(GlobalStore())
 const inputHandler = debounce(async (): Promise<void> => {
     error.value = ''
     if (email.value.trim() == '') {
@@ -53,11 +55,14 @@ watch(visible, () => {
             </v-card-title>
             <v-card-text>
                 <v-autocomplete :items="items" v-model:search="email" v-model:model-value="selectedEmail"
-                    placeholder="Enter email address" color="primary" :loading="isLoading" label="Email"
-                    prepend-inner-icon="mdi-email" :multiple="false" hide-no-data :error-messages="error" @update:search="() => {
+                    placeholder="Enter email address" color="primary" :loading="isLoading" label="Email" :multiple="false"
+                    hide-no-data :error-messages="error" @update:search="() => {
                         isLoading = true
                         inputHandler()
                     }">
+                    <template v-slot:prepend-inner="{ isActive }">
+                        <v-icon icon="mdi-email" :class="isActive.value == true ? 'text-primary' : 'text-grey'"></v-icon>
+                    </template>
                     <template v-slot:chip="{ props, item }">
                         <v-chip color="primary" v-bind="props" v-if="item.title">
                             <template v-slot:prepend>
@@ -69,7 +74,8 @@ watch(visible, () => {
                 </v-autocomplete>
             </v-card-text>
             <v-card-actions class="justify-end px-4 pb-4">
-                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" @click="submitHandler">
+                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" @click="submitHandler"
+                    :loading="Loading">
                     Add
                 </v-btn>
             </v-card-actions>

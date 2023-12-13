@@ -56,7 +56,7 @@ const close = () => {
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
                 <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl"
-                    :loading="Loading">
+                    :loading="Loading" :disabled="Loading">
                     Add
                 </v-btn>
             </v-card-actions>

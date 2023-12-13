@@ -13,7 +13,6 @@ type TRule = (arg: string) => boolean | string
 
 const Props = withDefaults(
     defineProps<{
-        modelValue: any,
         label?: string
         color?: string
         placeholder?: string
@@ -41,7 +40,6 @@ const Props = withDefaults(
     }
 )
 const error: Ref<boolean> = ref(false)
-const _value = ref(Props.modelValue)
 const type: Ref<string> = ref(Props.isEmail ? 'email' : Props.isPassword ? 'password' : 'text')
 let Rules: TRule[] = []
 
@@ -70,26 +68,19 @@ if (Props.errorMessages) {
         error.value = true
     }
 }
-const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-}>()
 </script>
 <template>
-    <v-text-field :label="Props.label" v-model="_value" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
+    <v-text-field :label="Props.label" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
         :append-inner-icon="!isPassword ? '' : isPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :error="error"
-        :prepend-inner-icon="Props.icon" :placeholder="placeholder" :error-messages="errorMessages"
-        @click:append-inner="changeVisibility" class="mb-4" @input="() => {
-            if (isContact) {
-                _value = _value.replace(/[^\d]/g, '')
-                _value = _value.slice(0, 10)
-            }
-            emit('update:modelValue', _value)
-        }">
+        :placeholder="placeholder" :error-messages="errorMessages" @click:append-inner="changeVisibility" class="mb-4">
+        <template v-slot:prepend-inner="{ isFocused }">
+            <v-icon v-if="Props.icon" :icon="Props.icon"
+                :class="isFocused.value == true ? 'text-primary' : 'text-grey'"></v-icon>
+        </template>
     </v-text-field>
 </template>
 <style>
-.v-field--focused>.v-field__prepend-inner>.v-icon {
-    --v-medium-emphasis-opacity: 1;
-    color: #26A69A !important;
+.v-icon {
+    --v-medium-emphasis-opacity: 1 !important;
 }
 </style>

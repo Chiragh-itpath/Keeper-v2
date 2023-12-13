@@ -80,7 +80,8 @@ const emits = defineEmits<{
                 </v-form>
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
-                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl" :loading="Loading">
+                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl"
+                    :loading="Loading" :disabled="Loading">
                     Update
                 </v-btn>
             </v-card-actions>
