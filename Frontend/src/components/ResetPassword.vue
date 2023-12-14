@@ -8,7 +8,7 @@ import { RouterEnum } from '@/Models/enum'
 
 const form = ref()
 
-const errorMessages: Ref<string[]> = ref([])
+const errorMessages: Ref<string> = ref('')
 const Password: Ref<string> = ref('')
 const confirmPassword: Ref<string> = ref('')
 const router = useRouter()
@@ -16,11 +16,11 @@ const { email } = storeToRefs(AccountStore())
 const { PasswordReset } = AccountStore()
 
 const ChangePassWord = async () => {
-    errorMessages.value = []
+    errorMessages.value = ''
     const { valid } = await form.value.validate()
     if (!valid) return
     if (Password.value != confirmPassword.value) {
-        errorMessages.value.push('Password and confirm Password must be same')
+        errorMessages.value = 'Password and confirm Password must be same'
         return
     }
     await PasswordReset({
@@ -28,9 +28,7 @@ const ChangePassWord = async () => {
         password: Password.value
     })
     router.push({ name: RouterEnum.LOGIN })
-
 }
-
 onMounted(() => {
     if (email.value == '') {
         router.go(-1)

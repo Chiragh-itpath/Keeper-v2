@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { RouterEnum } from '@/Models/enum'
 import type { ILogin } from '@/Models/UserModels'
 import TextField from '@/components/Custom/TextField.vue'
@@ -20,10 +20,13 @@ const login = async (): Promise<void> => {
     if (!valid) return
     await loginUser(loginForm)
 }
+onMounted(() => {
+    errors.value = {}
+})
 </script>
 <template>
-    <v-container fluid class="bg-blue-grey-lighten-5">
-        <v-row justify="center" align-content="center" class="h-screen">
+    <v-container fluid class="h-screen bg-blue-grey-lighten-5">
+        <v-row justify="center" align-content="center" class="h-100">
             <v-col cols="12" lg="4" md="6" sm="8">
                 <v-card elevation="10" class="rounded-xl">
                     <v-card-title class="text-center mt-5">

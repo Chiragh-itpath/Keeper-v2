@@ -6,13 +6,11 @@ import { AccountStore, GlobalStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { RouterEnum } from '@/Models/enum'
 
-
 const otp: Ref<string> = ref('')
-const otpFromServer: Ref<string> = ref('')
 const errorMessages: Ref<string> = ref('')
-const { email } = storeToRefs(AccountStore())
-const { fetchOtp } = AccountStore()
+const { serverOtp } = storeToRefs(AccountStore())
 const { Loading } = storeToRefs(GlobalStore())
+
 const form = ref()
 const router = useRouter()
 
@@ -22,19 +20,16 @@ const VerifyOTP = async () => {
         errorMessages.value = 'Enter valid otp'
         return;
     }
-
-    if (otp.value != otpFromServer.value) {
+    if (otp.value != serverOtp.value) {
         errorMessages.value = 'Wrong otp'
         return
     }
     router.push({ name: RouterEnum.PASSWORD_RESET })
 }
-onMounted(async () => {
-    if (email.value == '') {
-        router.push({ name: RouterEnum.VERIFY_EMAIL })
-        return
+onMounted(() => {
+    if (serverOtp.value == '') {
+        router.go(-1)
     }
-    otpFromServer.value = await fetchOtp(email.value)
 })
 </script>
 <template>

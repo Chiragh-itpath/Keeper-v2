@@ -9,7 +9,7 @@ const tabs = ref()
 const searchText: Ref<string> = ref('')
 </script>
 <template>
-    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5" fluid>
+    <v-container class="overflow-auto" fluid>
         <v-row class="mt-10 align-center">
             <v-col cols="12" md="8">
                 <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable hide-details

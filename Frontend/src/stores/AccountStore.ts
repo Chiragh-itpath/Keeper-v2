@@ -9,6 +9,7 @@ import { setToken } from '@/Services/TokenService'
 const AccountStore = defineStore('AccountStore', () => {
     const router = useRouter()
     const email: Ref<string> = ref('')
+    const serverOtp: Ref<string> = ref('')
     const registerUser = async (user: IRegister): Promise<void> => {
         const response = await signup(user)
         if (response) {
@@ -34,6 +35,7 @@ const AccountStore = defineStore('AccountStore', () => {
     }
     return {
         email,
+        serverOtp,
         registerUser,
         loginUser,
         fetchOtp,
