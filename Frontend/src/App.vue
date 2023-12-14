@@ -7,7 +7,7 @@ import Toster from '@/components/VToster.vue'
     <v-layout>
         <router-view name="NavBar" />
         <router-view name="SideBar" />
-        <v-main class="overflow-hidden">
+        <v-main>
             <router-view>
             </router-view>
         </v-main>
@@ -16,10 +16,6 @@ import Toster from '@/components/VToster.vue'
 <style>
 a {
     text-decoration: none;
-}
-
-.h-screen {
-    height: calc(100vh - 80px) !important;
 }
 
 .fill {

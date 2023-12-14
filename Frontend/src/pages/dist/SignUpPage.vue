@@ -33,8 +33,8 @@ async function register(): Promise<void> {
 
 </script>
 <template>
-    <v-container fill-height fluid class="bg-blue-grey-lighten-5">
-        <v-row justify="center" align-content="center" class="h-screen">
+    <v-container fluid class=" h-screen">
+        <v-row justify="center" align-content="center" class="h-100">
             <v-col cols="12" sm="9" md="6" lg="4">
                 <v-card class="pa-4 elevation-12 rounded-xl">
                     <v-card-title class="text-center mt-5">
