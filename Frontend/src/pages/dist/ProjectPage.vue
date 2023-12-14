@@ -11,7 +11,7 @@ const router = useRouter();
 const date = ref('')
 </script>
 <template>
-    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5 px-10" fluid>
+    <v-container class="px-10" fluid>
         <v-row>
             <v-col>
                 <date-picker label="Select a Date" v-model="date"></date-picker>

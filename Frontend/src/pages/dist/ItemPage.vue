@@ -30,7 +30,7 @@ onMounted(async () => {
 })
 </script>
 <template>
-    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5" fluid>
+    <v-container class="overflow-auto" fluid>
 
         <v-row class="mx-5">
             <v-col cols="12">
