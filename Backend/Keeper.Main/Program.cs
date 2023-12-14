@@ -15,6 +15,7 @@ builder.Services
     .RegisterServices()
     .RegisterServices()
     .AddSwagger()
+    .AddLogger()
     .ConfigureApiBehavior()
     .ConfigAuth(builder.Configuration)
     .AddMailServices(builder.Configuration);

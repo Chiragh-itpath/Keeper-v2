@@ -1,4 +1,6 @@
 ﻿using Keeper.Context.Model;
+using log4net;
+using log4net.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -84,6 +86,11 @@ namespace Keeper.Repos.Config
                 });
             });
             return services;
+        }
+        public static IServiceCollection AddLogger(this IServiceCollection services)
+        {
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+            return services.AddSingleton(LogManager.GetLogger(typeof(Program)));
         }
     }
 }
