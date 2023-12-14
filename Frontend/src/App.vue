@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import Loader from '@/components/Custom/LoaderComponent.vue'
 import Toster from '@/components/VToster.vue'
 </script>
 
 <template>
     <Toster />
-    <loader />
     <v-layout>
         <router-view name="NavBar" />
         <router-view name="SideBar" />
@@ -19,9 +17,11 @@ import Toster from '@/components/VToster.vue'
 a {
     text-decoration: none;
 }
+
 .h-screen {
     height: calc(100vh - 80px) !important;
 }
+
 .fill {
     transform: scale(1.05);
     transition: transform 600ms ease-in;

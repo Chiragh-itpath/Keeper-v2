@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, type Ref, reactive } from 'vue'
 import TextField from '@/components/Custom/TextField.vue'
-import { KeepStore } from '@/stores'
+import { GlobalStore, KeepStore } from '@/stores'
 import type { IEditKeep } from '@/Models/KeepModels'
+import { storeToRefs } from 'pinia';
 
 const props = withDefaults(defineProps<{
     modelValue: boolean,
@@ -13,7 +14,7 @@ const props = withDefaults(defineProps<{
 })
 
 const { Updatekeep, getSingleKeep, } = KeepStore()
-
+const { Loading } = storeToRefs(GlobalStore())
 const visible: Ref<boolean> = ref(false)
 const form = ref()
 const editKeep: IEditKeep = reactive({
@@ -54,8 +55,8 @@ const emits = defineEmits<{
 <template>
     <v-dialog transition="scale-transition" v-model="visible" max-width="700" close-on-back>
         <v-card>
-            <v-card-title class="text-center bg-primary"> 
-                Edit keep 
+            <v-card-title class="text-center bg-primary">
+                Edit keep
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
@@ -71,7 +72,8 @@ const emits = defineEmits<{
                 </v-form>
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
-                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="px-5 mx-2 rounded-xl">
+                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120"
+                    class="px-5 mx-2 rounded-xl" :loading="Loading" :disabled="Loading">
                     Update
                 </v-btn>
             </v-card-actions>

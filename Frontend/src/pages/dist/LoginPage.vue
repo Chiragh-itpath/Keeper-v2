@@ -3,10 +3,10 @@ import { ref, reactive } from 'vue'
 import { RouterEnum } from '@/Models/enum'
 import type { ILogin } from '@/Models/UserModels'
 import TextField from '@/components/Custom/TextField.vue'
-import { AccountStore } from '@/stores'
-import type { Ref } from 'vue'
+import { AccountStore, GlobalStore } from '@/stores'
+import { storeToRefs } from 'pinia'
 const { loginUser } = AccountStore()
-const errorMessage: Ref<string[]> = ref([])
+const { Loading, errors } = storeToRefs(GlobalStore())
 
 const form = ref()
 const loginForm = reactive<ILogin>({
@@ -15,6 +15,7 @@ const loginForm = reactive<ILogin>({
 })
 
 const login = async (): Promise<void> => {
+    errors.value = {}
     const { valid } = await form.value.validate()
     if (!valid) return
     await loginUser(loginForm)
@@ -35,9 +36,10 @@ const login = async (): Promise<void> => {
                     <v-card-text>
                         <v-form ref="form" @submit.prevent="login" validate-on="submit">
                             <div class="mx-5">
-                                <text-field v-model="loginForm.email" label="Email" is-required is-email icon="mdi-email" />
+                                <text-field v-model="loginForm.email" label="Email" is-required is-email icon="mdi-email"
+                                    :error-messages="errors.email" />
                                 <text-field v-model="loginForm.password" label="Password" is-required is-password
-                                    icon="mdi-lock" :error-messages="errorMessage" />
+                                    icon="mdi-lock" :error-messages="errors.password" />
                             </div>
                             <div class="text-right">
                                 <router-link :to="{ name: RouterEnum.VERIFY_EMAIL }">
@@ -47,7 +49,7 @@ const login = async (): Promise<void> => {
                             <v-card-actions>
                                 <div class="d-flex flex-column justify-center mx-auto">
                                     <v-btn type="submit" flatcolor="#5865f2" rounded="lg" size="large" variant="flat"
-                                        color="teal" class="mt-4">
+                                        color="teal" class="mt-4" :loading="Loading">
                                         Login
                                     </v-btn>
                                     <div class="mt-5">
@@ -69,10 +71,9 @@ const login = async (): Promise<void> => {
 .blur {
     opacity: 0.2;
 }
+
 img {
-    
     width: 100vw;
     height: 100vh;
-    
 }
 </style>

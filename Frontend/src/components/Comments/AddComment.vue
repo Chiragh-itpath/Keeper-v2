@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import TextField from '@/components/Custom/TextField.vue'
-import { ItemStore, UserStore } from '@/stores';
+import { GlobalStore, ItemStore, UserStore } from '@/stores';
 import type { IComment } from '@/Models/CommentModel'
+import { storeToRefs } from 'pinia';
 
 const props = withDefaults(defineProps<{
     itemId: string
@@ -15,6 +16,7 @@ const comment: Ref<string> = ref('')
 const form = ref()
 const { User } = UserStore()
 const { AddComment } = ItemStore()
+const { Loading } = storeToRefs(GlobalStore())
 const submitHandler = async () => {
     const { valid } = await form.value.validate()
     if (!valid) return
@@ -38,7 +40,8 @@ const emits = defineEmits<{
     <div>
         <v-form ref="form" validate-on="submit" class="d-flex mt-5" @submit.prevent="submitHandler">
             <text-field v-model="comment" is-required label="Add your comment"></text-field>
-            <v-btn icon="mdi-arrow-up" class="ms-4 mt-1" color="primary" @click="submitHandler"></v-btn>
+            <v-btn icon="mdi-arrow-up" class="ms-4 mt-1" color="primary" @click="submitHandler" :loading="Loading"
+                :disabled="Loading"></v-btn>
         </v-form>
     </div>
 </template>

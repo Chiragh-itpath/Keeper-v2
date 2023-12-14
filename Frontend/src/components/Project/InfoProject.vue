@@ -48,14 +48,19 @@ const emits = defineEmits<{
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">{{ project?.title }}</v-col>
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Description:</v-col>
-                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3 description">{{ project?.description }}</v-col>
+                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3 description">
+                        {{ project?.description }}
+                        <span v-if="!project?.description" class="text-grey">No Description provided</span>
+                    </v-col>
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Tag:</v-col>
-                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3"><v-chip color="primary">{{ project?.tag }}</v-chip></v-col>
-
+                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
+                        <v-chip color="primary" v-if="project?.tag">{{ project?.tag }}</v-chip>
+                        <span v-else>-</span>
+                    </v-col>
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Owner:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
-                        {{ project?.createdBy == User.email ? 'me' : project?.createdBy }}
+                        {{ project?.createdBy }}
                     </v-col>
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Created On:</v-col>

@@ -22,14 +22,14 @@ namespace Keeper.Services.Services
             var result = await _repo.GetAllAsync(UserId);
 
             var projects = result
-                .Select(project => Mapper(project))
+                .Select(project => Mapper(project,UserId))
                 .ToList();
             return projects;
         }
-        public async Task<ProjectViewModel> GetByIdAsync(Guid Id)
+        public async Task<ProjectViewModel> GetByIdAsync(Guid Id,Guid userId)
         {
-            var result = await _repo.GetByIdAsync(Id) ?? throw new InnerException("",StatusType.NOT_FOUND);
-            return Mapper(result);
+            var result = await _repo.GetByIdAsync(Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            return Mapper(result,userId);
         }
         public async Task<ProjectViewModel> SaveAsync(AddProject addProject, Guid userId)
         {
@@ -46,12 +46,12 @@ namespace Keeper.Services.Services
                 project.TagId = tag?.Id;
             }
             var projectId = await _repo.SaveAsync(project);
-            var res = await GetByIdAsync(projectId);
+            var res = await GetByIdAsync(projectId,userId);
             return res;
         }
         public async Task<ProjectViewModel> UpdateAsync(EditProject editProject, Guid userId)
         {
-            var project = await _repo.GetByIdAsync(editProject.Id) ?? throw new InnerException("",StatusType.NOT_FOUND);
+            var project = await _repo.GetByIdAsync(editProject.Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             project.Title = editProject.Title;
             project.Description = editProject.Description;
             project.UpdatedById = userId;
@@ -66,7 +66,7 @@ namespace Keeper.Services.Services
                 project.TagId = null;
             }
             var projectId = await _repo.UpdateAsync(project);
-            var res = await GetByIdAsync(projectId);
+            var res = await GetByIdAsync(projectId, userId);
             return res;
         }
         public async Task<bool> DeleteByIdAsync(Guid id)
@@ -75,7 +75,7 @@ namespace Keeper.Services.Services
             await _repo.DeleteAsync(project!);
             return true;
         }
-        private static ProjectViewModel Mapper(ProjectModel project)
+        private static ProjectViewModel Mapper(ProjectModel project, Guid userId)
         {
             return new ProjectViewModel
             {
@@ -87,6 +87,7 @@ namespace Keeper.Services.Services
                 UpdatedBy = project.UpdatedBy?.Email,
                 CreatedOn = project.CreatedOn,
                 UpdatedOn = project.UpdatedOn,
+                IsShared = project.CreatedBy.Id != userId,
             };
         }
     }

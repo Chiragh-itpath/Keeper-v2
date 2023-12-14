@@ -53,8 +53,8 @@ namespace Keeper.Main.Controllers
         [HttpDelete("{Id}")]
         public async Task<ResponseModel<string>> Delete(Guid id)
         {
-            await _itemService.DeleteAsync(id);
-            return new ResponseModel<string>();
+            var res = await _itemService.DeleteAsync(id);
+            return new ResponseModel<string>() { Data = res.ToString() };
         }
         [HttpPost("AddComment")]
         public async Task<ResponseModel<CommentViewModel>> AddComment(AddComment addComment)

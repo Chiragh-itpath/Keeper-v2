@@ -10,11 +10,11 @@ const { smAndDown, xxl } = useDisplay()
             <v-sheet :height="smAndDown ? '400' : '100%'" class="w-100 d-flex align-center">
                 <v-row justify="center">
                     <v-col cols="12" class="text-center text-xl-h1 text-sm-h3 text-h4" :class="xxl ? 'my-2' : ''">
-                        <span class="text-primary">Create.</span>
+                        <span class="text-primary">Create. </span>
                         <span class="">Organize.</span>
                     </v-col>
                     <v-col cols="12" class="text-center text-xl-h1 text-sm-h3 text-h4" :class="xxl ? 'my-2' : ''">
-                        <span>Share.</span>
+                        <span>Share. </span>
                         <span class="text-primary">Easy.</span>
                     </v-col>
                     <v-col cols="10" class="text-center text-xl-h4 text-body-2" :class="xxl ? 'my-2' : ''">

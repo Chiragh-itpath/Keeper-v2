@@ -34,8 +34,8 @@ const projectId = computed(() => {
         <v-row class="mx-5">
             <v-col cols="12" v-if="date || route.name == RouterEnum.KEEP_BY_TAG">
                 Filter By:
-                <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
-                <v-chip color="black" closable v-if="route.name == RouterEnum.KEEP_BY_TAG"
+                <v-chip class="mx-3 pa-3 bg-primary" closable v-if="date" @click:close="date = ''" >Date</v-chip>
+                <v-chip class="bg-primary" closable v-if="route.name == RouterEnum.KEEP_BY_TAG"
                     @click:close="router.push({ name: RouterEnum.KEEP })">
                     Tag
                 </v-chip>

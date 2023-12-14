@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { Uitlity } from '@/stores'
+import { GlobalStore } from '@/stores'
 
-const { Loading } = storeToRefs(Uitlity())
+const { Loading } = storeToRefs(GlobalStore())
 </script>
 
 <template>

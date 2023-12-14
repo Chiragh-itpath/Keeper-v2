@@ -23,11 +23,11 @@ const handleInvite = async (): Promise<void> => {
 
 }
 watch(props, async () => {
-    visible.value = props.modelValue
-    if (visible.value) {
+    if (props.modelValue) {
         await GetContacts()
         await GetGroups()
     }
+    visible.value = props.modelValue
 })
 watch(visible, () => {
     if (!visible.value)
@@ -38,7 +38,7 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="600" close-on-back max-height="500">
+    <v-dialog transition="scale-transition" v-model="visible" max-width="600" close-on-back>
         <v-card>
             <v-card-title class="text-center bg-primary">
                 Invite To Project

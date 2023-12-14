@@ -10,7 +10,10 @@ const AccountStore = defineStore('AccountStore', () => {
     const router = useRouter()
     const email: Ref<string> = ref('')
     const registerUser = async (user: IRegister): Promise<void> => {
-        await signup(user)
+        const response = await signup(user)
+        if (response) {
+            router.push({ name: RouterEnum.LOGIN })
+        }
     }
     const loginUser = async (user: ILogin): Promise<void> => {
         const response = await signin(user)

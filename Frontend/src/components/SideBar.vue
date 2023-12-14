@@ -2,11 +2,11 @@
 import { RouterEnum } from '@/Models/enum'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { Uitlity, ProjectStore, KeepStore } from '@/stores'
+import { GlobalStore, ProjectStore, KeepStore } from '@/stores'
 import { onMounted, reactive, watch } from 'vue';
 import { useDisplay } from 'vuetify';
 
-const { SideBarIsVisible } = storeToRefs(Uitlity())
+const { SideBarIsVisible } = storeToRefs(GlobalStore())
 const { ProjectTags } = storeToRefs(ProjectStore())
 const { keepTags } = storeToRefs(KeepStore())
 const route = useRoute()

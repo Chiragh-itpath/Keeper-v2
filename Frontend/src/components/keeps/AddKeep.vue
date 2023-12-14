@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref, watch } from 'vue'
 import TextField from '@/components/Custom/TextField.vue'
-import { KeepStore } from '@/stores'
+import { KeepStore, GlobalStore } from '@/stores'
 import type { IAddKeep } from '@/Models/KeepModels'
+import { storeToRefs } from 'pinia';
 
 const props = withDefaults(defineProps<{
     projectId: string,
@@ -11,7 +12,7 @@ const props = withDefaults(defineProps<{
 
 const { AddKeep } = KeepStore()
 const visible: Ref<boolean> = ref(false)
-
+const { Loading } = storeToRefs(GlobalStore())
 const form = ref()
 const addKeep: IAddKeep = reactive({
     title: '',
@@ -60,7 +61,7 @@ const close = () => {
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
                 <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120"
-                    class="px-5 mx-2 rounded-xl">
+                    class="px-5 mx-2 rounded-xl" :loading="Loading" :disabled="Loading">
                     Add
                 </v-btn>
             </v-card-actions>

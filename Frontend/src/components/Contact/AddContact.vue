@@ -1,40 +1,50 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { UserStore } from '@/stores'
+import { GlobalStore, UserStore } from '@/stores'
 import { ContactStore } from '@/stores'
 import { debounce } from 'lodash'
+import { storeToRefs } from 'pinia';
 const visible: Ref<boolean> = ref(false)
 const email: Ref<string> = ref('')
-const emailList: Ref<string[]> = ref([])
+const selectedEmail: Ref<string | undefined> = ref()
+const items: Ref<string[]> = ref([])
 const error: Ref<string> = ref('')
 const { SearchEmail } = UserStore()
 const { AddContact } = ContactStore()
+const isLoading: Ref<boolean> = ref(false)
 
+const { Loading } = storeToRefs(GlobalStore())
 const inputHandler = debounce(async (): Promise<void> => {
     error.value = ''
-    if(email.value && email.value.trim() == '') return
-    const res = await SearchEmail(email.value)
-    emailList.value = res;
-}, 1000)
-const submitHandler = async () => {
-    const find = emailList.value.find(x => x == email.value)
-    if (!find) {
-        error.value = 'Please select email'
+    if (email.value.trim() == '') {
+        isLoading.value = false
         return
     }
-    await AddContact(email.value)
+    const res = await SearchEmail(email.value)
+    items.value = res;
+    isLoading.value = false
+}, 500)
+const submitHandler = async () => {
+    if (selectedEmail.value == '' || selectedEmail.value == null) {
+        error.value = 'Please enter valid email'
+        return
+    }
+    await AddContact(selectedEmail.value)
     visible.value = false
+    items.value = []
+    email.value = ''
+    selectedEmail.value = ''
 }
 watch(visible, () => {
     if (visible.value) {
         email.value = ''
-        emailList.value = []
+        items.value = []
         error.value = ''
     }
 })
 </script>
 <template>
-    <v-btn color="primary" append-icon="mdi-plus" @click="visible = !visible" width="100%">New Contact</v-btn>
+    <v-btn color="primary" prepend-icon="mdi-plus" @click="visible = !visible" width="100%">New Contact</v-btn>
     <v-dialog v-model="visible" max-width="600">
         <v-card class="rounded-lg">
             <v-card-title class="bg-primary text-center">
@@ -44,21 +54,28 @@ watch(visible, () => {
                 </span>
             </v-card-title>
             <v-card-text>
-                <v-combobox :items="emailList" v-model:search="email" placeholder="Enter email address" color="primary"
-                    label="Email" prepend-inner-icon="mdi-email" :multiple="false" @update:search="inputHandler"
-                    :error-messages="error">
-                    <template v-slot:chip="{ item }">
-                        <v-chip color="primary">
+                <v-autocomplete :items="items" v-model:search="email" v-model:model-value="selectedEmail"
+                    placeholder="Enter email address" color="primary" :loading="isLoading" label="Email" :multiple="false"
+                    hide-no-data :error-messages="error" @update:search="() => {
+                        isLoading = true
+                        inputHandler()
+                    }">
+                    <template v-slot:prepend-inner="{ isActive }">
+                        <v-icon icon="mdi-email" :class="isActive.value == true ? 'text-primary' : 'text-grey'"></v-icon>
+                    </template>
+                    <template v-slot:chip="{ props, item }">
+                        <v-chip color="primary" v-bind="props" v-if="item.title">
                             <template v-slot:prepend>
                                 <v-avatar class="text-uppercase bg-red me-2">{{ item.value.slice(0, 1) }}</v-avatar>
                             </template>
                             {{ item.value }}
                         </v-chip>
                     </template>
-                </v-combobox>
+                </v-autocomplete>
             </v-card-text>
             <v-card-actions class="justify-end px-4 pb-4">
-                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" @click="submitHandler">
+                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" @click="submitHandler"
+                    :loading="Loading">
                     Add
                 </v-btn>
             </v-card-actions>

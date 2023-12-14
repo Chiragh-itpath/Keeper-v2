@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { UserStore, Uitlity } from '@/stores'
+import { UserStore, GlobalStore } from '@/stores'
 import InviteNotification from '@/components/InviteNotification.vue'
 import { RouterEnum } from '@/Models/enum'
 import { onMounted } from 'vue';
 let { logout, User, myProfile } = UserStore()
-const { ToggleSideBar } = Uitlity()
+const { ToggleSideBar } = GlobalStore()
 
 const toggleSidebar = (): void => {
     ToggleSideBar()

@@ -31,6 +31,13 @@ const items = computed(() => {
     ]
     return item
 })
+const getContactCount = (id: string): number => {
+    const group = Groups.value.find(x => x.id == id)
+    if (group) {
+        return group.contacts.length
+    }
+    return 0
+}
 
 watch(selectedItem, () => {
     let emails: string[] = []
@@ -53,17 +60,27 @@ const emits = defineEmits<{
 </script>
 
 <template>
-    <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips>
+    <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips label="select contact">
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.title }}</v-chip>
         </template>
-        <template v-slot:selection="{ item, index }">
-            <v-chip color="primary" v-if="index < 2">
-                <span>{{ item.title }}</span>
-            </v-chip>
-            <span v-if="index === 2" class="text-grey text-caption align-self-center">
-                (+{{ selectedItem.length - 2 }} others)
-            </span>
+        <template v-slot:item="{ item, props: itemProp }">
+            <v-list-item :title="item.title" v-bind="itemProp" class="px-0 mx-0">
+                <template v-slot:prepend="{ isActive }">
+                    <v-checkbox :model-value="isActive" hide-details></v-checkbox>
+                </template>
+                <template v-slot:subtitle="{ subtitle }">
+                    {{ subtitle }}
+                    <span v-if="subtitle == 'group'">
+                        ({{ getContactCount(item.props.id) }})
+                    </span>
+                </template>
+            </v-list-item>
+        </template>
+        <template v-slot:no-data>
+            <v-list-item class="text-grey">
+                No contacts or group added
+            </v-list-item>
         </template>
     </v-autocomplete>
 </template>

@@ -4,7 +4,7 @@ import { KeepStore } from '@/stores/KeepStore'
 import { ProjectStore } from '@/stores/ProjectStore'
 import { InviteStore } from '@/stores/InviteStore'
 import { UserStore } from '@/stores/UserStore'
-import { Uitlity } from '@/stores/UtilityStore'
+import { GlobalStore } from '@/stores/GlobalStore'
 import { ContactStore } from '@/stores/ContactStore'
 import { GroupStore } from '@/stores/GroupStore'
 
@@ -13,7 +13,7 @@ export {
     ItemStore,
     KeepStore,
     ProjectStore,
-    Uitlity,
+    GlobalStore,
     UserStore,
     InviteStore,
     ContactStore,

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, type Ref } from 'vue'
 import { RouterEnum } from '@/Models/enum'
 import TextField from '@/components/Custom/TextField.vue'
-import { AccountStore } from '@/stores'
+import { AccountStore, GlobalStore } from '@/stores'
 import type { IRegister } from '@/Models/UserModels'
-import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 const { registerUser } = AccountStore()
-
+const { Loading, errors } = storeToRefs(GlobalStore())
 const form = ref()
-const router = useRouter();
+const signupClicked: Ref<boolean> = ref(false)
 const SignUpForm = reactive<IRegister>({
     userName: '',
     email: '',
@@ -24,12 +24,11 @@ const checkPassword = (): boolean | string => {
 }
 
 async function register(): Promise<void> {
+    signupClicked.value = true
+    errors.value = {}
     const { valid } = await form.value.validate()
-
     if (!valid) return
-
     await registerUser(SignUpForm)
-    router.push({ name: RouterEnum.LOGIN })
 }
 
 </script>
@@ -45,10 +44,11 @@ async function register(): Promise<void> {
                     <v-card-subtitle class="text-center mb-5">
                         to continue to Keeper
                     </v-card-subtitle>
-                    <v-form @submit.prevent="register" ref="form" validate-on="submit">
+                    <v-form @submit.prevent="register" ref="form" :validate-on="signupClicked ? 'input' : 'submit'">
                         <div class="mx-5">
                             <text-field v-model="SignUpForm.userName" label="Username" icon="mdi-account" is-required />
-                            <text-field v-model="SignUpForm.email" label="Email" icon="mdi-email" is-required is-email />
+                            <text-field v-model="SignUpForm.email" label="Email" icon="mdi-email" is-required is-email
+                                :error-messages="errors.email" />
                             <text-field v-model="SignUpForm.contact" label="Contact" icon="mdi-account" is-required
                                 is-contact />
                             <text-field v-model="SignUpForm.password" label="Password" icon="mdi-lock" is-required
@@ -56,12 +56,12 @@ async function register(): Promise<void> {
                             <text-field v-model="SignUpForm.confirmPassword" label="Confirm Password" icon="mdi-lock"
                                 is-required is-password :-validation-rules="[checkPassword]" />
                         </div>
-
                         <v-card-actions>
                             <div class="d-flex flex-column justify-center mx-auto">
                                 <v-btn type="submit" flatcolor="#5865f2" rounded="lg" size="large" variant="flat"
-                                    color="teal" class="mt-4">Sign Up</v-btn>
-
+                                    color="teal" class="mt-4" :loading="Loading">
+                                    Sign Up
+                                </v-btn>
                                 <div class="mt-5">
                                     Already have an account?
                                     <router-link :to="{ name: RouterEnum.LOGIN }">Sign In</router-link>

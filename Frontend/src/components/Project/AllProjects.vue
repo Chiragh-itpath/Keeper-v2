@@ -130,6 +130,4 @@ const deleteHandler = async (): Promise<void> => {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-
 </style>

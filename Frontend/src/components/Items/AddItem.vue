@@ -52,7 +52,7 @@ watch(visible, () => {
         New Item
     </v-btn>
     <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="900">
-        <v-card max-height="600" class="">
+        <v-card max-height="600">
             <v-card-title class="bg-primary text-center position-sticky">
                 New Item
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
