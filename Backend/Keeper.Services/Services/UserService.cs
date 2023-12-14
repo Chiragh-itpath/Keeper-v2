@@ -29,7 +29,7 @@ namespace KeeperCore.Services
         public async Task<UserViewModel> CheckEmail(string email)
         {
             var res = await _userRepo.GetByEmailAsync(email);
-            if (res == null) throw new InnerException("", StatusType.NOT_FOUND);
+            if (res == null) throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
             return new UserViewModel
             {
                 Id = res.Id,

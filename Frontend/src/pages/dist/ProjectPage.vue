@@ -5,29 +5,32 @@ import AllProjects from '@/components/Project/AllProjects.vue'
 import DatePicker from '@/components/Custom/DatePicker.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { RouterEnum } from '@/Models/enum'
+
 const route = useRoute();
 const router = useRouter();
 const date = ref('')
 </script>
 <template>
-    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5" fluid>
-        <v-row class="mx-5">
+    <v-container class="overflow-auto h-screen bg-blue-grey-lighten-5 px-10" fluid>
+        <v-row>
             <v-col>
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
-            <v-col cols="12" lg="3" sm="4" xl="2" class="my-auto d-flex justify-end" v-if="route.name != RouterEnum.SHARED">
+            <v-col cols="12" lg="2" sm="3" xl="2" class="my-auto d-flex justify-end" v-if="route.name != RouterEnum.SHARED">
                 <add-project />
             </v-col>
         </v-row>
-        <v-row class="mx-5">
+        <v-row>
             <v-col cols="12" v-if="date || route.name == RouterEnum.PROJECT_BY_TAG">
                 Filter By:
-                <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
-                <v-chip color="black" closable v-if="route.name == RouterEnum.PROJECT_BY_TAG"
+                <v-chip class="mx-3 pa-3 bg-primary" closable v-if="date" @click:close="date = ''">Date</v-chip>
+                <v-chip class="bg-primary" closable v-if="route.name == RouterEnum.PROJECT_BY_TAG"
                     @click:close="router.push({ name: RouterEnum.PROJECT })">
                     Tag
                 </v-chip>
             </v-col>
+        </v-row>
+        <v-row>
             <all-projects :date="date"></all-projects>
         </v-row>
     </v-container>

@@ -10,6 +10,7 @@ import InviteKeep from '@/components/keeps/InviteKeep.vue'
 import InfoKeep from '@/components/keeps/InfoKeep.vue'
 import HoverEffect from '@/components/Custom/HoverEffect.vue'
 import Delete from '@/components/Custom/DeletePropmt.vue'
+import NoItem from '../NoItem.vue'
 import type { IKeep } from '@/Models/KeepModels'
 import { dateHelper } from '@/Services/HelperFunction'
 
@@ -57,6 +58,9 @@ onMounted(() => {
 })
 </script>
 <template>
+    <no-item v-if="KeepsToDisplay.length == 0">
+        No Keep Found
+    </no-item>
     <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(keep, index) in KeepsToDisplay" :key="index">
         <v-hover v-slot="{ props, isHovering }">
             <v-card v-bind="props" elevation="7" :class="isHovering ? 'fill' : ''" class="cursor-pointer"

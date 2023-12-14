@@ -20,7 +20,8 @@ namespace Keeper.Main.Controllers
             await _accountService.RegisterAsync(register);
             return new ResponseModel<string>
             {
-                Message = "Registered successfully"
+                Message = "Registered successfully",
+                Data = "true"
             };
         }
         [HttpPost("Login")]

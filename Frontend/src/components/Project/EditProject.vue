@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref, type Ref, watch } from 'vue'
-import { ProjectStore } from '@/stores'
+import { storeToRefs } from "pinia";
+import { GlobalStore, ProjectStore } from '@/stores'
 import TextField from '@/components/Custom/TextField.vue'
 import type { IEditProject } from '@/Models/ProjectModels'
 
@@ -13,7 +14,7 @@ const props = withDefaults(defineProps<{
 })
 
 const { GetSingalProject, UpdateProject } = ProjectStore()
-
+const { Loading } = storeToRefs(GlobalStore())
 const editProject: IEditProject = reactive({
     id: '',
     title: '',
@@ -79,7 +80,8 @@ const emits = defineEmits<{
                 </v-form>
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
-                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl">
+                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="120" class="mx-2 rounded-xl"
+                    :loading="Loading" :disabled="Loading">
                     Update
                 </v-btn>
             </v-card-actions>

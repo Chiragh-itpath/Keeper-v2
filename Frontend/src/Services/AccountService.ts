@@ -2,8 +2,9 @@ import { http } from '@/config/ApiClient'
 import type { ILogin, IPasswordReset, IRegister } from '@/Models/UserModels'
 import type { IToken } from '@/Models/TokenModel'
 
-const signup = async (user: IRegister): Promise<void> => {
-    await http.post('Account/Register', user)
+const signup = async (user: IRegister): Promise<string> => {
+    const response: string = await http.post('Account/Register', user)
+    return response
 }
 
 const signin = async (user: ILogin): Promise<IToken | null> => {
