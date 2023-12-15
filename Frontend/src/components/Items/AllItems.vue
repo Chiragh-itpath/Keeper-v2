@@ -7,7 +7,6 @@ import EditItem from '@/components/Items/EditItem.vue'
 import InfoItem from '@/components/Items/InfoItem.vue'
 import HoverEffect from '@/components/Custom/HoverEffect.vue'
 import Delete from '@/components/Custom/DeletePropmt.vue'
-import { ItemType } from '@/Models/enum'
 
 const { Items } = storeToRefs(ItemStore())
 const { DeleteItem } = ItemStore()
@@ -32,7 +31,7 @@ const deleteHandler = async (): Promise<void> => {
 
                     <a :href="item.url" class="text-white" target="_blank">
                         <v-chip class="me-4 cursor-pointer">
-                            {{ item.type == ItemType.TICKET ? '#' : '!' }} {{ item.number }}
+                            {{ item.type == 'Ticket' ? '#' : '!' }} {{ item.number }}
                         </v-chip>
                     </a>
                     <span class="text-white text-truncate">{{ item.title }}</span>

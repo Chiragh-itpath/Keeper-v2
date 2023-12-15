@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
 import { InviteStore } from '@/stores'
-import { type Colors } from '@/Models/enum'
+import { type Colors } from '@/Models/types'
 
 const GlobalStore = defineStore('globalStore', () => {
     const { InvitedProjectList, InvitedKeepList } = storeToRefs(InviteStore())

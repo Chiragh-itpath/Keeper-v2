@@ -1,4 +1,4 @@
-import type { Colors } from '@/Models/enum'
+import type { Colors } from '@/Models/types'
 import { GlobalStore } from '@/stores/GlobalStore'
 import { storeToRefs } from 'pinia'
 export const useToster = (options: { message: string; color?: Colors }) => {

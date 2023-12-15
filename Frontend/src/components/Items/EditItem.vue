@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, watch, type Ref } from 'vue'
-import { ItemType } from '@/Models/enum'
+import { type ItemType } from '@/Models/types'
 import { ItemStore } from '@/stores'
 import TextField from '@/components/Custom/TextField.vue'
 import TextEditor from '@/components/Custom/TextEditor.vue'
@@ -17,18 +17,18 @@ const editItem: IEditItem = reactive({
     keepId: '',
     userId: '',
     number: '',
-    type: ItemType.TICKET,
+    type: 'Ticket',
     to: '',
     discussedBy: '',
     files: null
 })
 const { getSingalItem, EditItem } = ItemStore()
-const itemType = ref('Ticket')
+const itemType: Ref<ItemType> = ref('Ticket')
 
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
     if (!valid) return
-    editItem.type = itemType.value == 'Ticket' ? ItemType.TICKET : ItemType.PR
+    editItem.type = itemType.value
     await EditItem(editItem)
     visible.value = false
 }

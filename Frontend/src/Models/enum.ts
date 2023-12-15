@@ -15,11 +15,6 @@ enum RouterEnum {
     PAGE_NOT_FOUND = 'PAGE_NOT_FOUND'
 }
 
-enum ItemType {
-    TICKET,
-    PR
-}
-
 const enum StatusType {
     SUCCESS,
     ALREADY_EXISTS,
@@ -32,14 +27,4 @@ const enum StatusType {
     INTERNAL_SERVER_ERROR
 }
 
-enum TagTypeEnum {
-    PROJECT,
-    KEEP
-}
-
-enum NoRecord {
-    Empty,
-    NotFound
-}
-type Colors = 'success' | 'info' | 'warning' | 'danger' | 'primary' | 'secondary'
-export { RouterEnum, ItemType, StatusType, TagTypeEnum, NoRecord, type Colors }
+export { RouterEnum, StatusType }
