@@ -1,6 +1,5 @@
-import { ItemType } from '@/Models/enum'
 import type { IComment } from './CommentModel'
-
+import type { ItemType } from '@/Models/types'
 type NullableString = string | undefined
 
 interface CommonItem {
@@ -8,7 +7,7 @@ interface CommonItem {
     description: NullableString
     url: NullableString
     type: ItemType
-    number: number
+    number: string
     to: NullableString
     discussedBy: NullableString
     keepId: string
