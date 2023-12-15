@@ -2,17 +2,18 @@
 import {
     contactRules,
     emailRules,
-    numberRules,
     passwordRule,
     requiredRule,
     urlRules
 } from '@/data/ValidationRules'
+import { watch } from 'vue';
 import { ref, type Ref } from 'vue'
 
 type TRule = (arg: string) => boolean | string
 
 const Props = withDefaults(
     defineProps<{
+        modelValue?: string
         label?: string
         color?: string
         placeholder?: string
@@ -22,7 +23,8 @@ const Props = withDefaults(
         isPassword?: boolean
         isNumber?: boolean
         isUrl?: boolean
-        icon?: string
+        icon?: string,
+        maxLimit?: number,
         ValidationRules?: TRule[],
         errorMessages?: string
     }>(),
@@ -37,9 +39,12 @@ const Props = withDefaults(
         isNumber: false,
         isUrl: false,
         icon: '',
+        maxLimit: 30
     }
 )
+const _value: Ref<string> = ref(Props.modelValue ?? '')
 const error: Ref<boolean> = ref(false)
+
 const type: Ref<string> = ref(Props.isEmail ? 'email' : Props.isPassword ? 'password' : 'text')
 let Rules: TRule[] = []
 
@@ -52,8 +57,6 @@ if (Props.isContact) Rules.push(contactRules)
 if (Props.isEmail) Rules.push(emailRules)
 
 if (Props.isPassword) Rules.push(passwordRule)
-
-if (Props.isNumber) Rules.push(numberRules)
 
 if (Props.isUrl) Rules.push(urlRules)
 
@@ -68,11 +71,29 @@ if (Props.errorMessages) {
         error.value = true
     }
 }
+watch(Props, () => {
+    _value.value = Props.modelValue ?? '';
+})
+watch(_value, () => {
+    emits('update:modelValue', _value.value?.trim() ?? '')
+})
+defineOptions({
+    inheritAttrs: false
+})
+const emits = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+}>()
 </script>
 <template>
-    <v-text-field :label="Props.label" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
+    <v-text-field v-model="_value" :label="Props.label" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
         :append-inner-icon="!isPassword ? '' : isPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :error="error"
-        :placeholder="placeholder" :error-messages="errorMessages" @click:append-inner="changeVisibility" class="mb-4">
+        :placeholder="placeholder" :error-messages="errorMessages" @click:append-inner="changeVisibility" class="mb-4"
+        @input="() => {
+            _value = _value.slice(0, Props.maxLimit)
+            if (Props.isContact || Props.isNumber) {
+                _value = _value.replace(/[^\d]/g, '')
+            }
+        }">
         <template v-slot:prepend-inner="{ isFocused }">
             <v-icon v-if="Props.icon" :icon="Props.icon"
                 :class="isFocused.value == true ? 'text-primary' : 'text-grey'"></v-icon>
