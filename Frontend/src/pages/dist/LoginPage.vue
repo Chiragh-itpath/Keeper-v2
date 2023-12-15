@@ -43,7 +43,7 @@ onMounted(() => {
                                 <text-field v-model="loginForm.email" label="Email" is-required is-email icon="mdi-email"
                                     :error-messages="errors.email" />
                                 <text-field v-model="loginForm.password" label="Password" is-required is-password
-                                    icon="mdi-lock" :error-messages="errors.password" />
+                                    icon="mdi-lock" :error-messages="errors.password" :max-limit="16" />
                             </div>
                             <div class="text-right">
                                 <router-link :to="{ name: RouterEnum.VERIFY_EMAIL }">
