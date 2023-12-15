@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, type Ref } from 'vue'
 import { RouterEnum } from '@/Models/enum'
 import type { ILogin } from '@/Models/UserModels'
 import TextField from '@/components/Custom/TextField.vue'
@@ -7,15 +7,16 @@ import { AccountStore, GlobalStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 const { loginUser } = AccountStore()
 const { Loading, errors } = storeToRefs(GlobalStore())
-
+const loginClicked: Ref<boolean> = ref(false)
 const form = ref()
 const loginForm = reactive<ILogin>({
-    email: 'keeper@yopmail.com',
-    password: 'admin123'
+    email: '',
+    password: ''
 })
 
 const login = async (): Promise<void> => {
     errors.value = {}
+    loginClicked.value = true
     const { valid } = await form.value.validate()
     if (!valid) return
     await loginUser(loginForm)
@@ -37,7 +38,7 @@ onMounted(() => {
                         to continue to Keeper
                     </v-card-subtitle>
                     <v-card-text>
-                        <v-form ref="form" @submit.prevent="login" validate-on="submit">
+                        <v-form ref="form" @submit.prevent="login" :validate-on="loginClicked ? 'input' : 'submit'">
                             <div class="mx-5">
                                 <text-field v-model="loginForm.email" label="Email" is-required is-email icon="mdi-email"
                                     :error-messages="errors.email" />
