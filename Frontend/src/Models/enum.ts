@@ -41,12 +41,5 @@ enum NoRecord {
     Empty,
     NotFound
 }
-enum Colors {
-    SUCCESS = 'success',
-    INFO = 'info',
-    WARNING = 'warning',
-    DANGER = 'danger',
-    PRIMARY = 'primary',
-    SECONDARY = 'secondary'
-}
-export { RouterEnum, ItemType, StatusType, TagTypeEnum, NoRecord, Colors }
+type Colors = 'success' | 'info' | 'warning' | 'danger' | 'primary' | 'secondary'
+export { RouterEnum, ItemType, StatusType, TagTypeEnum, NoRecord, type Colors }

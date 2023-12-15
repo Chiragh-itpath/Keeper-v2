@@ -5,6 +5,8 @@ import type { IItem, IAddItem, IEditItem } from '@/Models/ItemModels'
 import { Insert, Update, GetAll, Get, Delete, PostComment } from '@/Services/ItemService'
 import { dateHelper } from '@/Services/HelperFunction'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
+import { useToster } from '@/composable/useToaster'
+
 const ItemStore = defineStore('item', () => {
     const Items: Ref<IItem[]> = ref([])
     const AllItems: Ref<IItem[]> = ref([])
@@ -83,6 +85,7 @@ const ItemStore = defineStore('item', () => {
     const DeleteItem = async (id: string): Promise<void> => {
         const response = await Delete(id)
         if (response) {
+            useToster({ message: 'Item Deleted' })
             const index = Items.value.findIndex((x) => x.id == id)
             if (index != -1) {
                 AllItems.value.splice(index, 1)

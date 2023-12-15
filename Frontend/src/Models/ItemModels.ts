@@ -8,7 +8,7 @@ interface CommonItem {
     description: NullableString
     url: NullableString
     type: ItemType
-    number: number
+    number: string
     to: NullableString
     discussedBy: NullableString
     keepId: string
