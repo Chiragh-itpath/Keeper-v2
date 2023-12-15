@@ -2,12 +2,13 @@ import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { IKeep, IAddKeep, IEditKeep } from '@/Models/KeepModels'
 import { Insert, GetAll, Update, Delete } from '@/Services/KeepService'
+import { useToster } from '@/composable/useToaster'
 
 const KeepStore = defineStore('KeepStore', () => {
     const Keeps: Ref<IKeep[]> = ref([])
 
     const keepTags = computed(() => {
-        const tags = Keeps.value.map((x) => x.tag).filter(x => x != '' && x != null)
+        const tags = Keeps.value.map((x) => x.tag).filter((x) => x != '' && x != null)
         return [...new Set(tags)]
     })
 
@@ -36,6 +37,7 @@ const KeepStore = defineStore('KeepStore', () => {
     const DeleteKeep = async (keepId: string): Promise<any> => {
         const response = await Delete(keepId)
         if (response) {
+            useToster({ message: 'Keep Deleted' })
             const index = Keeps.value.findIndex((x) => x.id == keepId)
             if (index !== -1) Keeps.value.splice(index, 1)
         }

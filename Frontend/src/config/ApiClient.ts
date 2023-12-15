@@ -1,8 +1,9 @@
 import axios, { AxiosError } from 'axios'
 import { storeToRefs } from 'pinia'
 import { GlobalStore, UserStore } from '@/stores'
+import { useToster } from '@/composable/useToaster'
 import { getToken } from '@/Services/TokenService'
-import { Colors, StatusType } from '@/Models/enum'
+import { StatusType } from '@/Models/enum'
 import type { IResponse } from '@/Models/ResponseModel'
 
 const http = axios.create({
@@ -17,10 +18,7 @@ const navigateTologin = async () => {
     const { logout } = UserStore()
     logout()
 }
-const useToster = (message: string, color: Colors) => {
-    const { makeToster } = GlobalStore()
-    makeToster(message, color)
-}
+
 http.interceptors.request.use((config) => {
     loadingEffect(true)
     config.headers.Authorization = `Bearer ${getToken()}`
@@ -38,7 +36,7 @@ http.interceptors.response.use(
         ) {
             GlobalStore().setError('email', data.message)
         } else if (data.message) {
-            useToster(data.message, data.isSuccess ? Colors.SUCCESS : Colors.DANGER)
+            useToster({ message: data.message, color: data.isSuccess ? 'success' : 'danger' })
         }
 
         return Promise.resolve(data.data)
@@ -46,12 +44,12 @@ http.interceptors.response.use(
     (error: AxiosError<any>): Promise<null> => {
         loadingEffect(false)
         if (error.code == 'ERR_NETWORK') {
-            useToster('Server unavailable', Colors.DANGER)
+            useToster({ message: 'Server unavailable', color: 'danger' })
         } else if (error.response?.status == 401) {
             navigateTologin()
-            useToster('Your session is over Please login again', Colors.WARNING)
+            useToster({ message: 'Your session is over Please login again', color: 'warning' })
         } else {
-            useToster(error.response?.data.message, Colors.DANGER)
+            useToster({ message: error.response?.data.message, color: 'danger' })
         }
         return Promise.resolve(null)
     }

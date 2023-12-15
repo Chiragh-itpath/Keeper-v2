@@ -39,7 +39,7 @@ const emits = defineEmits<{
                 <span>
                     <v-chip>
                         <a :href="Item.url" class="text-decoration-none text-white" target="_blank">
-                            {{ Item.type == 0 ? '#' : '!' }}
+                            {{ Item.type == 'Ticket' ? '#' : '!' }}
                             {{ Item.number }}
                         </a>
                     </v-chip>

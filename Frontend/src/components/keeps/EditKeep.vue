@@ -63,10 +63,11 @@ const emits = defineEmits<{
                 <v-form @submit.prevent="submitHandler" ref="form" validate-on="submit">
                     <v-row>
                         <v-col cols="12" sm="8">
-                            <text-field v-model="editKeep.title" label="Title" is-required />
+                            <text-field v-model="editKeep.title" label="Title*" placeholder="Keep Title" is-required
+                                :max-limit="100" />
                         </v-col>
                         <v-col cols="12" sm="4">
-                            <text-field v-model="editKeep.tag" label="Tag" />
+                            <text-field v-model="editKeep.tag" label="Tag" placeholder="Keep Tag" />
                         </v-col>
                     </v-row>
                 </v-form>

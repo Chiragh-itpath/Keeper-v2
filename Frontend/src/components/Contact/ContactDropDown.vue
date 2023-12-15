@@ -52,12 +52,13 @@ const emits = defineEmits<{
 
 <template>
     <v-select :items="items" :multiple="multiple" chips color="primary" :label="label ? label : 'Email'"
-        placeholder="Select Contacts" v-model="modelValue" :error-messages="errors">
+        placeholder="Select Contacts" v-model="modelValue" :error-messages="errors" clearable>
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.value }}</v-chip>
         </template>
         <template v-slot:no-data>
             <v-list-item class="text-grey">No Contacts</v-list-item>
         </template>
+
     </v-select>
 </template>

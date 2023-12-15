@@ -2,6 +2,7 @@ import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { IProject, IAddProject, IEditProject } from '@/Models/ProjectModels'
 import { Insert, GetAll, Update, Delete } from '@/Services/ProjectService'
+import { useToster } from '@/composable/useToaster'
 
 const ProjectStore = defineStore('ProjectStore', () => {
     const Projects: Ref<IProject[]> = ref([])
@@ -47,6 +48,7 @@ const ProjectStore = defineStore('ProjectStore', () => {
     const DeleteProject = async (id: string): Promise<void> => {
         const response = await Delete(id)
         if (response) {
+            useToster({ message: 'Project Deleted' })
             const index = FindIndex(id)
             if (index !== -1) Projects.value.splice(index, 1)
         }

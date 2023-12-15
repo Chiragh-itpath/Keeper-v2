@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, type Ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { RouterEnum } from '@/Models/enum'
 import TextField from '@/components/Custom/TextField.vue'
 import { AccountStore, GlobalStore } from '@/stores'
 import type { IRegister } from '@/Models/UserModels'
-import { storeToRefs } from 'pinia'
 const { registerUser } = AccountStore()
 const { Loading, errors } = storeToRefs(GlobalStore())
 const form = ref()
@@ -33,9 +33,9 @@ async function register(): Promise<void> {
 
 </script>
 <template>
-    <v-container fluid class=" h-screen">
-        <v-row justify="center" align-content="center" class="h-100">
-            <v-col cols="12" sm="9" md="6" lg="4">
+    <v-container fluid class="my-10 mb-md-0">
+        <v-row justify="center">
+            <v-col cols="12" sm="8" md="6" lg="4" xl="3">
                 <v-card class="pa-4 elevation-12 rounded-xl">
                     <v-card-title class="text-center mt-5">
                         <h2 class="text-teal">Keeper</h2>
@@ -46,15 +46,15 @@ async function register(): Promise<void> {
                     </v-card-subtitle>
                     <v-form @submit.prevent="register" ref="form" :validate-on="signupClicked ? 'input' : 'submit'">
                         <div class="mx-5">
-                            <text-field v-model="SignUpForm.userName" label="Username" icon="mdi-account" is-required />
+                            <text-field v-model="SignUpForm.userName" label="Full Name" icon="mdi-account" is-required />
                             <text-field v-model="SignUpForm.email" label="Email" icon="mdi-email" is-required is-email
                                 :error-messages="errors.email" />
-                            <text-field v-model="SignUpForm.contact" label="Contact" icon="mdi-account" is-required
-                                is-contact />
+                            <text-field v-model="SignUpForm.contact" label="Mobile Number" icon="mdi-account" is-required
+                                is-contact :max-limit="10" />
                             <text-field v-model="SignUpForm.password" label="Password" icon="mdi-lock" is-required
-                                is-password />
+                                is-password :max-limit="16" />
                             <text-field v-model="SignUpForm.confirmPassword" label="Confirm Password" icon="mdi-lock"
-                                is-required is-password :-validation-rules="[checkPassword]" />
+                                is-required is-password :-validation-rules="[checkPassword]" :max-limit="16" />
                         </div>
                         <v-card-actions>
                             <div class="d-flex flex-column justify-center mx-auto">
