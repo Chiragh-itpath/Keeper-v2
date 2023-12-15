@@ -28,11 +28,15 @@ const deleteHandler = async (): Promise<void> => {
         <v-hover v-slot="{ isHovering, props }">
             <v-card v-bind="props" :elevation="isHovering ? 15 : 5" @click="() => { infoVisible = true; id = item.id }">
                 <v-card-title class="bg-primary d-flex">
-
                     <a :href="item.url" class="text-white" target="_blank">
-                        <v-chip class="me-4 cursor-pointer">
-                            {{ item.type == 'Ticket' ? '#' : '!' }} {{ item.number }}
-                        </v-chip>
+                        <v-tooltip color="primary">
+                            <template v-slot:activator="{ props }">
+                                <v-chip class="me-4 cursor-pointer" v-bind="props">
+                                    {{ item.type == 0 ? '!' : '#' }} {{ item.number }}
+                                </v-chip>
+                            </template>
+                            {{ item.type == 0 ? 'Ticket' : 'PR' }}
+                        </v-tooltip>
                     </a>
                     <span class="text-white text-truncate">{{ item.title }}</span>
                     <v-spacer></v-spacer>
