@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue'
-import { GroupStore } from '@/stores'
+import { GlobalStore, GroupStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import type { IGroup } from '@/Models/GroupModels'
 import type { IContact } from '@/Models/ContactModels'
@@ -10,6 +10,7 @@ import ContactDropDown from '@/components/Contact/ContactDropDown.vue'
 
 const { Groups } = storeToRefs(GroupStore())
 const { AddContacts } = GroupStore()
+const { Loading } = storeToRefs(GlobalStore())
 const group: Ref<undefined | IGroup> = ref()
 const visible: Ref<boolean> = ref(false)
 const Contacts: Ref<IContact[]> = ref([])
@@ -60,7 +61,8 @@ const submitHandler = async () => {
                         </contact-drop-down>
                     </v-col>
                     <v-col cols="auto">
-                        <v-btn color="primary" class="rounded-xl" @click="submitHandler">Add Person</v-btn>
+                        <v-btn color="primary" class="rounded-xl" @click="submitHandler" :loading="Loading"
+                            :disabled="Loading">Add Person</v-btn>
                     </v-col>
                     <v-col cols="12">
                         <v-card max-height="500" elevation="0">
