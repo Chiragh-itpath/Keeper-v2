@@ -41,7 +41,7 @@ const close = () => {
     <v-btn @click="visible = true" color="primary" variant="elevated" prepend-icon="mdi-plus" width="100%">
         New Keep
     </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700">
+    <v-dialog transition="scale-transition" v-model="visible" max-width="700" @update:model-value="close">
         <v-card>
             <v-card-title class="text-center bg-primary">
                 New keep
