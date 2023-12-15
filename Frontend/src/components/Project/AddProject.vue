@@ -41,10 +41,11 @@ const close = () => {
                 <v-form @submit.prevent="submitHandler" ref="form" validate-on="submit">
                     <v-row>
                         <v-col cols="12" sm="8">
-                            <text-field v-model="addProject.title" label="Title" is-required />
+                            <text-field v-model="addProject.title" label="Title*" placeholder="Project Title" is-required
+                                :max-limit="100" />
                         </v-col>
                         <v-col cols="12" sm="4">
-                            <text-field v-model="addProject.tag" label="Tag" />
+                            <text-field v-model="addProject.tag" label="Tag" placeholder="Project Tag" />
                         </v-col>
                     </v-row>
                     <v-row>

@@ -16,7 +16,7 @@ const editItem: IEditItem = reactive({
     url: '',
     keepId: '',
     userId: '',
-    number: 0,
+    number: '',
     type: ItemType.TICKET,
     to: '',
     discussedBy: '',
@@ -64,8 +64,6 @@ const emits = defineEmits<{
     (e: 'update:modelValue', modelValue: boolean): void
 }>()
 
-
-
 </script>
 <template>
     <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="900">
@@ -81,15 +79,17 @@ const emits = defineEmits<{
                             <v-select :items="['Ticket', 'PR']" label="Type" color="primary" v-model="itemType" />
                         </v-col>
                         <v-col cols="6" lg="3" md="3" sm="6">
-                            <text-field label="Number" is-number v-model="editItem.number" />
+                            <text-field label="Number" placeholder="Ticker | PR number" is-number
+                                v-model="editItem.number" />
                         </v-col>
                         <v-col>
-                            <text-field label="Item Name" is-required v-model="editItem.title" />
+                            <text-field label="Item Name*" placeholder="Item title" is-required v-model="editItem.title" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <text-field label="URL" is-url v-model="editItem.url" icon="mdi-link-box-variant-outline" />
+                            <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url"
+                                icon="mdi-link-box-variant-outline" />
                         </v-col>
                         <v-col cols="12">
                             <text-editor v-model="editItem.description" />

@@ -16,7 +16,7 @@ const addItem: IAddItem = reactive({
     url: '',
     keepId: '',
     userId: '',
-    number: 0,
+    number: '',
     type: ItemType.TICKET,
     to: '',
     discussedBy: '',
@@ -42,7 +42,7 @@ watch(visible, () => {
     if (visible.value) {
         addItem.keepId = props.keepId
         addItem.title = addItem.description = addItem.url = addItem.discussedBy = addItem.to = ''
-        addItem.number = 0
+        addItem.number = ''
     }
 })
 
@@ -64,15 +64,17 @@ watch(visible, () => {
                             <v-select :items="['Ticket', 'PR']" label="Type" color="primary" v-model="itemType" />
                         </v-col>
                         <v-col cols="6" lg="3" md="3" sm="6">
-                            <text-field label="Number" is-number v-model="addItem.number" />
+                            <text-field label="Number" placeholder="Ticker | PR number" is-number v-model="addItem.number"
+                                :max-limit="10" />
                         </v-col>
                         <v-col>
-                            <text-field label="Item Name" is-required v-model="addItem.title" />
+                            <text-field label="Item Name*" placeholder="Item title" is-required v-model="addItem.title" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <text-field label="URL" is-url v-model="addItem.url" icon="mdi-link-box-variant-outline" />
+                            <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
+                                icon="mdi-link-box-variant-outline" />
                         </v-col>
                         <v-col cols="12">
                             <text-editor v-model="addItem.description"></text-editor>
