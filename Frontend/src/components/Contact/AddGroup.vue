@@ -76,11 +76,11 @@ watch(visible, () => {
             </v-card-text>
             <v-card-actions class="justify-end">
                 <v-btn class="rounded-xl mx-2 mb-2" variant="elevated" color="primary" width="120" v-if="window == 'group'"
-                    append-icon="mdi-arrow-right" @click="validateForm" :loading="Loading" :disabled="Loading">
+                    append-icon="mdi-arrow-right" @click="validateForm">
                     Next
                 </v-btn>
                 <v-btn class="rounded-xl mx-2 mb-2" variant="elevated" color="primary" width="120" v-else
-                    @click="handleSubmit">
+                    @click="handleSubmit" :loading="Loading" :disabled="Loading">
                     Done
                 </v-btn>
             </v-card-actions>

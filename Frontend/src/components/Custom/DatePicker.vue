@@ -44,7 +44,8 @@ const clear = () => {
             </v-text-field>
         </template>
         <v-date-picker v-model="date" color="primary" :max="new Date()" @click:cancel="menu = false"
-            input-placeholder="mm/dd/yyyy" hide-actions hide-weekdays></v-date-picker>
+            input-placeholder="mm/dd/yyyy" hide-weekdays>
+        </v-date-picker>
     </v-menu>
 </template>
 <style >
