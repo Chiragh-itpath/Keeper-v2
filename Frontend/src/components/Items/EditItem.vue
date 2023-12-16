@@ -52,7 +52,7 @@ watch(props, () => {
         editItem.url = item!.url
         editItem.to = item!.to
         editItem.discussedBy = item!.discussedBy
-        editItem.type = item!.type
+        editItem.type = item!.type == 0 ? 'Ticket' : 'PR'
     }
 })
 watch(visible, () => {
