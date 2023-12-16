@@ -43,6 +43,7 @@ watch(visible, () => {
         addItem.keepId = props.keepId
         addItem.title = addItem.description = addItem.url = addItem.discussedBy = addItem.to = ''
         addItem.number = ''
+        addItem.files = null
     }
 })
 

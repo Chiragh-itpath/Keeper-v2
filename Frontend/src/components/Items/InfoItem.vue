@@ -37,12 +37,17 @@ const emits = defineEmits<{
         <v-card v-if="Item">
             <v-card-title class="bg-primary d-flex">
                 <span>
-                    <v-chip>
-                        <a :href="Item.url" class="text-decoration-none text-white" target="_blank">
-                            {{ Item.type == 'Ticket' ? '#' : '!' }}
-                            {{ Item.number }}
-                        </a>
-                    </v-chip>
+                    <a :href="Item.url" class="text-decoration-none text-white" target="_blank">
+                        <v-tooltip>
+                            <template v-slot:activator="{ props }">
+                                <v-chip class="cursor-pointer" v-bind="props">
+                                    {{ Item.type == 0 ? '!' : '#' }}
+                                    {{ Item.number }}
+                                </v-chip>
+                            </template>
+                            {{ Item.type == 0 ? 'Ticket' : 'PR' }}
+                        </v-tooltip>
+                    </a>
                 </span>
                 <v-spacer></v-spacer>
                 <span class="text-truncate">{{ Item.title }}</span>
@@ -63,8 +68,22 @@ const emits = defineEmits<{
                             URL: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
                         </div>
                         <div>
-                            <div class="mb-3">To: {{ Item.to ?? '' }}</div>
-                            <div class="mb-3">Discussed by:{{ Item.discussedBy ?? '' }}</div>
+                            <div class="mb-3">Discuss with:
+                                <template v-if="Item.to">
+                                    <v-chip color="primary">{{ Item.to }}</v-chip>
+                                </template>
+                                <template v-else>
+                                    <v-chip class="bg-grey-darkken-3">
+                                        -
+                                    </v-chip>
+                                </template>
+                            </div>
+                            <div class="mb-3">Discussed by:
+                                <template v-if="Item.discussedBy">
+                                    <v-chip class="bg-primary">{{ Item.discussedBy }}
+                                    </v-chip>
+                                </template>
+                            </div>
                         </div>
                         <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
                         <div v-for="(file, index) in Item.files" :key="index" class="my-3">

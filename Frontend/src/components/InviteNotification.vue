@@ -1,27 +1,32 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { GlobalStore, InviteStore } from '@/stores'
 
-const { NotificationCount } = storeToRefs(GlobalStore())
+const menu = ref(false)
+const { NotificationCount, Loading } = storeToRefs(GlobalStore())
 const { InvitedProjectList, InvitedKeepList } = storeToRefs(InviteStore())
 const { ProjectInviteResponse, keepInviteResponse, FetchInvitedProjects, FetchInvitedKeeps } = InviteStore()
 
 const onProjectInviteAccept = async (id: string): Promise<void> => {
     await ProjectInviteResponse(id, true)
     InvitedProjectList.value = InvitedProjectList.value.filter(x => x.projectId != id)
+    menu.value = false
 }
 const onProjectInviteDecline = async (id: string): Promise<void> => {
     await ProjectInviteResponse(id, false)
     InvitedProjectList.value = InvitedProjectList.value.filter(x => x.projectId != id)
+    menu.value = false
 }
 const onKeepInviteAccept = async (id: string): Promise<void> => {
     await keepInviteResponse(id, true)
     InvitedKeepList.value = InvitedKeepList.value.filter(x => x.keepId != id)
+    menu.value = false
 }
 const onKeepInviteDecline = async (id: string): Promise<void> => {
     await keepInviteResponse(id, false)
     InvitedKeepList.value = InvitedKeepList.value.filter(x => x.keepId != id)
+    menu.value = false
 }
 onMounted(async (): Promise<void> => {
     await FetchInvitedProjects()
@@ -29,7 +34,7 @@ onMounted(async (): Promise<void> => {
 })
 </script>
 <template>
-    <v-menu location="bottom" transition="scale-transition">
+    <v-menu location="bottom" transition="scale-transition" v-model="menu" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
             <span class="me-10">
                 <v-badge :content="NotificationCount" color="red" v-if="NotificationCount > 0">
@@ -54,14 +59,18 @@ onMounted(async (): Promise<void> => {
                         </div>
                     </v-card-text>
                     <v-card-actions class="d-flex justify-end ma-0 pa-0 px-3 ">
-                        <v-icon color="green" role="button" size="x-large" class="mx-4"
-                            @click="onProjectInviteAccept(notification.projectId)">
-                            mdi-check-circle-outline
-                        </v-icon>
-                        <v-icon color="red" role="button" size="x-large"
-                            @click="onProjectInviteDecline(notification.projectId)">
-                            mdi-close-circle-outline
-                        </v-icon>
+                        <v-progress-circular indeterminate color="primary" v-if="Loading"></v-progress-circular>
+                        <template v-else>
+
+                            <v-icon color="green" role="button" size="x-large" class="mx-4"
+                                @click="onProjectInviteAccept(notification.projectId)">
+                                mdi-check-circle-outline
+                            </v-icon>
+                            <v-icon color="red" role="button" size="x-large"
+                                @click="onProjectInviteDecline(notification.projectId)">
+                                mdi-close-circle-outline
+                            </v-icon>
+                        </template>
                     </v-card-actions>
                 </v-card>
                 <v-card v-for="(notification, index) in InvitedKeepList" :key="index" class="my-3 custom-card rounded-lg"

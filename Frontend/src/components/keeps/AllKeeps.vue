@@ -63,7 +63,7 @@ onMounted(() => {
     </no-item>
     <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(keep, index) in KeepsToDisplay" :key="index">
         <v-hover v-slot="{ props, isHovering }">
-            <v-card v-bind="props" elevation="7" :class="isHovering ? 'fill' : ''" class="cursor-pointer"
+            <v-card v-bind="props" :elevation="isHovering ? 15 : 5" class="cursor-pointer"
                 @click="router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })">
                 <v-card-title class="bg-primary d-flex">
                     <span class="text-truncate">{{ keep.title }}</span>

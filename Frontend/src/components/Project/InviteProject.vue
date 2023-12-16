@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { InviteStore, ContactStore, GroupStore } from '@/stores'
+import { storeToRefs } from 'pinia';
+import { InviteStore, ContactStore, GroupStore, GlobalStore } from '@/stores'
 import InviteDropDown from '@/components/Contact/InviteDropDown.vue'
 
 const props = withDefaults(defineProps<{
@@ -16,6 +17,7 @@ const inviteEmails: Ref<string[]> = ref([])
 const { InviteUsersToProject } = InviteStore()
 const { GetContacts } = ContactStore()
 const { GetGroups } = GroupStore()
+const { Loading } = storeToRefs(GlobalStore())
 
 const handleInvite = async (): Promise<void> => {
     await InviteUsersToProject(props.id, inviteEmails.value)
@@ -53,7 +55,7 @@ const emits = defineEmits<{
             </v-card-text>
             <v-card-actions class="justify-end">
                 <v-btn color="primary" variant="elevated" min-width="130" class="mx-4 mb-3 rounded-xl" @click="handleInvite"
-                    :disabled="inviteEmails.length == 0">
+                    :disabled="Loading || inviteEmails.length == 0" :loading="Loading">
                     invite
                 </v-btn>
             </v-card-actions>

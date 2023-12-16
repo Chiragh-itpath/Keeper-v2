@@ -31,7 +31,7 @@ const close = () => {
     <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" width="100%" @click="visible = true">
         New Project
     </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" width="700">
+    <v-dialog transition="scale-transition" v-model="visible" width="700" @update:model-value="close">
         <v-card>
             <v-card-title class="text-center bg-primary">
                 New Project

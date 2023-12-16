@@ -61,7 +61,7 @@ const deleteHandler = async (): Promise<void> => {
     </no-item>
     <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(project, index) in ProjectsToDisplay" :key="index">
         <v-hover v-slot="{ isHovering, props }">
-            <v-card elevation="10" v-bind="props" :class="isHovering ? 'fill' : ''" class="cursor-pointer"
+            <v-card :elevation="isHovering ?  15 : 5" v-bind="props" class="cursor-pointer"
                 @click="router.push({ name: RouterEnum.KEEP, params: { id: project.id } })">
                 <v-card-title class="bg-primary d-flex">
                     <span class="text-truncate">{{ project.title }}</span>

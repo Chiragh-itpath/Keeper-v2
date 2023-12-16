@@ -6,23 +6,25 @@ interface CommonItem {
     title: string
     description: NullableString
     url: NullableString
-    type: ItemType
     number: string
     to: NullableString
     discussedBy: NullableString
     keepId: string
 }
 interface IAddItem extends CommonItem {
+    type: ItemType
     files: any
 }
 
 interface IEditItem extends CommonItem {
+    type: ItemType
     id: string
     files: any
 }
 
 interface IItem extends CommonItem {
     id: string
+    type: number
     createdBy: string
     createdOn: string
     updatedBy: NullableString
