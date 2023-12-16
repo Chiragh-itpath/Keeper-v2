@@ -2,7 +2,7 @@
 import { ref, type Ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { AccountStore } from '@/stores'
+import { AccountStore, GlobalStore } from '@/stores'
 import TextField from '@/components/Custom/TextField.vue'
 import { RouterEnum } from '@/Models/enum'
 
@@ -14,7 +14,7 @@ const confirmPassword: Ref<string> = ref('')
 const router = useRouter()
 const { email } = storeToRefs(AccountStore())
 const { PasswordReset } = AccountStore()
-
+const { Loading } = storeToRefs(GlobalStore())
 const ChangePassWord = async () => {
     errorMessages.value = ''
     const { valid } = await form.value.validate()
@@ -41,7 +41,7 @@ onMounted(() => {
         <text-field label="Confirm Password" v-model="confirmPassword" is-required is-password
             placeholder="Enter confirm Password" :error-messages="errorMessages" />
         <div class="d-flex justify-center pa-4">
-            <v-btn color="primary" @click="ChangePassWord">Change Password</v-btn>
+            <v-btn color="primary" @click="ChangePassWord" :loading="Loading" :disabled="Loading">Change Password</v-btn>
         </div>
     </v-form>
 </template>
