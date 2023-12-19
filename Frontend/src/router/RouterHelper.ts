@@ -1,23 +1,19 @@
 import { RouterEnum } from '@/Models/enum'
 import type { RouteLocationNormalized } from 'vue-router'
-import { ContactStore, GroupStore, ItemStore, KeepStore, ProjectStore } from '@/stores'
+import { ContactStore, GroupStore, ItemStore, KeepStore } from '@/stores'
 
 const beforeResolve = async (route: RouteLocationNormalized) => {
     const id = Array.isArray(route.params.id) ? route.params.id.join('') : route.params.id
     const keepId = Array.isArray(route.params.keepId)
         ? route.params.keepId.join('')
         : route.params.keepId
-    const projectStore = ProjectStore()
     const keepStore = KeepStore()
     const itemStore = ItemStore()
     const contactStore = ContactStore()
     const groupStore = GroupStore()
     switch (route.name) {
-        case RouterEnum.PROJECT:
-            await projectStore.GetProjects()
-            break
         case RouterEnum.KEEP:
-            await keepStore.GetKeeps(id)
+            // await keepStore.GetKeeps(id)
             break
         case RouterEnum.ITEM:
             await itemStore.GetAllItems(keepId)

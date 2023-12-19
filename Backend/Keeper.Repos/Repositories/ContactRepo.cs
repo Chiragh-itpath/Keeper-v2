@@ -26,6 +26,7 @@ namespace Keeper.Repos.Repositories
         {
             return await (from contact in _db.Contact.AsNoTracking()
                           join user in _db.Users.AsNoTracking() on contact.Email equals user.Email
+                          where contact.UserId == userId
                           select new ContactModel
                           {
                               Id = contact.Id,

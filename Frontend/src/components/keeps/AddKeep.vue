@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref, watch } from 'vue'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import { KeepStore, GlobalStore } from '@/stores'
 import type { IAddKeep } from '@/Models/KeepModels'
 import { storeToRefs } from 'pinia';
@@ -55,7 +55,7 @@ const close = () => {
                                 :max-limit="100" />
                         </v-col>
                         <v-col cols="12" sm="4">
-                            <text-field v-model="addKeep.tag" label="Tag" placeholder="Keep Tag"  />
+                            <text-field v-model="addKeep.tag" label="Tag" placeholder="Keep Tag" />
                         </v-col>
                     </v-row>
                 </v-form>

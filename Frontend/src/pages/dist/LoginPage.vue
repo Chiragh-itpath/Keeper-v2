@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted, type Ref } from 'vue'
 import { RouterEnum } from '@/Models/enum'
 import type { ILogin } from '@/Models/UserModels'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import { AccountStore, GlobalStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 const { loginUser } = AccountStore()

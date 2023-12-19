@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import AddItem from '@/components/Items/AddItem.vue'
-import AllItems from '@/components/Items/AllItems.vue'
-import NoItem from '@/components/NoItem.vue'
-import DatePicker from '@/components/Custom/DatePicker.vue'
+import { useRoute } from 'vue-router'
+import { AddItem, AllItems } from '@/components/Items'
+import { DatePicker } from '@/components/Custom'
 import { ItemStore, ContactStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
-
-const router = useRouter()
 const route = useRoute()
 const { Items } = storeToRefs(ItemStore())
 const { FilterByDate } = ItemStore()
 
 const date = ref()
 
-
+const projectId = computed(() => {
+    const id = route.params.id
+    return Array.isArray(id) ? id.join('') : id
+})
 const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
@@ -34,7 +33,22 @@ onMounted(async () => {
 
         <v-row class="mx-5">
             <v-col cols="12">
-                <v-btn color="primary" prepend-icon="mdi-arrow-left" @click="router.go(-1)">Back</v-btn>
+                <v-breadcrumbs divider="/" :items="[
+                    {
+                        title: 'Projects',
+                        disabled: false,
+                        to: '/Project'
+                    },
+                    {
+                        title: 'Keeps',
+                        disabled: false,
+                        to: `/Project/${projectId}`
+                    },
+                    {
+                        title: 'Item',
+                        disabled: true
+                    }
+                ]"></v-breadcrumbs>
             </v-col>
             <v-col>
                 <date-picker label="Select a date" v-model="date"></date-picker>

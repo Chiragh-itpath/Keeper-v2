@@ -2,7 +2,7 @@
 import { ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia';
 import { InviteStore, ContactStore, GroupStore, GlobalStore } from '@/stores'
-import InviteDropDown from '@/components/Contact/InviteDropDown.vue'
+import { InviteDropDown } from '@/components/Contact'
 
 const props = withDefaults(defineProps<{
     id: string,

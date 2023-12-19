@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref } from 'vue'
 import { GlobalStore, ProjectStore } from '@/stores'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import type { IAddProject } from '@/Models/ProjectModels'
 import { storeToRefs } from 'pinia';
 

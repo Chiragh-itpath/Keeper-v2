@@ -1,32 +1,26 @@
 <script lang="ts" setup>
 import { type Ref, ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { RouterEnum } from '@/Models/enum'
 import { KeepStore } from '@/stores'
-
-import EditKeep from '@/components/keeps/EditKeep.vue'
-import InviteKeep from '@/components/keeps/InviteKeep.vue'
-import InfoKeep from '@/components/keeps/InfoKeep.vue'
-import HoverEffect from '@/components/Custom/HoverEffect.vue'
-import Delete from '@/components/Custom/DeletePropmt.vue'
-import NoItem from '../NoItem.vue'
+import { EditKeep, InfoKeep, InviteKeep } from '@/components/keeps'
+import { HoverEffect, NoItem, DeletePropmt } from '@/components/Custom'
 import type { IKeep } from '@/Models/KeepModels'
 import { dateHelper } from '@/Services/HelperFunction'
 
 const props = withDefaults(defineProps<{
-    date?: string | null
+    keeps: IKeep[],
+    date?: string | null,
+    tags: string[]
 }>(), {
     date: null
 })
 
 const router = useRouter()
-const route = useRoute()
-const { Keeps } = storeToRefs(KeepStore())
-const KeepsToDisplay: Ref<IKeep[]> = ref([])
 const id: Ref<string> = ref('')
-const projectId: Ref<string> = ref('')
+const KeepsToDisplay: Ref<IKeep[]> = ref(props.keeps)
 
+const projectId: Ref<string> = ref('')
 const editVisible: Ref<boolean> = ref(false)
 const deleteVisible: Ref<boolean> = ref(false)
 const infoVisible: Ref<boolean> = ref(false)
@@ -38,23 +32,17 @@ const deleteHandler = async (): Promise<void> => {
     deleteVisible.value = false
 }
 
-watch([props, route], () => {
-    const tag = Array.isArray(route.params.tag) ? route.params.tag.join('') : route.params.tag;
-
+watch(props, () => {
     const filterFunction = (keep: IKeep) => {
         const keepDate = dateHelper(keep.createdOn);
         return (!props.date || keepDate === dateHelper(props.date)) &&
-            (
-                route.name === RouterEnum.KEEP ||
-                (route.name === RouterEnum.KEEP_BY_TAG && keep.tag == tag)
-            )
+            (props.tags.length == 0 || props.tags.includes(keep.tag))
     }
-
-    KeepsToDisplay.value = Keeps.value.filter(filterFunction);
+    KeepsToDisplay.value = props.keeps.filter(filterFunction);
 })
 
 onMounted(() => {
-    KeepsToDisplay.value = Keeps.value
+    KeepsToDisplay.value = props.keeps
 })
 </script>
 <template>
@@ -107,13 +95,7 @@ onMounted(() => {
         </v-hover>
     </v-col>
     <edit-keep v-model="editVisible" :id="id" :project-id="projectId"></edit-keep>
-    <delete v-model="deleteVisible" @click:yes="deleteHandler">Keep</delete>
+    <delete-propmt v-model="deleteVisible" @click:yes="deleteHandler">Keep</delete-propmt>
     <invite-keep v-model="inviteVisible" :id="id" :project-id="projectId"></invite-keep>
     <info-keep v-model="infoVisible" :id="id"></info-keep>
 </template>
-<style scoped>
-.v-list-item {
-    min-height: 0 !important;
-    margin: 5px 0 !important;
-}
-</style>

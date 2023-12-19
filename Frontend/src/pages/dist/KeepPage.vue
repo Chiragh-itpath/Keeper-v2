@@ -1,46 +1,62 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
-import AddKeep from '@/components/keeps/AddKeep.vue'
-import AllKeeps from '@/components/keeps/AllKeeps.vue'
-import DatePicker from '@/components/Custom/DatePicker.vue'
-import { RouterEnum } from '@/Models/enum'
+import { computed, onMounted, ref, type Ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { AddKeep, AllKeeps } from '@/components/keeps'
+import { DatePicker, TagSelector } from '@/components/Custom'
+import { KeepStore } from '@/stores'
 
 const date = ref()
 const route = useRoute()
-const router = useRouter()
-
+const loading: Ref<boolean> = ref(false)
+const selectedTags: Ref<string[]> = ref([])
+const { GetKeeps } = KeepStore()
+const { Keeps, keepTags } = storeToRefs(KeepStore())
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
 })
+onMounted(async () => {
+    loading.value = true
+    await GetKeeps(projectId.value)
+    loading.value = false
+})
 </script>
 <template>
-    <v-container class="overflow-auto" fluid>
-        <v-row class="mx-5">
+    <v-container class="overflow-auto px-10" fluid>
+        <v-row>
             <v-col cols="12">
-                <v-btn color="primary" prepend-icon="mdi-arrow-left" @click="router.push({ name: RouterEnum.PROJECT })">
-                    Back
-                </v-btn>
+                <v-breadcrumbs divider="/" :items="[
+                    {
+                        title: 'Projects',
+                        disabled: false,
+                        to: '/Project'
+                    },
+                    {
+                        title: 'Keep',
+                        disabled: true
+                    }
+                ]">
+                    <template v-slot:title="{ item }">
+                        {{ item.title }}</template>
+                </v-breadcrumbs>
             </v-col>
-            <v-col>
+            <v-col class="d-flex">
+                <tag-selector :items="keepTags" v-model:selected="selectedTags"></tag-selector>
+                <span class="mx-2"></span>
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
             <v-col cols="12" lg="2" sm="3" xl="2" class="my-auto d-flex justify-end">
                 <add-keep :project-id="projectId"></add-keep>
             </v-col>
         </v-row>
-        <v-row class="mx-5">
-            <v-col cols="12" v-if="date || route.name == RouterEnum.KEEP_BY_TAG">
-                Filter By:
-                <v-chip class="mx-3 pa-3 bg-primary" closable v-if="date" @click:close="date = ''">Date</v-chip>
-                <v-chip class="bg-primary" closable v-if="route.name == RouterEnum.KEEP_BY_TAG"
-                    @click:close="router.push({ name: RouterEnum.KEEP })">
-                    Tag
-                </v-chip>
+        <v-row v-if="loading">
+            <v-col v-for="i in 10" :key="i" cols="3">
+                <v-skeleton-loader type="text,actions"></v-skeleton-loader>
             </v-col>
-            <all-keeps :date="date"></all-keeps>
+        </v-row>
+        <v-row v-else class="mt-10">
+            <all-keeps :date="date" :keeps="Keeps" :tags="selectedTags"></all-keeps>
         </v-row>
     </v-container>
 </template>

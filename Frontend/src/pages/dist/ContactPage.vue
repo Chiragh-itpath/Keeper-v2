@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import AddGroup from '@/components/Contact/AddGroup.vue'
-import AddContact from '@/components/Contact/AddContact.vue'
-import AllContacts from '@/components/Contact/AllContacts.vue'
-import AllGroups from '@/components/Contact/AllGroups.vue'
+import { AllContacts, AddContact, AllGroups, AddGroup } from '@/components/Contact'
 
 const tabs = ref()
 const searchText: Ref<string> = ref('')
