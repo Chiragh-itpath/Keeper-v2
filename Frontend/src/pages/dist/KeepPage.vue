@@ -24,9 +24,14 @@ onMounted(async () => {
 </script>
 <template>
     <v-container class="overflow-auto px-10" fluid>
-        <v-row>
+        <v-row v-if="loading">
+            <v-col v-for="i in 16" :key="i" cols="3">
+                <v-skeleton-loader type="text,actions"></v-skeleton-loader>
+            </v-col>
+        </v-row>
+        <v-row v-if="!loading">
             <v-col cols="12">
-                <v-breadcrumbs divider="/" :items="[
+                <v-breadcrumbs divider="/" class="px-0" :items="[
                     {
                         title: 'Projects',
                         disabled: false,
@@ -46,16 +51,11 @@ onMounted(async () => {
                 <span class="mx-2"></span>
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
-            <v-col cols="12" lg="2" sm="3" xl="2" class="my-auto d-flex justify-end">
+            <v-col class="my-auto d-flex justify-end">
                 <add-keep :project-id="projectId"></add-keep>
             </v-col>
         </v-row>
-        <v-row v-if="loading">
-            <v-col v-for="i in 10" :key="i" cols="3">
-                <v-skeleton-loader type="text,actions"></v-skeleton-loader>
-            </v-col>
-        </v-row>
-        <v-row v-else class="mt-10">
+        <v-row v-if="!loading" class="mt-10">
             <all-keeps :date="date" :keeps="Keeps" :tags="selectedTags"></all-keeps>
         </v-row>
     </v-container>

@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { ref, type Ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import OtpInput from '@/components/Custom/OtpInput.vue'
-import { AccountStore, GlobalStore } from '@/stores'
+import { ref, type Ref } from 'vue'
+import { OtpInput } from '@/components/Custom/'
+import { GlobalStore } from '@/stores'
 import { storeToRefs } from 'pinia'
-import { RouterEnum } from '@/Models/enum'
+
+
+const props = defineProps<{
+    opt: string
+}>()
 
 const otp: Ref<string> = ref('')
 const errorMessages: Ref<string> = ref('')
-const { serverOtp } = storeToRefs(AccountStore())
 const { Loading } = storeToRefs(GlobalStore())
 
 const form = ref()
-const router = useRouter()
 
 const VerifyOTP = async () => {
     errorMessages.value = ''
@@ -20,17 +21,16 @@ const VerifyOTP = async () => {
         errorMessages.value = 'Enter valid otp'
         return;
     }
-    if (otp.value != serverOtp.value) {
+    if (otp.value != props.opt) {
         errorMessages.value = 'Wrong otp'
         return
     }
-    router.push({ name: RouterEnum.PASSWORD_RESET })
+    emit('valid')
 }
-onMounted(() => {
-    if (serverOtp.value == '') {
-        router.go(-1)
-    }
-})
+const emit = defineEmits<{
+    (e: 'valid'): void
+}>()
+
 </script>
 <template>
     <v-form ref="form" validate-on="submit">

@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<{
 const { Contacts } = storeToRefs(ContactStore())
 const checkedContacts: Ref<string[]> = ref([])
 const ContactsToDisplay: Ref<IContact[]> = ref(props.contacts ?? Contacts.value)
-const chcekHandler = (checked: boolean, value: string) => {
+const chcekHandler = (checked: boolean | null, value: string) => {
     if (checked) {
         checkedContacts.value.push(value)
     } else {

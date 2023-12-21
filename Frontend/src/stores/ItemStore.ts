@@ -1,8 +1,7 @@
 import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { IItem, IAddItem, IEditItem } from '@/Models/ItemModels'
-import { Insert, Update, GetAll, Get, Delete, PostComment } from '@/Services/ItemService'
-import { dateHelper } from '@/Services/HelperFunction'
+import { ItemService } from '@/Services/ItemService'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
 import { useToster } from '@/composable/useToaster'
 
@@ -11,6 +10,7 @@ const ItemStore = defineStore('item', () => {
     const AllItems: Ref<IItem[]> = ref([])
 
     const KeepId: Ref<string> = ref('')
+    const itemService = new ItemService()
     const getSingalItem = (id: string): IItem | undefined => {
         const item = Items.value.find((x) => x.id == id)
         return item
@@ -18,7 +18,7 @@ const ItemStore = defineStore('item', () => {
 
     const GetAllItems = async (id: string): Promise<void> => {
         KeepId.value = id
-        const response = await GetAll(id)
+        const response = await itemService.GetAll(id)
         if (response) {
             AllItems.value = response
             fetchItems()
@@ -26,7 +26,7 @@ const ItemStore = defineStore('item', () => {
     }
 
     const GetById = async (id: string): Promise<IItem | null> => {
-        const response = await Get(id)
+        const response = await itemService.GetById(id)
         if (response) {
             return response
         }
@@ -49,7 +49,7 @@ const ItemStore = defineStore('item', () => {
             }
         }
 
-        const response = await Insert(formData)
+        const response = await itemService.Add(formData)
         if (response) {
             AllItems.value.push(response)
             fetchItems()
@@ -71,7 +71,7 @@ const ItemStore = defineStore('item', () => {
                 formData.append('files', file)
             }
         }
-        const response = await Update(formData)
+        const response = await itemService.Update(formData)
         if (response) {
             const index = Items.value.findIndex((x) => x.id == editItem.id)
             AllItems.value.splice(index, 1, response)
@@ -82,7 +82,7 @@ const ItemStore = defineStore('item', () => {
         Items.value = AllItems.value
     }
     const DeleteItem = async (id: string): Promise<void> => {
-        const response = await Delete(id)
+        const response = await itemService.Delete(id)
         if (response) {
             useToster({ message: 'Item Deleted' })
             const index = Items.value.findIndex((x) => x.id == id)
@@ -93,15 +93,8 @@ const ItemStore = defineStore('item', () => {
         }
     }
     const AddComment = async (addCommnet: IAddComment): Promise<IComment | null> => {
-        const comment = await PostComment(addCommnet)
+        const comment = await itemService.PostComment(addCommnet)
         return comment
-    }
-    const FilterByDate = (date: string) => {
-        if (date == '') {
-            fetchItems()
-        } else {
-            Items.value = AllItems.value.filter((x) => dateHelper(date) == dateHelper(x.createdOn))
-        }
     }
     return {
         Items,
@@ -112,7 +105,6 @@ const ItemStore = defineStore('item', () => {
         GetAllItems,
         GetById,
         getSingalItem,
-        FilterByDate,
         AddComment
     }
 })

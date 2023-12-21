@@ -1,43 +1,77 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { onMounted, ref, type Ref } from 'vue';
 import { AllContacts, AddContact, AllGroups, AddGroup } from '@/components/Contact'
+import { ContactStore, GroupStore } from '@/stores'
 
 const tabs = ref()
-const searchText: Ref<string> = ref('')
+const contactSearch: Ref<string> = ref('')
+const groupSearch: Ref<string> = ref('')
+const { GetContacts } = ContactStore()
+const { GetGroups } = GroupStore()
+const loading: Ref<boolean> = ref(false)
+onMounted(async () => {
+    loading.value = true
+    await GetContacts()
+    await GetGroups()
+    loading.value = false
+})
 </script>
 <template>
     <v-container class="overflow-auto" fluid>
-        <v-row class="mt-10 align-center">
-            <v-col cols="12" md="8">
-                <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable hide-details
-                    v-model="searchText"></v-text-field>
+        <v-row v-if="loading">
+            <v-col cols="12">
+                <v-skeleton-loader type="heading"></v-skeleton-loader>
             </v-col>
-            <v-col cols="6" md="2" class="text-center">
-                <add-contact></add-contact>
-            </v-col>
-            <v-col cols="6" md="2" class="text-center">
-                <add-group></add-group>
+            <v-col cols="12">
+                <v-skeleton-loader type="list-item,table-tbody"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row class="mt-10">
+        <v-row v-if="!loading">
             <v-col cols="12">
-                <v-card elevation="8">
+                <v-card elevation="0" class="d-flex flex-row-reverse">
                     <v-tabs color="primary" v-model="tabs">
-                        <v-tab value="contact" class="w-50">Contacts</v-tab>
-                        <v-tab value="group" class="w-50">Groups</v-tab>
+                        <v-tab value="contact">Contacts</v-tab>
+                        <v-tab value="group">Groups</v-tab>
                     </v-tabs>
                 </v-card>
             </v-col>
-            <v-col cols="12">
-                <v-window v-model="tabs">
-                    <v-window-item value="contact">
-                        <all-contacts :search="searchText"></all-contacts>
-                    </v-window-item>
-                    <v-window-item value="group">
-                        <all-groups :search="searchText"></all-groups>
-                    </v-window-item>
-                </v-window>
-            </v-col>
         </v-row>
+        <v-window v-model="tabs" v-if="!loading">
+            <v-window-item value="contact">
+                <v-row class="mt-10 align-center">
+                    <v-col>
+                        <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
+                            hide-details v-model="contactSearch">
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="auto" class="text-end me-2">
+                        <add-contact></add-contact>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <all-contacts :search="contactSearch"></all-contacts>
+                    </v-col>
+                </v-row>
+            </v-window-item>
+            <v-window-item value="group">
+                <v-row class="mt-10 align-center">
+                    <v-col>
+                        <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
+                            hide-details v-model="groupSearch"></v-text-field>
+                    </v-col>
+                    <v-col cols="auto" class="text-center">
+                        <add-group></add-group>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <all-groups :search="groupSearch"></all-groups>
+                    </v-col>
+                </v-row>
+            </v-window-item>
+        </v-window>
+
+
     </v-container>
 </template>

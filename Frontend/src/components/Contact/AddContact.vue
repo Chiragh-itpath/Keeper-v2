@@ -3,7 +3,8 @@ import { ref, watch, type Ref } from 'vue'
 import { GlobalStore, UserStore } from '@/stores'
 import { ContactStore } from '@/stores'
 import { debounce } from 'lodash'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
+
 const visible: Ref<boolean> = ref(false)
 const email: Ref<string> = ref('')
 const selectedEmail: Ref<string | undefined> = ref()
@@ -44,7 +45,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-btn color="primary" prepend-icon="mdi-plus" @click="visible = !visible" width="100%">New Contact</v-btn>
+    <v-btn color="primary" prepend-icon="mdi-plus" @click="visible = !visible">New Contact</v-btn>
     <v-dialog v-model="visible" max-width="600">
         <v-card class="rounded-lg">
             <v-card-title class="bg-primary text-center">

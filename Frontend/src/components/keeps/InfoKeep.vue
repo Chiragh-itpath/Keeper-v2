@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import type { IKeep } from '@/Models/KeepModels'
-import { dateHelper } from '@/Services/HelperFunction'
-import { UserStore, KeepStore } from '@/stores'
+import { UserStore } from '@/stores'
+import { useDate } from 'vuetify'
 
+const dateHelper = useDate()
 const props = withDefaults(defineProps<{
     modelValue: boolean,
-    id: string
+    id: string,
+    keep?: IKeep
 }>(), {
     modelValue: false
 })
@@ -14,23 +16,23 @@ const props = withDefaults(defineProps<{
 const visible: Ref<boolean> = ref(false)
 const Keep: Ref<IKeep | undefined> = ref()
 const { User, myProfile } = UserStore()
-const { getSingle } = KeepStore()
 
 watch(props, async () => {
     visible.value = props.modelValue
     if (props.modelValue) {
-        Keep.value = getSingle(props.id)
 
         if (User.id == '') {
             await myProfile()
         }
     }
 })
+
 watch(visible, () => {
     if (!visible.value) {
         emits('update:modelValue', visible.value)
     }
 })
+
 const emits = defineEmits<{
     (e: 'update:modelValue', modelValue: boolean): void
 }>()
@@ -57,20 +59,24 @@ const emits = defineEmits<{
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Owner:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
-                        {{ Keep?.createdBy == User.email ? 'me' : Keep?.createdBy }}
+                        {{ Keep?.createdBy }}
                     </v-col>
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Created On:</v-col>
-                    <v-col cols="6" class="pb-0 pb-sm-3">{{ dateHelper(Keep?.createdOn) }}</v-col>
+                    <v-col cols="6" class="pb-0 pb-sm-3">
+                        {{ dateHelper.format(Keep?.createdOn, 'keyboardDate') }}
+                    </v-col>
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified By:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
-                        {{ Keep?.createdBy == User.email ? 'me' : Keep?.createdBy }}
+                        {{ Keep?.updatedBy }}
                     </v-col>
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
-                        {{ dateHelper(Keep?.updatedOn) }}
+                        <span v-if="dateHelper.isValid(Keep?.updatedOn)">
+                            {{ dateHelper.format(Keep?.updatedOn, 'keyboardDate') }}
+                        </span>
                     </v-col>
                 </v-row>
             </v-card-text>

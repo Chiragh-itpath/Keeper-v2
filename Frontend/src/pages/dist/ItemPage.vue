@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, onMounted, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { AddItem, AllItems } from '@/components/Items'
 import { DatePicker } from '@/components/Custom'
@@ -7,10 +7,10 @@ import { ItemStore, ContactStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 const route = useRoute()
+const { GetAllItems } = ItemStore()
 const { Items } = storeToRefs(ItemStore())
-const { FilterByDate } = ItemStore()
-
-const date = ref()
+const loading: Ref<boolean> = ref(false)
+const date = ref(null)
 
 const projectId = computed(() => {
     const id = route.params.id
@@ -21,17 +21,21 @@ const keepId = computed(() => {
     return Array.isArray(id) ? id.join('') : id
 })
 
-watch(date, () => {
-    FilterByDate(date.value)
-})
 onMounted(async () => {
+    loading.value = true
+    await GetAllItems(keepId.value)
     await ContactStore().GetContacts()
+    loading.value = false
 })
 </script>
 <template>
-    <v-container class="overflow-auto" fluid>
-
-        <v-row class="mx-5">
+    <v-container class="px-10 pt-5" fluid>
+        <v-row v-if="loading">
+            <v-col v-for=" i  in  4" :key="i" cols="6">
+                <v-skeleton-loader type="text,image,actions"></v-skeleton-loader>
+            </v-col>
+        </v-row>
+        <v-row v-if="!loading">
             <v-col cols="12">
                 <v-breadcrumbs divider="/" :items="[
                     {
@@ -53,21 +57,12 @@ onMounted(async () => {
             <v-col>
                 <date-picker label="Select a date" v-model="date"></date-picker>
             </v-col>
-            <v-col cols="12" lg="2" md="3" sm="3" class="my-auto d-flex justify-end">
+            <v-col class="my-auto d-flex justify-end">
                 <add-item :keep-id="keepId"></add-item>
             </v-col>
         </v-row>
-        <v-row class="mx-5">
-            <v-col cols="12" v-if="date">
-                Filter By:
-                <v-chip color="black" closable v-if="date" @click:close="date = ''" class="mx-3 pa-3">Date</v-chip>
-            </v-col>
+        <v-row v-if="!loading">
+            <all-items :items="Items" :date="date"></all-items>
         </v-row>
-        <v-row class="mx-5">
-            <all-items></all-items>
-        </v-row>
-        <no-item v-if="Items.length == 0">
-            No record has been added yet
-        </no-item>
     </v-container>
 </template>

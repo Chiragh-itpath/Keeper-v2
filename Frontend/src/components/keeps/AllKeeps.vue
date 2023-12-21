@@ -6,8 +6,8 @@ import { KeepStore } from '@/stores'
 import { EditKeep, InfoKeep, InviteKeep } from '@/components/keeps'
 import { HoverEffect, NoItem, DeletePropmt } from '@/components/Custom'
 import type { IKeep } from '@/Models/KeepModels'
-import { dateHelper } from '@/Services/HelperFunction'
-
+import { useDate } from 'vuetify'
+const dateHelper = useDate()
 const props = withDefaults(defineProps<{
     keeps: IKeep[],
     date?: string | null,
@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
 
 const router = useRouter()
 const id: Ref<string> = ref('')
+const keep: Ref<IKeep | undefined> = ref()
 const KeepsToDisplay: Ref<IKeep[]> = ref(props.keeps)
 
 const projectId: Ref<string> = ref('')
@@ -34,8 +35,9 @@ const deleteHandler = async (): Promise<void> => {
 
 watch(props, () => {
     const filterFunction = (keep: IKeep) => {
-        const keepDate = dateHelper(keep.createdOn);
-        return (!props.date || keepDate === dateHelper(props.date)) &&
+        return (
+            !props.date ||
+            dateHelper.format(props.date, 'keyboardDate') == dateHelper.format(keep.createdOn, 'keyboardDate')) &&
             (props.tags.length == 0 || props.tags.includes(keep.tag))
     }
     KeepsToDisplay.value = props.keeps.filter(filterFunction);
@@ -46,12 +48,13 @@ onMounted(() => {
 })
 </script>
 <template>
-    <no-item v-if="KeepsToDisplay.length == 0">
-        No Keep Found
+    <no-item v-if="KeepsToDisplay.length == 0" title="No Keep Found"
+        :sub-title="(date) ? 'There is no record on this date' : 'Please click on add button to insert new record'">
+
     </no-item>
     <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(keep, index) in KeepsToDisplay" :key="index">
         <v-hover v-slot="{ props, isHovering }">
-            <v-card v-bind="props" :elevation="isHovering ? 15 : 5" class="cursor-pointer"
+            <v-card v-bind="props" :elevation="isHovering ? 8 : 3" class="cursor-pointer"
                 @click="router.push({ name: RouterEnum.ITEM, params: { id: keep.projectId, keepId: keep.id } })">
                 <v-card-title class="bg-primary d-flex">
                     <span class="text-truncate">{{ keep.title }}</span>
@@ -97,5 +100,5 @@ onMounted(() => {
     <edit-keep v-model="editVisible" :id="id" :project-id="projectId"></edit-keep>
     <delete-propmt v-model="deleteVisible" @click:yes="deleteHandler">Keep</delete-propmt>
     <invite-keep v-model="inviteVisible" :id="id" :project-id="projectId"></invite-keep>
-    <info-keep v-model="infoVisible" :id="id"></info-keep>
+    <info-keep v-model="infoVisible" :id="id" :keep="keep"></info-keep>
 </template>

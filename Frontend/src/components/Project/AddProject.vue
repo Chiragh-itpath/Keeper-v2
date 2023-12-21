@@ -28,7 +28,7 @@ const close = () => {
 }
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" width="100%" @click="visible = true">
+    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true">
         New Project
     </v-btn>
     <v-dialog transition="scale-transition" v-model="visible" width="700" @update:model-value="close">

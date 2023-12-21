@@ -46,7 +46,7 @@ onMounted(() => {
                                     icon="mdi-lock" :error-messages="errors.password" :max-limit="16" />
                             </div>
                             <div class="text-right">
-                                <router-link :to="{ name: RouterEnum.VERIFY_EMAIL }">
+                                <router-link :to="{ name: RouterEnum.PASSWORD_RESET }">
                                     Forgot Password?
                                 </router-link>
                             </div>

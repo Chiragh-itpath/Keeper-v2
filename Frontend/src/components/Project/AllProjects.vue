@@ -7,7 +7,7 @@ import { EditProject, InfoProject, InviteProject } from '@/components/Project'
 import { DeletePropmt, HoverEffect, NoItem } from '@/components/Custom'
 
 import type { IProject } from '@/Models/ProjectModels'
-import { dateHelper } from '@/Services/HelperFunction'
+import { useDate } from 'vuetify'
 
 const props = withDefaults(defineProps<{
     date?: string | null,
@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<{
 const { DeleteProject } = ProjectStore()
 const router = useRouter()
 const id: Ref<string> = ref('')
+const dateHelper = useDate()
 const ProjectsToDisplay: Ref<IProject[]> = ref(props.projects)
 const selectedProject: Ref<IProject | undefined> = ref()
 const visible = reactive<{
@@ -46,19 +47,21 @@ const deleteHandler = async (): Promise<void> => {
     visible.delete = false
 }
 const filterFunction = (project: IProject) => {
-    const projectDate = dateHelper(project.createdOn);
-    return (!props.date || projectDate === dateHelper(props.date)) &&
+
+    return (
+        !props.date ||
+        dateHelper.format(project.createdOn, 'keyboardDate') == dateHelper.format(props.date, 'keyboardDate')) &&
         (props.tags.length === 0 || props.tags.includes(project.tag)) &&
         (!props.isShared || project.isShared);
 }
 </script>
 <template>
-    <no-item v-if="ProjectsToDisplay.length == 0">
-        No Projects found
+    <no-item v-if="ProjectsToDisplay.length == 0" title="No Project Found"
+        :sub-title="date ? 'There is No Project on this date' : 'Please click on add button to insert new record'">
     </no-item>
     <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(project, index) in ProjectsToDisplay" :key="index">
         <v-hover v-slot="{ isHovering, props }">
-            <v-card :elevation="isHovering ? 15 : 5" v-bind="props" class="cursor-pointer"
+            <v-card :elevation="isHovering ? 8 : 3" v-bind="props" class="cursor-pointer"
                 @click="router.push({ name: RouterEnum.KEEP, params: { id: project.id } })">
                 <v-card-title class="bg-primary d-flex">
                     <span class="text-truncate">{{ project.title }}</span>

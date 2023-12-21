@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, type Ref, watch } from 'vue'
 import { ProjectStore, UserStore } from '@/stores'
-import { dateHelper } from '@/Services/HelperFunction'
 import type { IProject } from '@/Models/ProjectModels'
-
+import { useDate } from 'vuetify';
 const props = withDefaults(defineProps<{
     id: string,
     modelValue: boolean
@@ -16,6 +15,7 @@ const { SingleProject } = ProjectStore()
 const { User, myProfile } = UserStore()
 const project: Ref<IProject | undefined> = ref()
 const visible: Ref<boolean> = ref(false)
+const dateHelper = useDate()
 
 watch(props, async () => {
     visible.value = props.modelValue
@@ -64,17 +64,22 @@ const emits = defineEmits<{
                     </v-col>
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Created On:</v-col>
-                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3">{{ dateHelper(project?.createdOn) }}</v-col>
-
+                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
+                        {{ dateHelper.format(project?.createdOn, 'keyboardDate') }}
+                    </v-col>
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">
                         Last Modified By:
                     </v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
-                        {{ project?.createdBy == User.email ? 'me' : project?.createdBy }}
+                        {{ project?.createdBy == User.email ? 'me' : project?.updatedBy }}
                     </v-col>
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Last Modified:</v-col>
-                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3">{{ dateHelper(project?.updatedOn) }}</v-col>
+                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
+                        <span v-if="dateHelper.isValid(project?.updatedOn)">
+                            {{ dateHelper.format(project?.updatedOn, 'keyboardDate') }}
+                        </span>
+                    </v-col>
                 </v-row>
             </v-card-text>
         </v-card>

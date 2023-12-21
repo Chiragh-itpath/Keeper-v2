@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue';
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
     items: string[]
-
-}>(), {
-
-})
+}>()
 const tags = ref(props.items)
 const menu: Ref<boolean> = ref(false)
 const selected: Ref<string[]> = ref([])
@@ -33,7 +30,8 @@ const emits = defineEmits<{
                 </span>
             </v-btn>
         </template>
-        <v-list min-width="200" select-strategy="classic" v-model:selected="selected" density="compact">
+        <v-list min-width="200" select-strategy="classic" v-model:selected="selected" density="compact"
+            v-if="tags.length > 0">
             <v-list-item v-for="(tag, index) in tags" :key="index" :value="tag">
                 <template v-slot:prepend="{ isActive }">
                     <v-checkbox hide-details :model-value="isActive" color="primary" density="comfortable"></v-checkbox>

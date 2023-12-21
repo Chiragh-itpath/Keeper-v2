@@ -1,38 +1,58 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
-import { storeToRefs } from 'pinia'
+import { ref, watch, type Ref, reactive } from 'vue'
 import { ItemStore } from '@/stores'
-
-import EditItem from '@/components/Items/EditItem.vue'
-import InfoItem from '@/components/Items/InfoItem.vue'
-import HoverEffect from '@/components/Custom/HoverEffect.vue'
-import Delete from '@/components/Custom/DeletePropmt.vue'
-
-const { Items } = storeToRefs(ItemStore())
+import { EditItem, InfoItem } from '@/components/Items/'
+import { HoverEffect, DeletePropmt, NoItem } from '@/components/Custom/'
+import type { IItem } from '@/Models/ItemModels'
+import { useDate } from 'vuetify'
+const dateHelper = useDate()
+const props = defineProps<{
+    items: IItem[],
+    date: Date | null
+}>()
+const itemToDisplay = ref(props.items)
 const { DeleteItem } = ItemStore()
 const id: Ref<string> = ref('')
-const editVisible: Ref<boolean> = ref(false)
-const deleteVisible: Ref<boolean> = ref(false)
-const infoVisible: Ref<boolean> = ref(false)
+
+const visible = reactive<{
+    edit: boolean,
+    delete: boolean,
+    info: boolean
+}>({
+    edit: false,
+    delete: false,
+    info: false
+})
 
 const deleteHandler = async (): Promise<void> => {
     await DeleteItem(id.value)
-    deleteVisible.value = false
+    visible.delete = false
 }
+watch(props, () => {
+    itemToDisplay.value = props.items.filter(x => {
+        return (
+            !props.date ||
+            dateHelper.format(x.createdOn, 'keyboardDate') == dateHelper.format(props.date, 'keyboardDate')
+        )
+    })
+})
 </script>
 <template>
-    <edit-item :id="id" v-model="editVisible"></edit-item>
-    <info-item :id="id" v-model="infoVisible"></info-item>
-    <delete v-model="deleteVisible" @click:yes="deleteHandler">Item</delete>
-    <v-col cols="12" lg="4" md="6" v-for="(item, index) of Items" :key="index">
+    <edit-item :id="id" v-model="visible.edit"></edit-item>
+    <info-item :id="id" v-model="visible.info"></info-item>
+    <delete-propmt v-model="visible.delete" @click:yes="deleteHandler">Item</delete-propmt>
+    <no-item v-if="itemToDisplay.length == 0" title="No Item Found"
+        :sub-title="date ? 'No record found on this date' : 'Please click on add button to insert new record'">
+    </no-item>
+    <v-col cols="12" lg="4" md="6" v-for="(item, index) of itemToDisplay" :key="index">
         <v-hover v-slot="{ isHovering, props }">
-            <v-card v-bind="props" :elevation="isHovering ? 15 : 5" @click="() => { infoVisible = true; id = item.id }">
+            <v-card v-bind="props" :elevation="isHovering ? 8 : 3" @click="() => { visible.info = true; id = item.id }">
                 <v-card-title class="bg-primary d-flex">
                     <a :href="item.url" class="text-white" target="_blank">
                         <v-tooltip color="primary">
                             <template v-slot:activator="{ props }">
                                 <v-chip class="me-4 cursor-pointer" v-bind="props">
-                                    {{ item.type == 0 ? '!' : '#' }} {{ item.number }}
+                                    {{ item.type == 0 ? '#' : '!' }} {{ item.number }}
                                 </v-chip>
                             </template>
                             {{ item.type == 0 ? 'Ticket' : 'PR' }}
@@ -44,13 +64,13 @@ const deleteHandler = async (): Promise<void> => {
                         <v-menu location="bottom" width="250">
                             <v-list>
                                 <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                    @click="() => { id = item.id; editVisible = true }">
+                                    @click="() => { id = item.id; visible.edit = true }">
                                     <hover-effect icon="file-document-edit-outline" icon-color="edit">
                                         Edit
                                     </hover-effect>
                                 </v-list-item>
                                 <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                    @click="() => { id = item.id; deleteVisible = true }">
+                                    @click="() => { id = item.id; visible.delete = true }">
                                     <hover-effect icon="delete-outline" icon-color="delete">
                                         Delete
                                     </hover-effect>

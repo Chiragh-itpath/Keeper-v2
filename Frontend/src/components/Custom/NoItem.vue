@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineProps<{
+    title?: string,
+    subTitle?: string
+}>()
 </script>
 <template>
     <v-col cols="12">
@@ -7,10 +11,10 @@
                 <v-icon color="primary" size="150">mdi-notebook-remove</v-icon>
             </div>
             <p class="text-h5 mt-10 text-primary">
-                <slot></slot>
+                {{ title }}
             </p>
             <p class="text-grey-darken-1 mt-2 text-center mb-10">
-                Please click on add button to insert new record
+                {{ subTitle }}
             </p>
         </div>
     </v-col>
