@@ -45,7 +45,7 @@ const HighLightText = (text: string) => {
                 <td class="text-center" colspan="3">No Groups</td>
             </tr>
             <tr v-for="(group, index) in GroupsToDisplay " :key="index" class="cursor-pointer">
-                <group-details :id="group.id" v-slot="{ onclick }">
+                <group-details :group="group" v-slot="{ onclick }">
                     <td @click="onclick" class="v-col-1">
                         <v-icon color="primary">mdi-account-group-outline</v-icon>
                     </td>

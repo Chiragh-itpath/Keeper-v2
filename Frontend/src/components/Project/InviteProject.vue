@@ -3,6 +3,7 @@ import { ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia';
 import { InviteStore, ContactStore, GroupStore, GlobalStore } from '@/stores'
 import { InviteDropDown } from '@/components/Contact'
+import type { IUser } from '@/Models/UserModels';
 
 const props = withDefaults(defineProps<{
     id: string,
@@ -13,16 +14,15 @@ const props = withDefaults(defineProps<{
 })
 
 const visible: Ref<boolean> = ref(props.modelValue)
-const inviteEmails: Ref<string[]> = ref([])
+const inviteUser: Ref<IUser[]> = ref([])
 const { InviteUsersToProject } = InviteStore()
 const { GetContacts } = ContactStore()
 const { GetGroups } = GroupStore()
 const { Loading } = storeToRefs(GlobalStore())
 
 const handleInvite = async (): Promise<void> => {
-    await InviteUsersToProject(props.id, inviteEmails.value)
+    await InviteUsersToProject(props.id, inviteUser.value)
     visible.value = false
-
 }
 watch(props, async () => {
     if (props.modelValue) {
@@ -49,13 +49,13 @@ const emits = defineEmits<{
             <v-card-text>
                 <v-row>
                     <v-col cols="12">
-                        <invite-drop-down v-model:emails="inviteEmails"></invite-drop-down>
+                        <invite-drop-down v-model:users="inviteUser"></invite-drop-down>
                     </v-col>
                 </v-row>
             </v-card-text>
             <v-card-actions class="justify-end">
                 <v-btn color="primary" variant="elevated" min-width="130" class="mx-4 mb-3 rounded-xl" @click="handleInvite"
-                    :disabled="Loading || inviteEmails.length == 0" :loading="Loading">
+                    :disabled="Loading || inviteUser.length == 0" :loading="Loading">
                     invite
                 </v-btn>
             </v-card-actions>

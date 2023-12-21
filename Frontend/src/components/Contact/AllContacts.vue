@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue';
-import { ContactStore } from '@/stores'
-import { storeToRefs } from 'pinia'
 import type { IContact } from '@/Models/ContactModels'
 
 const props = withDefaults(defineProps<{
@@ -9,7 +7,7 @@ const props = withDefaults(defineProps<{
     search?: string,
     hideHeader?: boolean,
     showBorder?: boolean,
-    contacts?: IContact[],
+    contacts: IContact[],
     noContacts?: boolean
 }>(), {
     checkbox: false,
@@ -19,10 +17,9 @@ const props = withDefaults(defineProps<{
     noContacts: false
 })
 
-const { Contacts } = storeToRefs(ContactStore())
 
 const checkedContacts: Ref<string[]> = ref([])
-const ContactsToDisplay: Ref<IContact[]> = ref(props.contacts ?? Contacts.value)
+const ContactsToDisplay: Ref<IContact[]> = ref(props.contacts)
 const chcekHandler = (checked: boolean | null, value: string) => {
     if (checked) {
         checkedContacts.value.push(value)
@@ -33,13 +30,12 @@ const chcekHandler = (checked: boolean | null, value: string) => {
 }
 watch(props, () => {
     if (props.search != '' && props.search != null) {
-
-        ContactsToDisplay.value = Contacts.value.filter(x =>
+        ContactsToDisplay.value = props.contacts.filter(x =>
             x.addedPerson.userName.startsWith(props.search) ||
             x.addedPerson.email.startsWith(props.search)
         )
     } else {
-        ContactsToDisplay.value = Contacts.value
+        ContactsToDisplay.value = props.contacts
     }
 })
 const HighLightText = (text: string) => {

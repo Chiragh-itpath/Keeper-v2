@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ContactStore, GroupStore } from '@/stores'
+import type { IUser } from '@/Models/UserModels';
 
-const selectedItem = ref()
+const selectedItem: Ref<any[]> = ref([])
 const { Contacts } = storeToRefs(ContactStore())
 const { Groups } = storeToRefs(GroupStore())
 
@@ -12,20 +13,16 @@ const items = computed(() => {
     item = [
         ...(Groups.value.filter(x => x.contacts.length > 0).map(x => {
             return {
-                props: {
-                    title: x.name,
-                    subtitle: 'group',
-                    id: x.id
-                }
+                title: x.name,
+                subtitle: 'group',
+                value: { id: x.id, type: 'group' }
             }
         })),
         ...(Contacts.value.map(x => {
             return {
-                props: {
-                    title: x.addedPerson.email,
-                    subtitle: 'contact',
-                    id: x.id
-                }
+                title: x.addedPerson.email,
+                subtitle: 'contact',
+                value: { id: x.id, type: 'contact' }
             }
         }))
     ]
@@ -40,22 +37,23 @@ const getContactCount = (id: string): number => {
 }
 
 watch(selectedItem, () => {
-    let emails: string[] = []
-    selectedItem.value.forEach(({ props }: { props: any }) => {
-        if (props.subtitle == 'contact') {
-            emails.push(props.title)
+    const user = selectedItem.value.flatMap((x: { id: string, type: 'group' | 'contact' }) => {
+        if (x.type === 'contact') {
+            const contact = Contacts.value.find(c => c.id === x.id);
+            return contact ? [contact.addedPerson] : [];
         } else {
-            const id = props.id
-            const temp = Groups.value.find(x => x.id == id)?.contacts.map(x => x.addedPerson.email)
-            emails = [...emails, ...temp!]
+            const group = Groups.value.find(g => g.id === x.id);
+            return group ? group.contacts.map(c => c.addedPerson) : [];
         }
-    })
-    emails = [...new Set(emails)]
-    emits('update:emails', emails)
+    }).filter((user, index, array) =>
+        array.findIndex(u => u.id == user.id) === index
+    );
+    emits('update:users', user)
 })
 
 const emits = defineEmits<{
-    (e: 'update:emails', emails: string[]): void
+    (e: 'update:emails', emails: string[]): void,
+    (e: 'update:users', users: IUser[]): void
 }>()
 </script>
 
@@ -65,14 +63,14 @@ const emits = defineEmits<{
             <v-chip color="primary">{{ item.title }}</v-chip>
         </template>
         <template v-slot:item="{ item, props: itemProp }">
-            <v-list-item :title="item.title" v-bind="itemProp" class="px-0 mx-0">
+            <v-list-item :title="item.title" :subtitle="item.raw.subtitle" v-bind="itemProp" class="px-0 mx-0">
                 <template v-slot:prepend="{ isActive }">
                     <v-checkbox :model-value="isActive" hide-details></v-checkbox>
                 </template>
                 <template v-slot:subtitle="{ subtitle }">
                     {{ subtitle }}
                     <span v-if="subtitle == 'group'">
-                        ({{ getContactCount(item.props.id) }})
+                        ({{ getContactCount(item.value.id) }})
                     </span>
                 </template>
             </v-list-item>
