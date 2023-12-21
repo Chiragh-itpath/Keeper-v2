@@ -1,4 +1,5 @@
 ﻿using Keeper.Common.ViewModels;
+using Keeper.Context.Model;
 
 namespace Keeper.Services.Interfaces
 {
@@ -6,6 +7,7 @@ namespace Keeper.Services.Interfaces
     {
         Task<UserViewModel> GetByIdAsync(Guid id);
         Task<UserViewModel> CheckEmail(string email);
-        Task<List<string>> EmailSearch(string email, Guid userId);
+        Task<List<UserViewModel>> EmailSearch(string email, Guid userId);
+        UserViewModel MapToUserVM(UserModel user);
     }
 }

@@ -2,12 +2,14 @@
 import { onMounted, ref, type Ref } from 'vue';
 import { AllContacts, AddContact, AllGroups, AddGroup } from '@/components/Contact'
 import { ContactStore, GroupStore } from '@/stores'
+import { storeToRefs } from 'pinia'
 
 const tabs = ref()
 const contactSearch: Ref<string> = ref('')
 const groupSearch: Ref<string> = ref('')
 const { GetContacts } = ContactStore()
 const { GetGroups } = GroupStore()
+const { Contacts } = storeToRefs(ContactStore())
 const loading: Ref<boolean> = ref(false)
 onMounted(async () => {
     loading.value = true
@@ -30,8 +32,8 @@ onMounted(async () => {
             <v-col cols="12">
                 <v-card elevation="0" class="d-flex flex-row-reverse">
                     <v-tabs color="primary" v-model="tabs">
-                        <v-tab value="contact">Contacts</v-tab>
-                        <v-tab value="group">Groups</v-tab>
+                        <v-tab value="contact" class="px-10">Contacts</v-tab>
+                        <v-tab value="group" class="px-10">Groups</v-tab>
                     </v-tabs>
                 </v-card>
             </v-col>
@@ -50,7 +52,7 @@ onMounted(async () => {
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <all-contacts :search="contactSearch"></all-contacts>
+                        <all-contacts :search="contactSearch" :contacts="Contacts"></all-contacts>
                     </v-col>
                 </v-row>
             </v-window-item>

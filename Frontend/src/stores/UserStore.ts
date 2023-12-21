@@ -34,9 +34,9 @@ const UserStore = defineStore('user', () => {
         return undefined
     }
 
-    const SearchEmail = async (email: string): Promise<string[]> => {
-        const emails = await userService.EmailSearch(email)
-        return emails ?? []
+    const SearchEmail = async (email: string): Promise<IUser[]> => {
+        const users = await userService.EmailSearch(email)
+        return users ?? []
     }
 
     const logout = () => {

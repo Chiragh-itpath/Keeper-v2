@@ -11,8 +11,8 @@ export class UserService {
         const response: IUser = await http.get(`${this.baseUrl}/Me`)
         return response
     }
-    public EmailSearch = async (email: string): Promise<string[] | null> => {
-        const response: string[] = await http.get(`${this.baseUrl}/EmailSearch?email=${email}`)
+    public EmailSearch = async (email: string): Promise<IUser[] | null> => {
+        const response: IUser[] = await http.get(`${this.baseUrl}/EmailSearch?email=${email}`)
         return response
     }
 }

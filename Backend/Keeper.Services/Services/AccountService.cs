@@ -34,7 +34,7 @@ namespace Keeper.Services.Services
                 UserName = register.UserName,
                 Email = register.Email,
                 Password = register.Password,
-                Contact = register.Contact,
+                Mobile = register.Mobile,
                 CreatedOn = DateTime.Now,
                 UpdateOn = null
             };

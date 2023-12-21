@@ -22,7 +22,7 @@ const items = computed(() => {
         ...(Contacts.value.map(x => {
             return {
                 props: {
-                    title: x.email,
+                    title: x.addedPerson.email,
                     subtitle: 'contact',
                     id: x.id
                 }
@@ -46,7 +46,7 @@ watch(selectedItem, () => {
             emails.push(props.title)
         } else {
             const id = props.id
-            const temp = Groups.value.find(x => x.id == id)?.contacts.map(x => x.email)
+            const temp = Groups.value.find(x => x.id == id)?.contacts.map(x => x.addedPerson.email)
             emails = [...emails, ...temp!]
         }
     })

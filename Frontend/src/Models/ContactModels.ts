@@ -1,6 +1,8 @@
 import { type IUser } from '@/Models/UserModels'
-interface IContact extends IUser {
-    userId: string
+interface IContact {
+    id: string,
+    addedBy: IUser
+    addedPerson: IUser
 }
 
 export type { IContact }
