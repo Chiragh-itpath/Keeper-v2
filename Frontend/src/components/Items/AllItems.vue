@@ -8,7 +8,7 @@ import { useDate } from 'vuetify'
 const dateHelper = useDate()
 const props = defineProps<{
     items: IItem[],
-    date: Date | null
+    date: Date | null | string
 }>()
 const itemToDisplay = ref(props.items)
 const { DeleteItem } = ItemStore()

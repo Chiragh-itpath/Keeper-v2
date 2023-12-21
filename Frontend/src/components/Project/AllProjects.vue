@@ -10,7 +10,7 @@ import type { IProject } from '@/Models/ProjectModels'
 import { useDate } from 'vuetify'
 
 const props = withDefaults(defineProps<{
-    date?: string | null,
+    date?: string | null | Date,
     projects: IProject[]
     tags: string[],
     isShared: boolean

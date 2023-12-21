@@ -10,7 +10,7 @@ import { useDate } from 'vuetify'
 const dateHelper = useDate()
 const props = withDefaults(defineProps<{
     keeps: IKeep[],
-    date?: string | null,
+    date?: string | null | Date,
     tags: string[]
 }>(), {
     date: null
