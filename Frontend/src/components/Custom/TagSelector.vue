@@ -32,9 +32,9 @@ const emits = defineEmits<{
         </template>
         <v-list min-width="200" select-strategy="classic" v-model:selected="selected" density="compact"
             v-if="tags.length > 0">
-            <v-list-item v-for="(tag, index) in tags" :key="index" :value="tag">
+            <v-list-item v-for="(tag, index) in tags" :key="index" :value="tag" variant="flat">
                 <template v-slot:prepend="{ isActive }">
-                    <v-checkbox hide-details :model-value="isActive" color="primary" density="comfortable"></v-checkbox>
+                    <v-checkbox hide-details :model-value="isActive" color="primary" density="compact"></v-checkbox>
                 </template>
                 {{ tag }}
             </v-list-item>

@@ -211,5 +211,17 @@ namespace Keeper.Services.Services
             }).ToList();
             return collaborator;
         }
+
+        public async Task<int> RemoveFromProject(Guid ShareId)
+        {
+            var item = await _projectShare.GetAsync(ShareId);
+            return await _projectShare.DeleteAsync(item);
+        }
+
+        public async Task<int> RemoveFromKeep(Guid shareId)
+        {
+            var item = await _shareKeep.GetAsync(shareId);
+            return await _shareKeep.DeleteAsync(item);
+        }
     }
 }

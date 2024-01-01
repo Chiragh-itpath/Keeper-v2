@@ -1,30 +1,25 @@
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IKeep, IAddKeep, IEditKeep } from '@/Models/KeepModels'
+import type { IKeep, IAddKeep, IEditKeep, IKeepMembers } from '@/Models/KeepModels'
 import { KeepService } from '@/Services/KeepService'
-import type { IProject } from '@/Models/ProjectModels'
 import { useToster } from '@/composable/useToaster'
-import { ProjectStore } from '.'
 
 const KeepStore = defineStore('KeepStore', () => {
     const keepService = new KeepService()
-    const { GetSingalProject } = ProjectStore()
-    
+    const isKeepFetched: Ref<boolean> = ref(false)
     const Keeps: Ref<IKeep[]> = ref([])
-    const Project: Ref<IProject | undefined> = ref()
 
     const keepTags = computed(() => {
         const tags = Keeps.value.map((x) => x.tag).filter((x) => x != '' && x != null)
         return [...new Set(tags)]
     })
 
-    const FetchProject = (id: string) => {
-        Project.value = GetSingalProject(id)
-    }
-
-    const getSingleKeep = (id: string): IKeep | undefined => {
-        const keep = Keeps.value.find((x) => x.id == id)
-        return keep
+    const getSingleKeep = async (id: string): Promise<IKeep | undefined> => {
+        if (isKeepFetched.value) {
+            return Keeps.value.find((x) => x.id == id)
+        } else {
+            return (await keepService.GetById(id)) ?? undefined
+        }
     }
 
     const FindIndex = (id: string): number => Keeps.value.findIndex((x) => x.id == id)
@@ -38,9 +33,8 @@ const KeepStore = defineStore('KeepStore', () => {
 
     const GetKeeps = async (projectId: string): Promise<any> => {
         const response = await keepService.GetAll(projectId)
-        if (response) {
-            Keeps.value = response
-        }
+        Keeps.value = response ?? []
+        isKeepFetched.value = true
     }
 
     const DeleteKeep = async (keepId: string): Promise<any> => {
@@ -59,6 +53,11 @@ const KeepStore = defineStore('KeepStore', () => {
             Keeps.value.splice(index, 1, response)
         }
     }
+    const GetInvitedMembers = async (id: string): Promise<IKeepMembers[]> =>
+        (await keepService.InvitedUser(id)) ?? []
+
+    const RemoveUser = async (id: string): Promise<boolean> =>
+        (await keepService.RemoveFromKeep(id)) != null
 
     return {
         Keeps,
@@ -68,7 +67,8 @@ const KeepStore = defineStore('KeepStore', () => {
         DeleteKeep,
         Updatekeep,
         getSingleKeep,
-        FetchProject
+        GetInvitedMembers,
+        RemoveUser
     }
 })
 export { KeepStore }

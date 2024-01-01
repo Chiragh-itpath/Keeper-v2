@@ -6,7 +6,6 @@ import { storeToRefs } from 'pinia'
 import { ProjectStore } from '@/stores'
 
 const { Projects, ProjectTags } = storeToRefs(ProjectStore())
-
 const date = ref('');
 const loading: Ref<boolean> = ref(false)
 const selectedTags: Ref<string[]> = ref([])
@@ -21,7 +20,7 @@ onMounted(async () => {
 <template>
     <v-container class="pa-10" fluid>
         <v-row v-if="loading">
-            <v-col v-for=" i  in  10 " :key="i" cols="3">
+            <v-col v-for=" i in 8" :key="i" cols="12" sm="6" md="4" lg="3">
                 <v-skeleton-loader type="text,image,actions"></v-skeleton-loader>
             </v-col>
         </v-row>

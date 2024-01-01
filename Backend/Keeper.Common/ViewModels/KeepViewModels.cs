@@ -18,4 +18,10 @@
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
     }
+    public class KeepUserViewModel
+    {
+        public Guid ShareId { get; set; }
+        public bool IsAccepted { get; set; }
+        public UserViewModel InvitedUser { get; set; } = new();
+    }
 }

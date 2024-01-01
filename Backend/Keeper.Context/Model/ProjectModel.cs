@@ -17,8 +17,9 @@ namespace Keeper.Context.Model
         public Guid? TagId { get; set; }
         public virtual TagModel? Tag { get; set; }
         public Guid CreatedById { get; set; }
-        public virtual UserModel CreatedBy { get; set; }
+        public virtual UserModel CreatedBy { get; set; } = default!;
         public Guid? UpdatedById { get; set; }
         public virtual UserModel? UpdatedBy { get; set; }
+
     }
 }

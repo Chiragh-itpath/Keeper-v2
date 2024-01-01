@@ -3,6 +3,7 @@ using Keeper.Common.InnerException;
 using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
+using Keeper.Services.Interfaces;
 using Keeper.Services.Services.Interfaces;
 
 namespace Keeper.Services.Services
@@ -12,13 +13,17 @@ namespace Keeper.Services.Services
         private readonly IKeepRepo _keepRepo;
         private readonly IProjectRepo _projectRepo;
         private readonly IProjectShareRepo _projectShareRepo;
+        private readonly IKeepShareRepo _keepShareRepo;
         private readonly ITagService _tag;
-        public KeepService(IKeepRepo keepRepo, ITagService tagService, IProjectRepo projectRepo, IProjectShareRepo projectShareRepo)
+        private readonly IUserService _user;
+        public KeepService(IKeepRepo keepRepo, ITagService tagService, IProjectRepo projectRepo, IProjectShareRepo projectShareRepo, IKeepShareRepo keepShareRepo, IUserService user)
         {
             _keepRepo = keepRepo;
             _tag = tagService;
             _projectRepo = projectRepo;
             _projectShareRepo = projectShareRepo;
+            _keepShareRepo = keepShareRepo;
+            _user = user;
         }
         public async Task<List<KeepViewModel>> GetAllAsync(Guid projectId, Guid userId)
         {
@@ -35,8 +40,8 @@ namespace Keeper.Services.Services
         }
         public async Task<KeepViewModel> GetAsync(Guid id)
         {
-            var result = await _keepRepo.GetAsync(id) ?? throw new InnerException("",StatusType.NOT_FOUND);
-            return Mapper(result);            
+            var result = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            return Mapper(result);
         }
         public async Task<KeepViewModel> AddAsync(AddKeep addKeep, Guid userId)
         {
@@ -60,7 +65,7 @@ namespace Keeper.Services.Services
         }
         public async Task<KeepViewModel> UpdateAsync(EditKeep editKeep, Guid userId)
         {
-            var keep = await _keepRepo.GetAsync(editKeep.Id) ?? throw new InnerException("",StatusType.SUCCESS);
+            var keep = await _keepRepo.GetAsync(editKeep.Id) ?? throw new InnerException("", StatusType.SUCCESS);
             keep.Title = editKeep.Title;
             keep.UpdatedOn = DateTime.Now;
             keep.UpdatedById = userId;
@@ -76,7 +81,7 @@ namespace Keeper.Services.Services
         }
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var keep = await _keepRepo.GetAsync(id) ?? throw new InnerException("",StatusType.NOT_FOUND);
+            var keep = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             await _keepRepo.DeleteAsync(keep);
             return true;
         }
@@ -93,6 +98,19 @@ namespace Keeper.Services.Services
                 UpdatedOn = keep.UpdatedOn,
                 Tag = keep.Tag?.Title,
             };
+        }
+        public async Task<List<KeepUserViewModel>> AllInvitedUser(Guid keepId)
+        {
+            await Task.CompletedTask;
+            var userList = await _keepShareRepo.GetAllAsync(keepId);
+            return userList
+                .Select(share => new KeepUserViewModel
+                {
+                    ShareId = share.Id,
+                    IsAccepted = share.IsAccepted,
+                    InvitedUser = _user.MapToUserVM(share.User)
+                })
+                .ToList();
         }
     }
 }

@@ -3,11 +3,13 @@ import { computed, ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ContactStore, GroupStore } from '@/stores'
 import type { IUser } from '@/Models/UserModels';
-
+defineProps<{
+    errorMessage?: string
+}>()
 const selectedItem: Ref<any[]> = ref([])
 const { Contacts } = storeToRefs(ContactStore())
 const { Groups } = storeToRefs(GroupStore())
-
+const menu: Ref<boolean> = ref(false)
 const items = computed(() => {
     let item: any[] = []
     item = [
@@ -37,6 +39,7 @@ const getContactCount = (id: string): number => {
 }
 
 watch(selectedItem, () => {
+    menu.value = false
     const user = selectedItem.value.flatMap((x: { id: string, type: 'group' | 'contact' }) => {
         if (x.type === 'contact') {
             const contact = Contacts.value.find(c => c.id === x.id);
@@ -49,6 +52,7 @@ watch(selectedItem, () => {
         array.findIndex(u => u.id == user.id) === index
     );
     emits('update:users', user)
+    menu.value = true
 })
 
 const emits = defineEmits<{
@@ -58,7 +62,8 @@ const emits = defineEmits<{
 </script>
 
 <template>
-    <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips label="select contact">
+    <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips label="select contact"
+        v-model:menu="menu" :error-messages="errorMessage">
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.title }}</v-chip>
         </template>

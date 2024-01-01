@@ -57,9 +57,9 @@ const filterFunction = (project: IProject) => {
 </script>
 <template>
     <no-item v-if="ProjectsToDisplay.length == 0" title="No Project Found"
-        :sub-title="date ? 'There is No Project on this date' : 'Please click on add button to insert new record'">
+        :sub-title="date ? 'There is no project on this date' : props.isShared ? 'There is no shared projects' : 'Please click on add button to insert new record'">
     </no-item>
-    <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(project, index) in ProjectsToDisplay" :key="index">
+    <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="( project, index ) in  ProjectsToDisplay " :key="index">
         <v-hover v-slot="{ isHovering, props }">
             <v-card :elevation="isHovering ? 8 : 3" v-bind="props" class="cursor-pointer"
                 @click="router.push({ name: RouterEnum.KEEP, params: { id: project.id } })">
@@ -117,7 +117,7 @@ const filterFunction = (project: IProject) => {
         </v-hover>
     </v-col>
     <edit-project v-model="visible.edit" :project="selectedProject!"> </edit-project>
-    <delete-propmt v-model="visible.delete" @click:yes="deleteHandler">Project</delete-propmt>
+    <delete-propmt v-model="visible.delete" @click:yes="deleteHandler" title="Delete Project">Project</delete-propmt>
     <info-project :id="id" v-model="visible.info"></info-project>
     <invite-project :id="id" v-model="visible.invite"></invite-project>
 </template>

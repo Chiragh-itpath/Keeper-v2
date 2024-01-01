@@ -1,28 +1,24 @@
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IProject, IAddProject, IEditProject } from '@/Models/ProjectModels'
+import type { IProject, IAddProject, IEditProject, IProjectMembers } from '@/Models/ProjectModels'
 import { ProjectService } from '@/Services/ProjectService'
 import { useToster } from '@/composable/useToaster'
 
 const ProjectStore = defineStore('ProjectStore', () => {
     const projectService = new ProjectService()
     const Projects: Ref<IProject[]> = ref([])
-
+    const isProjectFetched: Ref<boolean> = ref(false)
     const ProjectTags = computed(() => {
         const tags = Projects.value.map((x) => x.tag).filter((x) => x != '' && x != null)
         return [...new Set(tags)]
     })
-    
+
     const FindIndex = (id: string): number => Projects.value.findIndex((x) => x.id == id)
 
-    const SingleProject = (id: string) => {
-        return Projects.value.find((x) => x.id == id)
-    }
-
-    const GetSingalProject = (id: string): IProject | undefined => {
-        const project = Projects.value.find((x) => x.id == id)
-        if (project) {
-            return project
+    const GetSingalProject = async (id: string): Promise<IProject | undefined> => {
+        if (isProjectFetched.value) return Projects.value.find((x) => x.id == id)
+        else {
+            return (await projectService.GetById(id)) ?? undefined
         }
     }
 
@@ -34,12 +30,8 @@ const ProjectStore = defineStore('ProjectStore', () => {
     }
 
     const GetProjects = async (): Promise<void> => {
-        Projects.value = []
-        const response = await projectService.GetAll()
-        if (!response) {
-            return
-        }
-        Projects.value = response
+        Projects.value = (await projectService.GetAll()) ?? []
+        isProjectFetched.value = true
     }
     const UpdateProject = async (editProject: IEditProject): Promise<void> => {
         const response = await projectService.Update(editProject)
@@ -58,6 +50,12 @@ const ProjectStore = defineStore('ProjectStore', () => {
         }
     }
 
+    const GetInvitedMembers = async (id: string): Promise<IProjectMembers[]> =>
+        (await projectService.InvitedUser(id)) ?? []
+
+    const RemoveUser = async (id: string): Promise<boolean> =>
+        (await projectService.RemoveFromProject(id)) != null
+
     return {
         Projects,
         ProjectTags,
@@ -66,7 +64,8 @@ const ProjectStore = defineStore('ProjectStore', () => {
         UpdateProject,
         DeleteProject,
         GetProjects,
-        SingleProject
+        GetInvitedMembers,
+        RemoveUser
     }
 })
 

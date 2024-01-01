@@ -98,7 +98,7 @@ onMounted(() => {
         </v-hover>
     </v-col>
     <edit-keep v-model="editVisible" :id="id" :project-id="projectId"></edit-keep>
-    <delete-propmt v-model="deleteVisible" @click:yes="deleteHandler">Keep</delete-propmt>
+    <delete-propmt v-model="deleteVisible" @click:yes="deleteHandler" title="Delete Keep">Keep</delete-propmt>
     <invite-keep v-model="inviteVisible" :id="id" :project-id="projectId"></invite-keep>
     <info-keep v-model="infoVisible" :id="id" :keep="keep"></info-keep>
 </template>

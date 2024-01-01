@@ -1,3 +1,5 @@
+import type { IUser } from "./UserModels"
+
 interface IAddKeep {
     title: string
     projectId: string
@@ -13,5 +15,9 @@ interface IKeep extends IAddKeep {
     createdOn: string
     updatedOn: string
 }
-
-export type { IAddKeep, IEditKeep, IKeep }
+interface IKeepMembers {
+    shareId: string
+    isAccepted: boolean
+    invitedUser: IUser
+}
+export type { IAddKeep, IEditKeep, IKeep, IKeepMembers }

@@ -40,7 +40,7 @@ watch(props, () => {
 <template>
     <edit-item :id="id" v-model="visible.edit"></edit-item>
     <info-item :id="id" v-model="visible.info"></info-item>
-    <delete-propmt v-model="visible.delete" @click:yes="deleteHandler">Item</delete-propmt>
+    <delete-propmt v-model="visible.delete" @click:yes="deleteHandler" title="Delete Item">Item</delete-propmt>
     <no-item v-if="itemToDisplay.length == 0" title="No Item Found"
         :sub-title="date ? 'No record found on this date' : 'Please click on add button to insert new record'">
     </no-item>

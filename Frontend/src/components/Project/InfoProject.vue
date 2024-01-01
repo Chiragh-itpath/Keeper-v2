@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
     modelValue: false
 })
 
-const { SingleProject } = ProjectStore()
+const { GetSingalProject } = ProjectStore()
 const { User, myProfile } = UserStore()
 const project: Ref<IProject | undefined> = ref()
 const visible: Ref<boolean> = ref(false)
@@ -20,7 +20,7 @@ const dateHelper = useDate()
 watch(props, async () => {
     visible.value = props.modelValue
     if (visible.value) {
-        project.value = SingleProject(props.id)
+        project.value = await GetSingalProject(props.id)
         if (User.id == '') {
             await myProfile()
         }
@@ -71,7 +71,7 @@ const emits = defineEmits<{
                         Last Modified By:
                     </v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
-                        {{ project?.createdBy == User.email ? 'me' : project?.updatedBy }}
+                        {{ project?.createdBy }}
                     </v-col>
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Last Modified:</v-col>

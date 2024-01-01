@@ -3,14 +3,16 @@ import { computed, onMounted, ref, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AddKeep, AllKeeps } from '@/components/keeps'
-import { DatePicker, TagSelector } from '@/components/Custom'
-import { KeepStore } from '@/stores'
+import { DatePicker, TagSelector, NoItem } from '@/components/Custom'
+import { KeepStore, ProjectStore } from '@/stores'
+import type { IProject } from '@/Models/ProjectModels'
+import type { IKeep } from '@/Models/KeepModels'
 
 const date = ref()
 const route = useRoute()
 const loading: Ref<boolean> = ref(false)
 const selectedTags: Ref<string[]> = ref([])
-const { GetKeeps } = KeepStore()
+const project: Ref<IProject | undefined> = ref()
 const { Keeps, keepTags } = storeToRefs(KeepStore())
 const projectId = computed(() => {
     const id = route.params.id
@@ -18,18 +20,19 @@ const projectId = computed(() => {
 })
 onMounted(async () => {
     loading.value = true
-    await GetKeeps(projectId.value)
+    await KeepStore().GetKeeps(projectId.value)
+    project.value = await ProjectStore().GetSingalProject(projectId.value)
     loading.value = false
 })
 </script>
 <template>
     <v-container class="overflow-auto px-10" fluid>
-        <v-row v-if="loading">
-            <v-col v-for="i in 16" :key="i" cols="3">
+        <v-row v-if="loading" class="mt-10">
+            <v-col v-for="i in 16" :key="i" cols="12" sm="6" md="4" lg="3">
                 <v-skeleton-loader type="text,actions"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading">
+        <v-row v-if="!loading && project">
             <v-col cols="12">
                 <v-breadcrumbs divider="/" class="px-0" :items="[
                     {
@@ -55,8 +58,11 @@ onMounted(async () => {
                 <add-keep :project-id="projectId"></add-keep>
             </v-col>
         </v-row>
-        <v-row v-if="!loading" class="mt-10">
+        <v-row v-if="!loading && project" class="mt-10">
             <all-keeps :date="date" :keeps="Keeps" :tags="selectedTags"></all-keeps>
+        </v-row>
+        <v-row v-if="!loading && !project" class="mt-15">
+            <no-item title="No Project Found with this id" back-button></no-item>
         </v-row>
     </v-container>
 </template>

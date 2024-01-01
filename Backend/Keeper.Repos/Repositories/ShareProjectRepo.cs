@@ -26,13 +26,15 @@ namespace Keeper.Repos.Repositories
             return await _db.SharedProjects
                 .AsNoTracking()
                 .Include(x => x.User)
-                .Where(x => x.ProjectId == ProjectId).ToListAsync();
+                .Where(x => x.ProjectId == ProjectId)
+                .ToListAsync();
         }
         public async Task<List<SharedProjectsModel>> GetAllInvited(Guid UserId)
         {
             return await _db.SharedProjects
                 .AsNoTracking()
-                .Where(x => x.UserId == UserId).ToListAsync();
+                .Where(x => x.UserId == UserId)
+                .ToListAsync();
         }
 
         public async Task<SharedProjectsModel> GetAsync(Guid id)

@@ -1,7 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { IInvitedKeep, IInvitedProject } from '@/Models/InviteModels'
-import type { Collaborators } from '@/Models/Collaborators'
 import { InviteService } from '@/Services/InviteService'
 import type { IUser } from '@/Models/UserModels'
 
@@ -46,20 +45,6 @@ const InviteStore = defineStore('inviteStore', () => {
             response: inviteResponse
         })
     }
-    const GetProjectCollaborators = async (projectId: string): Promise<Collaborators[]> => {
-        const response = await inviteService.ProjectCollaborators(projectId)
-        if (response) {
-            return response
-        }
-        return []
-    }
-    const GetKeepCollaborators = async (keepId: string): Promise<Collaborators[]> => {
-        const response = await inviteService.KeepCollaborators(keepId)
-        if (response) {
-            return response
-        }
-        return []
-    }
     return {
         InvitedProjectList,
         InvitedKeepList,
@@ -68,9 +53,7 @@ const InviteStore = defineStore('inviteStore', () => {
         ProjectInviteResponse,
         FetchInvitedKeeps,
         InviteUsersToKeep,
-        keepInviteResponse,
-        GetProjectCollaborators,
-        GetKeepCollaborators
+        keepInviteResponse
     }
 })
 

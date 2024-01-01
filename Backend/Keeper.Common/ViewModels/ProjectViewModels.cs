@@ -18,5 +18,12 @@
         public string CreatedBy { get; set; } = default!;
         public string? UpdatedBy { get; set; }
         public bool IsShared { get; set; } = false;
+        public List<ProjectUsersViewModel> Users { get; set; } = new();
+    }
+    public class ProjectUsersViewModel
+    {
+        public Guid ShareId{ get; set; }
+        public bool IsAccepted { get; set; }
+        public UserViewModel InvitedUser { get; set; } = new();
     }
 }

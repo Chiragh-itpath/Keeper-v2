@@ -1,5 +1,4 @@
 import { http } from '@/config/ApiClient'
-import type { Collaborators } from '@/Models/Collaborators'
 import type {
     IInvitedKeep,
     IInvitedProject,
@@ -28,18 +27,6 @@ export class InviteService {
     }
     public GetAllInvitedKeeps = async (): Promise<IInvitedKeep[] | null> => {
         const response: IInvitedKeep[] = await http.get(`${this.baseUrl}/InvitedKeeps`)
-        return response
-    }
-    public ProjectCollaborators = async (projectId: string): Promise<Collaborators[] | null> => {
-        const response: Collaborators[] = await http.get(
-            `${this.baseUrl}/ProjectCollaborators?ProjectId=${projectId}`
-        )
-        return response
-    }
-    public KeepCollaborators = async (keepId: string): Promise<Collaborators[] | null> => {
-        const response: Collaborators[] = await http.get(
-            `${this.baseUrl}/KeepCollaborators?keepId=${keepId}`
-        )
         return response
     }
 }
