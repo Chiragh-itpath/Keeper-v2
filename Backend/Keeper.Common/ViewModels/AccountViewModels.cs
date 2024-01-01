@@ -8,7 +8,7 @@
     public class RegisterModel : LoginModel
     {
         public string UserName { get; set; } = default!;
-        public string Contact {  get; set; } = default!;
+        public string Mobile {  get; set; } = default!;
     }
     public class PasswordResetModel : LoginModel { }
 }

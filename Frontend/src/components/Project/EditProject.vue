@@ -2,18 +2,17 @@
 import { reactive, ref, type Ref, watch } from 'vue'
 import { storeToRefs } from "pinia";
 import { GlobalStore, ProjectStore } from '@/stores'
-import TextField from '@/components/Custom/TextField.vue'
-import type { IEditProject } from '@/Models/ProjectModels'
+import { TextField } from '@/components/Custom'
+import type { IEditProject, IProject } from '@/Models/ProjectModels'
 
 const props = withDefaults(defineProps<{
-    id: string,
-    modelValue: boolean
+    modelValue: boolean,
+    project?: IProject
 }>(), {
-    id: '',
     modelValue: false
 })
 
-const { GetSingalProject, UpdateProject } = ProjectStore()
+const { UpdateProject } = ProjectStore()
 const { Loading } = storeToRefs(GlobalStore())
 const editProject: IEditProject = reactive({
     id: '',
@@ -32,19 +31,12 @@ const submitHandler = async (): Promise<void> => {
         visible.value = false
     }
 }
-const toggle = () => {
-    const project = GetSingalProject(props.id)
-    editProject.id = project!.id
-    editProject.title = project!.title
-    editProject.description = project!.description
-    editProject.tag = project!.tag
-
-}
 watch(props, () => {
     visible.value = props.modelValue
-    if (props.modelValue) {
-        toggle()
-    }
+    editProject.id = props.project!.id
+    editProject.title = props.project!.title
+    editProject.description = props.project!.description
+    editProject.tag = props.project!.tag
 })
 watch(visible, () => {
     if (!visible.value)

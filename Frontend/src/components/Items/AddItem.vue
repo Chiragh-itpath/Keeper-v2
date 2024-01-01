@@ -49,7 +49,7 @@ watch(visible, () => {
 
 </script>
 <template>
-    <v-btn class="w-100" color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true">
+    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true">
         New Item
     </v-btn>
     <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="900">
@@ -65,8 +65,8 @@ watch(visible, () => {
                             <v-select :items="['Ticket', 'PR']" label="Type" color="primary" v-model="itemType" />
                         </v-col>
                         <v-col cols="6" lg="3" md="3" sm="6">
-                            <text-field label="Number" placeholder="Ticker | PR number" is-number v-model="addItem.number"
-                                :max-limit="10" />
+                            <text-field label="Number*" placeholder="Ticker | PR number" is-required is-number
+                                v-model="addItem.number" :max-limit="10" />
                         </v-col>
                         <v-col>
                             <text-field label="Item Name*" placeholder="Item title" is-required v-model="addItem.title" />

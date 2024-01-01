@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { GlobalStore, GroupStore } from '@/stores'
+import { ContactStore, GlobalStore, GroupStore } from '@/stores'
 import TextField from '@/components/Custom/TextField.vue'
 import AllContact from '@/components/Contact/AllContacts.vue'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 
 const form = ref()
 const visible: Ref<boolean> = ref(false)
@@ -14,6 +14,7 @@ const search: Ref<string> = ref('')
 
 const { AddGroup } = GroupStore()
 const { Loading } = storeToRefs(GlobalStore())
+const { Contacts } = storeToRefs(ContactStore())
 const validateForm = async () => {
     const { valid } = await form.value.validate()
     if (!valid) return
@@ -45,7 +46,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-btn color="primary" prepend-icon="mdi-plus" class="rounded" @click="visible = !visible" width="100%">
+    <v-btn color="primary" prepend-icon="mdi-plus" class="rounded" @click="visible = !visible">
         New Group
     </v-btn>
     <v-dialog v-model="visible" max-width="600" class="">
@@ -68,8 +69,8 @@ watch(visible, () => {
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
                             v-model="search"></v-text-field>
                         <v-card max-height="500" elevation="0">
-                            <all-contact checkbox show-border hide-header v-model:selected="contactList"
-                                :search="search"></all-contact>
+                            <all-contact :contacts="Contacts" checkbox show-border hide-header
+                                v-model:selected="contactList" :search="search"></all-contact>
                         </v-card>
                     </v-window-item>
                 </v-window>

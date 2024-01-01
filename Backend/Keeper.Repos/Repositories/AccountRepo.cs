@@ -1,6 +1,4 @@
-﻿using Keeper.Common.Response;
-using Keeper.Common.ViewModels;
-using Keeper.Context;
+﻿using Keeper.Context;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;

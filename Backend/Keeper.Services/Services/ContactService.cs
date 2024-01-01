@@ -1,9 +1,7 @@
-﻿using Keeper.Common.Enums;
-using Keeper.Common.InnerException;
-using Keeper.Common.ViewModels;
+﻿using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
-using Keeper.Repos.Interfaces;
 using Keeper.Repos.Repositories.Interfaces;
+using Keeper.Services.Interfaces;
 using Keeper.Services.Services.Interfaces;
 
 namespace Keeper.Services.Services
@@ -11,36 +9,35 @@ namespace Keeper.Services.Services
     public class ContactService : IContactService
     {
         private readonly IContactRepo _contact;
-        private readonly IUserRepo _user;
-        public ContactService(IContactRepo contact, IUserRepo user)
+        private readonly IUserService _userService;
+        public ContactService(IContactRepo contact, IUserService userService)
         {
             _contact = contact;
-            _user = user;
+            _userService = userService;
         }
-        private static ContactViewModel Mapper(ContactModel contact)
+        public  ContactViewModel Mapper(ContactModel contact)
         {
             return new ContactViewModel
             {
                 Id = contact.Id,
-                Email = contact.Email,
-                UserId = contact.UserId,
-                Contact = contact.User.Contact,
-                UserName = contact.User.UserName
+                AddedBy = _userService.MapToUserVM(contact.AddedBy),
+                AddedPerson= _userService.MapToUserVM(contact.AddedPerson)
             };
         }
-        public async Task<ContactViewModel> AddAsync(AddContact contact, Guid userId)
+        public async Task<List<ContactViewModel>> AddAsync(AddContact contact, Guid userId)
         {
-            var res = await _contact.FindByEmailAsync(contact.Email, userId);
-            if (res != null)
+            List<ContactViewModel> contacts = new();
+            foreach(var addedId in contact.UserIds)
             {
-                throw new InnerException("Contact Already Exist",StatusType.ALREADY_EXISTS);
+                var addedContact = await _contact.AddAsync(new ContactModel
+                {
+                    AddedById = userId,
+                    AddedId = addedId
+                });
+                var viewModel = await GetById(addedContact.Id);
+                contacts.Add(viewModel);
             }
-            var newContact = await _contact.AddAsync(new ContactModel
-            {
-                Email = contact.Email,
-                UserId = userId,
-            });
-            return await GetById(newContact.Id);
+            return contacts;
         }
 
         public async Task<List<ContactViewModel>> GetAllContacts(Guid userId)

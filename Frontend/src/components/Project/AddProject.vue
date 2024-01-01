@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref } from 'vue'
 import { GlobalStore, ProjectStore } from '@/stores'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import type { IAddProject } from '@/Models/ProjectModels'
 import { storeToRefs } from 'pinia';
 
@@ -28,7 +28,7 @@ const close = () => {
 }
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" width="100%" @click="visible = true">
+    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true" class="w-sm-100"> 
         New Project
     </v-btn>
     <v-dialog transition="scale-transition" v-model="visible" width="700" @update:model-value="close">

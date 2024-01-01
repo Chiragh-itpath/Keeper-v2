@@ -9,5 +9,6 @@ namespace Keeper.Services.Services.Interfaces
         Task<KeepViewModel> AddAsync(AddKeep addKeep,Guid userId);
         Task<KeepViewModel> UpdateAsync(EditKeep editKeep, Guid userId);
         Task<bool> DeleteAsync(Guid id);
+        Task<List<KeepUserViewModel>> AllInvitedUser(Guid keepId);
     }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref, watch } from 'vue'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import { KeepStore, GlobalStore } from '@/stores'
 import type { IAddKeep } from '@/Models/KeepModels'
 import { storeToRefs } from 'pinia';
@@ -38,7 +38,7 @@ const close = () => {
 }
 </script>
 <template>
-    <v-btn @click="visible = true" color="primary" variant="elevated" prepend-icon="mdi-plus" width="100%">
+    <v-btn @click="visible = true" color="primary" variant="elevated" prepend-icon="mdi-plus">
         New Keep
     </v-btn>
     <v-dialog transition="scale-transition" v-model="visible" max-width="700" @update:model-value="close">
@@ -55,7 +55,7 @@ const close = () => {
                                 :max-limit="100" />
                         </v-col>
                         <v-col cols="12" sm="4">
-                            <text-field v-model="addKeep.tag" label="Tag" placeholder="Keep Tag"  />
+                            <text-field v-model="addKeep.tag" label="Tag" placeholder="Keep Tag" />
                         </v-col>
                     </v-row>
                 </v-form>

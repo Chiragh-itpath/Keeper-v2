@@ -1,5 +1,6 @@
 ﻿using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
+using Keeper.Services.Services;
 using Keeper.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -88,24 +89,6 @@ namespace Keeper.Main.Controllers
             return new ResponseModel<string>
             {
                 Message = $"Inviation {(res ? "Accepted" : "Declied")}"
-            };
-        }
-        [HttpGet("ProjectCollaborators")]
-        public async Task<ResponseModel<List<Collaborator>>> ProjectCollaborators(Guid ProjectId)
-        {
-            var res = await _invite.GetProjectCollaborators(ProjectId);
-            return new ResponseModel<List<Collaborator>>
-            {
-                Data = res
-            };
-        }
-        [HttpGet("KeepCollaborators")]
-        public async Task<ResponseModel<List<Collaborator>>> KeepCollaborators(Guid keepId)
-        {
-            var res = await _invite.GetKeepCollaborators(keepId);
-            return new ResponseModel<List<Collaborator>>
-            {
-                Data = res
             };
         }
     }

@@ -2,13 +2,14 @@
 import { ref, watch, type Ref } from 'vue'
 import { ItemStore } from '@/stores'
 import type { IItem } from '@/Models/ItemModels'
-import { dateHelper } from '@/Services/HelperFunction'
 import AllComments from '@/components/Comments/AllComments.vue'
+import { useDate } from 'vuetify'
 
 const { GetById } = ItemStore()
 const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
 const Item: Ref<IItem | null> = ref(null)
+const dateHelper = useDate()
 const props = withDefaults(defineProps<{
     modelValue: boolean,
     id: string
@@ -41,7 +42,7 @@ const emits = defineEmits<{
                         <v-tooltip>
                             <template v-slot:activator="{ props }">
                                 <v-chip class="cursor-pointer" v-bind="props">
-                                    {{ Item.type == 0 ? '!' : '#' }}
+                                    {{ Item.type == 0 ? '#' : '!' }}
                                     {{ Item.number }}
                                 </v-chip>
                             </template>
@@ -54,66 +55,74 @@ const emits = defineEmits<{
                 <v-spacer></v-spacer>
                 <v-icon color="white" @click="(visible = false)">mdi-close</v-icon>
             </v-card-title>
-            <v-card-text class="">
-                <div class="d-flex flex-row-reverse">
+            <v-card-text class="pa-0 pb-5">
+                <div class="d-flex flex-row-reverse mx-5">
                     <v-tabs v-model="tab" color="primary" class="">
                         <v-tab value="info">Info</v-tab>
                         <v-tab value="comments">Comments</v-tab>
                         <v-tab value="logs">logs</v-tab>
                     </v-tabs>
                 </div>
-                <v-window v-model="tab" class="mt-5">
-                    <v-window-item value="info">
-                        <div v-if="Item.url" class="mb-3">
-                            URL: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
-                        </div>
-                        <div>
-                            <div class="mb-3">Discuss with:
-                                <template v-if="Item.to">
-                                    <v-chip color="primary">{{ Item.to }}</v-chip>
-                                </template>
-                                <template v-else>
-                                    <v-chip class="bg-grey-darkken-3">
-                                        -
-                                    </v-chip>
-                                </template>
+                <v-card height="400" max-height="400" class="overflow-y-auto mx-2 pa-5 " elevation="0">
+                    <v-window v-model="tab" class="mt-5">
+                        <v-window-item value="info">
+                            <div v-if="Item.url" class="mb-3">
+                                URL: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
                             </div>
-                            <div class="mb-3">Discussed by:
-                                <template v-if="Item.discussedBy">
-                                    <v-chip class="bg-primary">{{ Item.discussedBy }}
-                                    </v-chip>
-                                </template>
+                            <div>
+                                <div class="mb-3">Discuss with:
+                                    <template v-if="Item.to">
+                                        <v-chip color="primary">{{ Item.to }}</v-chip>
+                                    </template>
+                                    <template v-else>
+                                        <v-chip class="bg-grey-darkken-3">
+                                            -
+                                        </v-chip>
+                                    </template>
+                                </div>
+                                <div class="mb-3">Discussed by:
+                                    <template v-if="Item.discussedBy">
+                                        <v-chip class="bg-primary">{{ Item.discussedBy }}
+                                        </v-chip>
+                                    </template>
+                                </div>
                             </div>
-                        </div>
-                        <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
-                        <div v-for="(file, index) in Item.files" :key="index" class="my-3">
-                            <a :href="file.fileUrl" target="_blank">
-                                <v-chip color="primary" class="pa-3 cursor-pointer">
-                                    <span class="ma-2">{{ file.fileName }}</span>
-                                </v-chip>
-                            </a>
-                        </div>
-                        <div class="description rounded-lg pa-3 mt-2 ">
-                            <div v-if="Item.description" v-html="Item.description"></div>
-                            <div v-else class="text-grey">No description provided</div>
-                        </div>
-                    </v-window-item>
-                    <v-window-item value="comments">
-                        <all-comments :item-id="Item.id" :comments="Item.comments"></all-comments>
-                    </v-window-item>
-                    <v-window-item value="logs">
-                        <v-row>
-                            <v-col cols="6">created by:</v-col>
-                            <v-col cols="6">{{ Item.createdBy }}</v-col>
-                            <v-col cols="6">created on:</v-col>
-                            <v-col cols="6">{{ dateHelper(Item.createdOn) }}</v-col>
-                            <v-col cols="6">updated by:</v-col>
-                            <v-col cols="6">{{ Item.updatedBy ?? '-' }}</v-col>
-                            <v-col cols="6">updated on:</v-col>
-                            <v-col cols="6">{{ dateHelper(Item.updatedOn) }}</v-col>
-                        </v-row>
-                    </v-window-item>
-                </v-window>
+                            <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
+                            <div v-for="(file, index) in Item.files" :key="index" class="my-3">
+                                <a :href="file.fileUrl" target="_blank">
+                                    <v-chip color="primary" class="pa-3 cursor-pointer">
+                                        <span class="ma-2">{{ file.fileName }}</span>
+                                    </v-chip>
+                                </a>
+                            </div>
+                            <div class="description rounded-lg pa-3 mt-2 ">
+                                <div v-if="Item.description" v-html="Item.description"></div>
+                                <div v-else class="text-grey">No description provided</div>
+                            </div>
+                        </v-window-item>
+                        <v-window-item value="comments">
+                            <all-comments :item-id="Item.id" :comments="Item.comments"></all-comments>
+                        </v-window-item>
+                        <v-window-item value="logs">
+                            <v-row>
+                                <v-col cols="6">created by:</v-col>
+                                <v-col cols="6">{{ Item.createdBy }}</v-col>
+                                <v-col cols="6">created on:</v-col>
+                                <v-col cols="6">
+                                    {{ dateHelper.format(Item.createdOn, 'keyboardDate') }}
+                                </v-col>
+                                <v-col cols="6">updated by:</v-col>
+                                <v-col cols="6">{{ Item.updatedBy ?? '-' }}</v-col>
+                                <v-col cols="6">updated on:</v-col>
+                                <v-col cols="6">
+                                    <span v-if="dateHelper.isValid(Item.updatedOn)">
+                                        {{ dateHelper.format(Item.updatedOn, 'keyboardDate') }}
+                                    </span>
+                                </v-col>
+                            </v-row>
+                        </v-window-item>
+                    </v-window>
+                </v-card>
             </v-card-text>
         </v-card>
 

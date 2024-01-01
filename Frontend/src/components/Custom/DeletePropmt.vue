@@ -4,9 +4,12 @@ import { storeToRefs } from 'pinia';
 import { ref, watch, type Ref } from 'vue'
 
 const props = withDefaults(defineProps<{
-    modelValue: boolean
+    modelValue: boolean,
+    title?: string,
+    subtitle?: string
 }>(), {
-    modelValue: false
+    modelValue: false,
+    subtitle: 'Are you sure want to delete this?'
 })
 
 const visible: Ref<boolean> = ref(false)
@@ -27,12 +30,11 @@ const emits = defineEmits<{
     <v-dialog v-model="visible" transition="scale-transition" max-width="400">
         <v-card>
             <v-card-title class="bg-primary">
-                Delete
-                <slot></slot>
+                {{ title }}
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text class="my-2">
-                Are you sure want to delete this?
+                {{ subtitle }}
             </v-card-text>
             <v-card-actions class="my-2 d-flex justify-end">
                 <v-btn variant="outlined" color="success" class="rounded-xl mx-2" width="100"

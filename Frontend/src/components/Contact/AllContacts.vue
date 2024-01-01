@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue';
-import { ContactStore } from '@/stores'
-import { storeToRefs } from 'pinia'
 import type { IContact } from '@/Models/ContactModels'
 
 const props = withDefaults(defineProps<{
@@ -9,7 +7,7 @@ const props = withDefaults(defineProps<{
     search?: string,
     hideHeader?: boolean,
     showBorder?: boolean,
-    contacts?: IContact[],
+    contacts: IContact[],
     noContacts?: boolean
 }>(), {
     checkbox: false,
@@ -19,10 +17,10 @@ const props = withDefaults(defineProps<{
     noContacts: false
 })
 
-const { Contacts } = storeToRefs(ContactStore())
+
 const checkedContacts: Ref<string[]> = ref([])
-const ContactsToDisplay: Ref<IContact[]> = ref(props.contacts ?? Contacts.value)
-const chcekHandler = (checked: boolean, value: string) => {
+const ContactsToDisplay: Ref<IContact[]> = ref(props.contacts)
+const chcekHandler = (checked: boolean | null, value: string) => {
     if (checked) {
         checkedContacts.value.push(value)
     } else {
@@ -32,10 +30,12 @@ const chcekHandler = (checked: boolean, value: string) => {
 }
 watch(props, () => {
     if (props.search != '' && props.search != null) {
-
-        ContactsToDisplay.value = Contacts.value.filter(x => x.userName.startsWith(props.search) || x.email.startsWith(props.search))
+        ContactsToDisplay.value = props.contacts.filter(x =>
+            x.addedPerson.userName.startsWith(props.search) ||
+            x.addedPerson.email.startsWith(props.search)
+        )
     } else {
-        ContactsToDisplay.value = Contacts.value
+        ContactsToDisplay.value = props.contacts
     }
 })
 const HighLightText = (text: string) => {
@@ -64,20 +64,20 @@ const emits = defineEmits<{
                 <td class="text-center text-grey" colspan="3">No Contacts</td>
             </tr>
             <tr v-for="(contact, index) in ContactsToDisplay" :key="index">
-                <td v-if="checkbox">
+                <td v-if="checkbox" class="v-col-1">
                     <v-checkbox color="primary" hide-details :model-value="checkedContacts.includes(contact.id)"
                         @update:model-value="(x) => chcekHandler(x, contact.id)"></v-checkbox>
                 </td>
                 <td class="v-col-2 v-col-md-1">
                     <v-avatar class="text-white text-uppercase" color="primary">
-                        {{ contact.email.slice(0, 1) }}
+                        {{ contact.addedPerson.email.slice(0, 1) }}
                     </v-avatar>
                 </td>
                 <td>
-                    <span v-html="HighLightText(contact.userName)"></span>
+                    <span v-html="HighLightText(contact.addedPerson.userName)"></span>
                 </td>
                 <td>
-                    <span v-html="HighLightText(contact.email)"></span>
+                    <span v-html="HighLightText(contact.addedPerson.email)"></span>
                 </td>
             </tr>
         </tbody>

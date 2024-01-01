@@ -1,10 +1,12 @@
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IKeep, IAddKeep, IEditKeep } from '@/Models/KeepModels'
-import { Insert, GetAll, Update, Delete } from '@/Services/KeepService'
+import type { IKeep, IAddKeep, IEditKeep, IKeepMembers } from '@/Models/KeepModels'
+import { KeepService } from '@/Services/KeepService'
 import { useToster } from '@/composable/useToaster'
 
 const KeepStore = defineStore('KeepStore', () => {
+    const keepService = new KeepService()
+    const isKeepFetched: Ref<boolean> = ref(false)
     const Keeps: Ref<IKeep[]> = ref([])
 
     const keepTags = computed(() => {
@@ -12,43 +14,50 @@ const KeepStore = defineStore('KeepStore', () => {
         return [...new Set(tags)]
     })
 
-    const getSingleKeep = (id: string): IKeep | undefined => {
-        const keep = Keeps.value.find((x) => x.id == id)
-        return keep
+    const getSingleKeep = async (id: string): Promise<IKeep | undefined> => {
+        if (isKeepFetched.value) {
+            return Keeps.value.find((x) => x.id == id)
+        } else {
+            return (await keepService.GetById(id)) ?? undefined
+        }
     }
 
     const FindIndex = (id: string): number => Keeps.value.findIndex((x) => x.id == id)
 
     const AddKeep = async (addKeep: IAddKeep): Promise<any> => {
-        const response = await Insert(addKeep)
+        const response = await keepService.Add(addKeep)
         if (response) {
             Keeps.value.push(response)
         }
     }
-    const getSingle = (id: string) => {
-        return Keeps.value.find((x) => x.id == id)
-    }
+
     const GetKeeps = async (projectId: string): Promise<any> => {
-        const response = await GetAll(projectId)
-        if (response) {
-            Keeps.value = response
-        }
+        const response = await keepService.GetAll(projectId)
+        Keeps.value = response ?? []
+        isKeepFetched.value = true
     }
+
     const DeleteKeep = async (keepId: string): Promise<any> => {
-        const response = await Delete(keepId)
+        const response = await keepService.Delete(keepId)
         if (response) {
             useToster({ message: 'Keep Deleted' })
             const index = Keeps.value.findIndex((x) => x.id == keepId)
             if (index !== -1) Keeps.value.splice(index, 1)
         }
     }
+
     const Updatekeep = async (editKeep: IEditKeep): Promise<any> => {
-        const response = await Update(editKeep)
+        const response = await keepService.Update(editKeep)
         if (response) {
             const index = FindIndex(editKeep.id)
             Keeps.value.splice(index, 1, response)
         }
     }
+    const GetInvitedMembers = async (id: string): Promise<IKeepMembers[]> =>
+        (await keepService.InvitedUser(id)) ?? []
+
+    const RemoveUser = async (id: string): Promise<boolean> =>
+        (await keepService.RemoveFromKeep(id)) != null
 
     return {
         Keeps,
@@ -58,7 +67,8 @@ const KeepStore = defineStore('KeepStore', () => {
         DeleteKeep,
         Updatekeep,
         getSingleKeep,
-        getSingle
+        GetInvitedMembers,
+        RemoveUser
     }
 })
 export { KeepStore }

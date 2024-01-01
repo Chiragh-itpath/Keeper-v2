@@ -12,10 +12,12 @@ namespace Keeper.Main.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly IInviteService _inviteService;
 
-        public ProjectController(IProjectService projectService)
+        public ProjectController(IProjectService projectService, IInviteService inviteService)
         {
             _projectService = projectService;
+            _inviteService = inviteService;
         }
 
         [HttpPost("")]
@@ -59,6 +61,24 @@ namespace Keeper.Main.Controllers
         {
             var res = await _projectService.DeleteByIdAsync(id);
             return new ResponseModel<string>() { Data = res.ToString() };
+        }
+        [HttpGet("Users/{Id}")]
+        public async Task<ResponseModel<List<ProjectUsersViewModel>>> InvitedUsers([FromRoute] Guid Id)
+        {
+            var users = await _projectService.AllInvitedUsers(Id);
+            return new ResponseModel<List<ProjectUsersViewModel>>
+            {
+                Data = users
+            };
+        }
+        [HttpDelete("Remove/{ShareId}")]
+        public async Task<ResponseModel<string>> Remove([FromRoute] Guid ShareId)
+        {
+            var res = await _inviteService.RemoveFromProject(ShareId);
+            return new ResponseModel<string>()
+            {
+                Data = $"{res}"
+            };
         }
     }
 }

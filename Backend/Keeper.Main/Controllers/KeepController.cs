@@ -12,9 +12,11 @@ namespace Keeper.Main.Controllers
     public class KeepController : ControllerBase
     {
         private readonly IKeepService _keepService;
-        public KeepController(IKeepService keepService)
+        private readonly IInviteService _inviteService;
+        public KeepController(IKeepService keepService, IInviteService inviteService)
         {
             _keepService = keepService;
+            _inviteService = inviteService;
         }
 
         [HttpPost("")]
@@ -56,5 +58,25 @@ namespace Keeper.Main.Controllers
             var res = await _keepService.DeleteAsync(Id);
             return new ResponseModel<string>() { Data = res.ToString() };
         }
+        [HttpGet("Users/{KeepId}")]
+        public async Task<ResponseModel<List<KeepUserViewModel>>> InvitedUser([FromRoute] Guid KeepId)
+        {
+            var users = await _keepService.AllInvitedUser(KeepId);
+            return new()
+            {
+                Data = users
+            };
+        }
+        [HttpDelete("Remove/{shareId}")]
+        public async Task<ResponseModel<string>> Remove([FromRoute] Guid shareId)
+        {
+            await Task.CompletedTask;
+            var res = await _inviteService.RemoveFromKeep(shareId);
+            return new()
+            {
+                Data = res.ToString(),
+            };
+        }
+
     }
 }

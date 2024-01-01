@@ -1,33 +1,36 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
 import TextField from '@/components/Custom/TextField.vue'
-import { UserStore, AccountStore, GlobalStore } from '@/stores'
-import { RouterEnum } from '@/Models/enum'
+import { UserStore, GlobalStore } from '@/stores'
+import { watch } from 'vue';
 
-
-const { email, serverOtp } = storeToRefs(AccountStore())
+defineProps<{
+    modelValue: string
+}>()
 const { errors, Loading } = storeToRefs(GlobalStore())
 const form = ref()
-const router = useRouter()
-const { CheckEmail } = UserStore()
-const { fetchOtp } = AccountStore()
 
+const { CheckEmail } = UserStore()
+const email: Ref<string> = ref('')
 
 const validateEmail = async () => {
     const { valid } = await form.value.validate()
     if (!valid) return
     const res = await CheckEmail(email.value)
     if (res) {
-        serverOtp.value = await fetchOtp(email.value)
-        router.push({ name: RouterEnum.VERIFY_OTP })
+        emit('valid')
     }
 }
 
-onMounted(() => {
-    errors.value = {}
-    form.value.reset()
+const emit = defineEmits<{
+    (e: 'valid'): void,
+    (e: 'update:modelValue', value: string): void
+}>()
+watch(email, () => {
+    if (email.value) {
+        emit('update:modelValue', email.value.trim())
+    }
 })
 </script>
 <template>
@@ -35,7 +38,7 @@ onMounted(() => {
         <div>
             <text-field v-model="email" label="Email" placeholder="Enter your Email" is-required is-email
                 :error-messages="errors.email" />
-            <div class="text-center">
+            <div class="text-center mt-10">
                 <v-btn color="primary" @click="validateEmail" :loading="Loading" :disabled="Loading">
                     Verify Email
                 </v-btn>
