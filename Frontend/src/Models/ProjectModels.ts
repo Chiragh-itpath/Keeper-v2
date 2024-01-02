@@ -15,7 +15,8 @@ interface IProject extends IAddProject {
     updatedBy: string
     createdOn: string
     updatedOn: string
-    isShared: boolean
+    isShared: boolean,
+    users: IProjectMembers[]
 }
 interface IProjectMembers {
     shareId: string

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, ref, watch, type Ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ContactStore, GroupStore } from '@/stores'
 import type { IUser } from '@/Models/UserModels';
@@ -7,8 +7,8 @@ defineProps<{
     errorMessage?: string
 }>()
 const selectedItem: Ref<any[]> = ref([])
-const { Contacts } = storeToRefs(ContactStore())
-const { Groups } = storeToRefs(GroupStore())
+const { Contacts, isContactFetched } = storeToRefs(ContactStore())
+const { Groups, isGroupFetched } = storeToRefs(GroupStore())
 const menu: Ref<boolean> = ref(false)
 const items = computed(() => {
     let item: any[] = []
@@ -59,6 +59,14 @@ const emits = defineEmits<{
     (e: 'update:emails', emails: string[]): void,
     (e: 'update:users', users: IUser[]): void
 }>()
+onMounted(async () => {
+    if(!isContactFetched.value) {
+        await ContactStore().GetContacts()
+    }
+    if(!isGroupFetched.value) {
+        await GroupStore().GetGroups()
+    }
+})
 </script>
 
 <template>
