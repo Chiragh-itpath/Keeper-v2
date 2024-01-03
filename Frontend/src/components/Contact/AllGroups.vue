@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { GroupStore, UserStore } from '@/stores'
+import { GroupStore } from '@/stores'
 import type { IGroup } from '@/Models/GroupModels'
 import GroupDetails from '@/components/Contact/GroupDetails.vue';
 
@@ -13,7 +13,6 @@ const props = withDefaults(defineProps<{
 
 const { Groups } = storeToRefs(GroupStore())
 
-const { User } = UserStore()
 
 const GroupsToDisplay: Ref<IGroup[]> = ref(Groups.value)
 watch(props, () => {
@@ -38,15 +37,15 @@ const HighLightText = (text: string) => {
             <tr>
                 <th></th>
                 <th>Name</th>
-                <th>Owner</th>
+                <th>Contacts</th>
             </tr>
         </thead>
         <tbody>
-            <tr v-if="Groups.length == 0 || GroupsToDisplay.length == 0" >
+            <tr v-if="Groups.length == 0 || GroupsToDisplay.length == 0">
                 <td class="text-center" colspan="3">No Groups</td>
             </tr>
             <tr v-for="(group, index) in GroupsToDisplay " :key="index" class="cursor-pointer">
-                <group-details :id="group.id" v-slot="{ onclick }">
+                <group-details :group="group" v-slot="{ onclick }">
                     <td @click="onclick" class="v-col-1">
                         <v-icon color="primary">mdi-account-group-outline</v-icon>
                     </td>
@@ -54,7 +53,7 @@ const HighLightText = (text: string) => {
                         <span v-html="HighLightText(group.name)"></span>
                     </td>
                     <td @click="onclick">
-                        <span v-html="group.userEmail == User.email ? 'Me' : group.userEmail"></span>
+                        <span>{{ group.contacts.length }}</span>
                     </td>
                 </group-details>
             </tr>

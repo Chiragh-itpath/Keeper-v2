@@ -9,5 +9,6 @@ namespace Keeper.Services.Services.Interfaces
         Task<ProjectViewModel> SaveAsync(AddProject addProject,Guid userId);
         Task<ProjectViewModel> UpdateAsync(EditProject editProject, Guid userId);
         Task<bool> DeleteByIdAsync(Guid Id);
+        Task<List<ProjectUsersViewModel>> AllInvitedUsers(Guid ProjectId);
     }
 }

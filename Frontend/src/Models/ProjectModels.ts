@@ -1,3 +1,5 @@
+import type { IUser } from './UserModels'
+
 interface IAddProject {
     title: string
     description: string
@@ -13,7 +15,12 @@ interface IProject extends IAddProject {
     updatedBy: string
     createdOn: string
     updatedOn: string
-    isShared: boolean
+    isShared: boolean,
+    users: IProjectMembers[]
 }
-
-export type { IAddProject, IEditProject, IProject }
+interface IProjectMembers {
+    shareId: string
+    isAccepted: boolean
+    invitedUser: IUser
+}
+export type { IAddProject, IEditProject, IProject, IProjectMembers }

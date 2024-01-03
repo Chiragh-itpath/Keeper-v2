@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted, type Ref } from 'vue'
 import { RouterEnum } from '@/Models/enum'
 import type { ILogin } from '@/Models/UserModels'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import { AccountStore, GlobalStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 const { loginUser } = AccountStore()
@@ -10,8 +10,8 @@ const { Loading, errors } = storeToRefs(GlobalStore())
 const loginClicked: Ref<boolean> = ref(false)
 const form = ref()
 const loginForm = reactive<ILogin>({
-    email: '',
-    password: ''
+    email: 'keeper@yopmail.com',
+    password: 'admin123'
 })
 
 const login = async (): Promise<void> => {
@@ -46,7 +46,7 @@ onMounted(() => {
                                     icon="mdi-lock" :error-messages="errors.password" :max-limit="16" />
                             </div>
                             <div class="text-right">
-                                <router-link :to="{ name: RouterEnum.VERIFY_EMAIL }">
+                                <router-link :to="{ name: RouterEnum.PASSWORD_RESET }">
                                     Forgot Password?
                                 </router-link>
                             </div>

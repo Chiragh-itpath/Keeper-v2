@@ -1,8 +1,8 @@
 import type { IContact } from '@/Models/ContactModels'
 import { http } from '@/config/ApiClient'
 export class ContactService {
-    public async AddContact(email: string): Promise<IContact | null> {
-        const response: IContact = await http.post('Contact', { email })
+    public async AddContact(userIds: string[]): Promise<IContact[] | null> {
+        const response: IContact[] = await http.post('Contact', { userIds })
         return response
     }
     public async GetContacts(): Promise<IContact[] | null> {

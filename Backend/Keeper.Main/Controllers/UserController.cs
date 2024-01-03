@@ -28,13 +28,16 @@ namespace Keeper.Main.Controllers
             return new ResponseModel<UserViewModel> { Data = res };
         }
         [HttpGet("EmailSearch")]
-        public async Task<ResponseModel<List<string>>> EmailSearch([FromQuery] string email)
+        public async Task<ResponseModel<List<UserViewModel>>> EmailSearch([FromQuery] string email)
         {
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
             var res = await _user.EmailSearch(email, userId);
-            return new ResponseModel<List<string>> { Data = res };
+            return new ResponseModel<List<UserViewModel>>
+            {
+                Data = res
+            };
         }
         [AllowAnonymous]
         [HttpGet("CheckMail")]

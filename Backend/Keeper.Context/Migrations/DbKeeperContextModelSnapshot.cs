@@ -55,7 +55,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ContactGroupLinkerModel", b =>
@@ -76,7 +76,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("ContactGroupLinker", (string)null);
+                    b.ToTable("ContactGroupLinker");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ContactModel", b =>
@@ -85,18 +85,19 @@ namespace Keeper.Context.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("AddedById")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("AddedId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AddedById");
 
-                    b.ToTable("Contact", (string)null);
+                    b.HasIndex("AddedId");
+
+                    b.ToTable("Contact");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.FileModel", b =>
@@ -115,7 +116,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Files", (string)null);
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.GroupModel", b =>
@@ -135,7 +136,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Group", (string)null);
+                    b.ToTable("Group");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ItemFileLinkerModel", b =>
@@ -156,7 +157,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("ItemFileLinker", (string)null);
+                    b.ToTable("ItemFileLinker");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ItemModel", b =>
@@ -215,7 +216,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Items", (string)null);
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.KeepModel", b =>
@@ -260,7 +261,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Keeps", (string)null);
+                    b.ToTable("Keeps");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ProjectModel", b =>
@@ -303,7 +304,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.SharedKeepsModel", b =>
@@ -332,7 +333,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SharedKeeps", (string)null);
+                    b.ToTable("SharedKeeps");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.SharedProjectsModel", b =>
@@ -356,7 +357,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SharedProjects", (string)null);
+                    b.ToTable("SharedProjects");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.TagModel", b =>
@@ -377,7 +378,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.UserModel", b =>
@@ -386,11 +387,6 @@ namespace Keeper.Context.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Contact")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -398,6 +394,11 @@ namespace Keeper.Context.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Mobile")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -413,7 +414,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.CommentModel", b =>
@@ -450,7 +451,7 @@ namespace Keeper.Context.Migrations
                         .IsRequired();
 
                     b.HasOne("Keeper.Context.Model.GroupModel", "Group")
-                        .WithMany()
+                        .WithMany("Linkers")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -462,13 +463,21 @@ namespace Keeper.Context.Migrations
 
             modelBuilder.Entity("Keeper.Context.Model.ContactModel", b =>
                 {
-                    b.HasOne("Keeper.Context.Model.UserModel", "User")
+                    b.HasOne("Keeper.Context.Model.UserModel", "AddedBy")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("AddedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Keeper.Context.Model.UserModel", "AddedPerson")
+                        .WithMany()
+                        .HasForeignKey("AddedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AddedBy");
+
+                    b.Navigation("AddedPerson");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.GroupModel", b =>
@@ -629,6 +638,11 @@ namespace Keeper.Context.Migrations
             modelBuilder.Entity("Keeper.Context.Model.CommentModel", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Keeper.Context.Model.GroupModel", b =>
+                {
+                    b.Navigation("Linkers");
                 });
 #pragma warning restore 612, 618
         }

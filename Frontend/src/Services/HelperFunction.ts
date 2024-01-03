@@ -1,11 +1,3 @@
-const dateHelper = (d: string | null | undefined): string => {
-    if (d) {
-        const date = new Date(d)
-        return date.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
-    }
-    return '-'
-}
-
 const dateDiffernce = (dateArg: string) => {
     const inputDate = new Date(dateArg)
     if (isNaN(inputDate.getTime())) {
@@ -34,4 +26,4 @@ const dateDiffernce = (dateArg: string) => {
     }
 }
 
-export { dateHelper, dateDiffernce }
+export { dateDiffernce }

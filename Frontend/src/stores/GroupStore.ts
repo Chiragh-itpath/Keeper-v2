@@ -6,6 +6,7 @@ import { ref, type Ref } from 'vue'
 export const GroupStore = defineStore('group', () => {
     const groupService = new GroupService()
     const Groups: Ref<IGroup[]> = ref([])
+    const isGroupFetched: Ref<boolean> = ref(false)
     const AddGroup = async (group: IAddGroup): Promise<void> => {
         const res = await groupService.AddGroup(group)
         if (res) {
@@ -15,6 +16,7 @@ export const GroupStore = defineStore('group', () => {
     const GetGroups = async (): Promise<void> => {
         const res = await groupService.GetAll()
         if (res) {
+            isGroupFetched.value = true
             Groups.value = res
         }
     }
@@ -25,5 +27,11 @@ export const GroupStore = defineStore('group', () => {
             Groups.value.splice(index, 1, res)
         }
     }
-    return { Groups, AddGroup, GetGroups, AddContacts }
+    return {
+        Groups,
+        isGroupFetched,
+        AddGroup,
+        GetGroups,
+        AddContacts
+    }
 })

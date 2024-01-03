@@ -13,7 +13,7 @@ namespace Keeper.Context.Model
         [StringLength(50), Required]
         public string Email { get; set; } = default!;
         [StringLength(10)]
-        public string Contact { get; set; } = default!;
+        public string Mobile { get; set; } = default!;
         [Required]
         public string Password { get; set; } = default!;
         public DateTime CreatedOn { get; set; }

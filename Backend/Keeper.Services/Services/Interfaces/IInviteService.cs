@@ -1,5 +1,4 @@
-﻿using Keeper.Common.Response;
-using Keeper.Common.ViewModels;
+﻿using Keeper.Common.ViewModels;
 
 namespace Keeper.Services.Services.Interfaces
 {
@@ -13,5 +12,7 @@ namespace Keeper.Services.Services.Interfaces
         Task<bool> ResponseToKeepInvite(InviteResponseModel keepInvite,Guid userId);
         Task<List<Collaborator>> GetProjectCollaborators(Guid projectId);
         Task<List<Collaborator>> GetKeepCollaborators(Guid keepId);
+        Task<int> RemoveFromProject(Guid ShareId);
+        Task<int> RemoveFromKeep(Guid shareId);
     }
 }

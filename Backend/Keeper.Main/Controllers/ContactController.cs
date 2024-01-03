@@ -17,13 +17,16 @@ namespace Keeper.Main.Controllers
             _contact = contact;
         }
         [HttpPost("")]
-        public async Task<ResponseModel<ContactViewModel>> AddContact(AddContact contact)
+        public async Task<ResponseModel<List<ContactViewModel>>> AddContact(AddContact contact)
         {
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
             var res = await _contact.AddAsync(contact, userId);
-            return new ResponseModel<ContactViewModel> { Data = res };
+            return new ResponseModel<List<ContactViewModel>>
+            {
+                Data = res
+            };
         }
         [HttpGet("")]
         public async Task<ResponseModel<List<ContactViewModel>>> GetContacts()

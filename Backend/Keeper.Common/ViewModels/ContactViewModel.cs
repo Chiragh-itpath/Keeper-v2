@@ -1,11 +1,13 @@
 ﻿namespace Keeper.Common.ViewModels
 {
-    public class ContactViewModel : UserViewModel
+    public class ContactViewModel 
     {
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
+        public UserViewModel AddedBy { get; set; } = default!;
+        public UserViewModel AddedPerson { get; set; } = default!;
     }
     public class AddContact
     {
-        public string Email { get; set; } = string.Empty;
+        public List<Guid> UserIds { get; set; } = default!;
     }
 }

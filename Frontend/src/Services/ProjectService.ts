@@ -1,25 +1,33 @@
 import { http } from '@/config/ApiClient'
-import type { IAddProject, IEditProject, IProject } from '@/Models/ProjectModels'
+import type { IAddProject, IEditProject, IProject, IProjectMembers } from '@/Models/ProjectModels'
 
-const Insert = async (Project: IAddProject): Promise<IProject | null> => {
-    const response: IProject = await http.post('Project', Project)
-    return response
+export class ProjectService {
+    private readonly baseUrl: string = 'Project'
+    public Add = async (Project: IAddProject): Promise<IProject | null> => {
+        const response: IProject = await http.post(this.baseUrl, Project)
+        return response
+    }
+    public GetById = async (ProjectId: string): Promise<IProject | null> => {
+        const response: IProject = await http.get(`${this.baseUrl}/${ProjectId}`)
+        return response
+    }
+    public GetAll = async (): Promise<IProject[] | null> => {
+        const response: IProject[] = await http.get(this.baseUrl)
+        return response
+    }
+    public Update = async (Project: IEditProject): Promise<IProject | null> => {
+        const response: IProject = await http.put(this.baseUrl, Project)
+        return response
+    }
+    public Delete = async (ProjectId: string): Promise<boolean> => {
+        const res = await http.delete(`${this.baseUrl}/${ProjectId}`)
+        return res != null
+    }
+    public InvitedUser = async (projectId: string): Promise<IProjectMembers[] | null> => {
+        const res: IProjectMembers[] = await http.get(`${this.baseUrl}/Users/${projectId}`)
+        return res
+    }
+    public RemoveFromProject = async (id: string) => {
+        return await http.delete(`${this.baseUrl}/Remove/${id}`)
+    }
 }
-const GetById = async (ProjectId: string): Promise<IProject | null> => {
-    const response: IProject = await http.get(`Project/${ProjectId}`)
-    return response
-}
-const GetAll = async (): Promise<IProject[] | null> => {
-    const response: IProject[] = await http.get('Project')
-    return response
-}
-const Update = async (Project: IEditProject): Promise<IProject | null> => {
-    const response: IProject = await http.put('Project', Project)
-    return response
-}
-const Delete = async (ProjectId: string): Promise<boolean> => {
-    const res = await http.delete(`Project/${ProjectId}`)
-    return res != null
-}
-
-export { Insert, GetById, GetAll, Update, Delete }

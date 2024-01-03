@@ -31,10 +31,9 @@ namespace Keeper.Services.Services
             var sender = await _user.GetById(userId);
             var project = await _project.GetByIdAsync(invite.ProjectId);
             int skipCount = 0;
-            for (int i = 0; i < invite.Emails.Count; i++)
+            for (int i = 0; i < invite.Users.Count; i++)
             {
-                var user = await _user.GetByEmailAsync(invite.Emails[i]);
-                var shared = await _projectShare.GetAsync(invite.ProjectId, user!.Id);
+                var shared = await _projectShare.GetAsync(invite.ProjectId, invite.Users[i].Id);
                 if (shared != null)
                 {
                     skipCount++;
@@ -43,19 +42,19 @@ namespace Keeper.Services.Services
                 var inviteModel = new SharedProjectsModel()
                 {
                     ProjectId = invite.ProjectId,
-                    UserId = user.Id
+                    UserId = invite.Users[i].Id
                 };
                 await _projectShare.AddAsync(inviteModel);
                 await _mail.SendEmailAsync(new MailModel
                 {
                     Category = MailCategory.SendInvitation,
                     From = sender?.Email ?? string.Empty,
-                    To = user.Email,
+                    To = invite.Users[i].Email,
                     Subject = "Project Invitation",
                     Message = project?.Title ?? string.Empty
                 });
             }
-            if (skipCount == invite.Emails.Count) throw new InnerException("All User already invited", StatusType.NOT_VALID);
+            if (skipCount == invite.Users.Count) throw new InnerException("All User already invited", StatusType.NOT_VALID);
             return true;
         }
         public async Task<List<InvitedProjectModel>> GetAllInvitedProject(Guid userId)
@@ -114,16 +113,15 @@ namespace Keeper.Services.Services
             var sender = await _user.GetById(userId);
             var keep = await _keep.GetAsync(invite.KeepId);
             int skipcount = 0;
-            for (int i = 0; i < invite.Emails.Count; i++)
-            {
-                var user = await _user.GetByEmailAsync(invite.Emails[i]);
-                var projectShared = (await _projectShare.GetAsync(invite.ProjectId, user!.Id)) != null;
+            for (int i = 0; i < invite.Users.Count; i++)
+            {   
+                var projectShared = (await _projectShare.GetAsync(invite.ProjectId, invite.Users[i].Id)) != null;
                 if (projectShared)
                 {
                     skipcount++;
                     continue;
                 }
-                var keepShared = (await _shareKeep.GetAsync(keep!.Id, user!.Id)) !=null;
+                var keepShared = (await _shareKeep.GetAsync(keep!.Id, invite.Users[i].Id)) !=null;
                 if (keepShared)
                 {
                     skipcount++;
@@ -133,19 +131,19 @@ namespace Keeper.Services.Services
                 {
                     KeepId = invite.KeepId,
                     ProjectId = invite.ProjectId,
-                    UserId = user!.Id
+                    UserId = invite.Users[i].Id
                 };
                 await _shareKeep.AddAsync(inviteModel);
                 await _mail.SendEmailAsync(new MailModel
                 {
                     Category = MailCategory.SendInvitation,
                     From = sender?.Email ?? string.Empty,
-                    To = user.Email,
+                    To = invite.Users[i].Email,
                     Subject = "Project Invitation",
                     Message = keep?.Title ?? ""
                 });
             }
-            if (skipcount == invite.Emails.Count) throw new InnerException("All User already Invited", StatusType.NOT_VALID);
+            if (skipcount == invite.Users.Count) throw new InnerException("All User already Invited", StatusType.NOT_VALID);
             return true;
         }
         public async Task<List<InviteKeepModel>> GetAllInvitedKeep(Guid UserId)
@@ -212,6 +210,18 @@ namespace Keeper.Services.Services
                 HasAccepted = x.IsAccepted
             }).ToList();
             return collaborator;
+        }
+
+        public async Task<int> RemoveFromProject(Guid ShareId)
+        {
+            var item = await _projectShare.GetAsync(ShareId);
+            return await _projectShare.DeleteAsync(item);
+        }
+
+        public async Task<int> RemoveFromKeep(Guid shareId)
+        {
+            var item = await _shareKeep.GetAsync(shareId);
+            return await _shareKeep.DeleteAsync(item);
         }
     }
 }

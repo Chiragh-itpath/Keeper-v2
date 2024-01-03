@@ -7,9 +7,11 @@ namespace Keeper.Context.Model
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-        public string Email { get; set; } = string.Empty;
-        [ForeignKey(nameof(UserModel))]
-        public Guid UserId { get; set; }
-        public virtual UserModel User { get; set; } = default!;
+        [ForeignKey(nameof(AddedPerson))]
+        public Guid AddedId { get; set; }
+        public virtual UserModel AddedPerson { get; set; } = default!;
+        [ForeignKey(nameof(AddedBy))]
+        public Guid AddedById { get; set; }
+        public virtual UserModel AddedBy { get; set; } = default!;
     }
 }

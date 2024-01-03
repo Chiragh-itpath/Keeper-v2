@@ -3,7 +3,7 @@
     public class ProjectInviteModel
     {
         public Guid ProjectId { get; set; }
-        public List<string> Emails { get; set; } = new List<string>();
+        public List<UserViewModel> Users{ get; set; } = new (); 
     }
     public class KeepInviteModel : ProjectInviteModel
     {

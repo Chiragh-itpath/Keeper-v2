@@ -25,6 +25,7 @@ namespace Keeper.Services.Services
                 Subject = mail.Subject,
                 Body = MessageBodyHelper(mail.Category,mail.Subject,mail.From,mail.Message)
             };
+            email.From.Add(MailboxAddress.Parse(_mailSettings.Mail));
             email.To.Add(MailboxAddress.Parse(mail.To));
             using var client = new SmtpClient();
             client.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);

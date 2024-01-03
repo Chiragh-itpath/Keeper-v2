@@ -17,5 +17,12 @@
         public string? Updatedby { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
+        public List<KeepUserViewModel> Users { get; set; } = new();
+    }
+    public class KeepUserViewModel
+    {
+        public Guid ShareId { get; set; }
+        public bool IsAccepted { get; set; }
+        public UserViewModel InvitedUser { get; set; } = new();
     }
 }

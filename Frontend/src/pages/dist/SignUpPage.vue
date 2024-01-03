@@ -2,7 +2,7 @@
 import { ref, reactive, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { RouterEnum } from '@/Models/enum'
-import TextField from '@/components/Custom/TextField.vue'
+import { TextField } from '@/components/Custom'
 import { AccountStore, GlobalStore } from '@/stores'
 import type { IRegister } from '@/Models/UserModels'
 const { registerUser } = AccountStore()

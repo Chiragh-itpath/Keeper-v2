@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { VOtpInput } from 'vuetify/labs/VOtpInput'
+
 
 const props = withDefaults(defineProps<{
     modelValue: string,

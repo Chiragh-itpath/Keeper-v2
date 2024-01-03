@@ -1,9 +1,10 @@
 ﻿using Keeper.Common.Enums;
 using Keeper.Common.InnerException;
-using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
+using Keeper.Context.Model;
 using Keeper.Repos.Interfaces;
 using Keeper.Services.Interfaces;
+using System.Reflection.Metadata.Ecma335;
 
 namespace KeeperCore.Services
 {
@@ -14,35 +15,37 @@ namespace KeeperCore.Services
         {
             _userRepo = userRepo;
         }
-        public async Task<UserViewModel> GetByIdAsync(Guid id)
+        public UserViewModel MapToUserVM(UserModel user)
         {
-
-            var user = await _userRepo.GetById(id) ?? throw new InnerException("No User found with this id", StatusType.NOT_FOUND);
             return new UserViewModel
             {
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
-                Contact = user.Contact
+                Mobile = user.Mobile
             };
+        }
+        public async Task<UserViewModel> GetByIdAsync(Guid id)
+        {
+            var user = await _userRepo.GetById(id) ?? throw new InnerException("No User found with this id", StatusType.NOT_FOUND);
+            return MapToUserVM(user);
         }
         public async Task<UserViewModel> CheckEmail(string email)
         {
             var res = await _userRepo.GetByEmailAsync(email);
-            if (res == null) throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
-            return new UserViewModel
-            {
-                Id = res.Id,
-                UserName = res.UserName,
-                Email = res.Email,
-                Contact = res.Contact
-            };
+            return res == null ? throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND) : MapToUserVM(res);
         }
-        public async Task<List<string>> EmailSearch(string email, Guid userId)
+        public async Task<List<UserViewModel>> EmailSearch(string email, Guid userId)
         {
             var result = await _userRepo.GetEmailList(email, userId);
-            var userList = result.Select(x => x.Email).ToList();
+            var userList = result.Select(x => MapToUserVM(x)).ToList();
             return userList;
+        }
+
+        public async Task<UserViewModel?> GetByEmailAsync(string email)
+        {
+            UserModel? user = await _userRepo.GetByEmailAsync(email);
+            return user != null ? MapToUserVM(user) : null;
         }
     }
 }

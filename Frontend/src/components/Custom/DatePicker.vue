@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { VDatePicker } from 'vuetify/labs/VDatePicker'
+import { useDate } from 'vuetify'
 const props = withDefaults(defineProps<{
     modelValue?: any,
     label?: string
@@ -8,15 +8,15 @@ const props = withDefaults(defineProps<{
     modelValue: '',
     label: ''
 })
+const dateHelper = useDate()
+
 const menu = ref()
 const date = ref()
 const displayDate = ref(props.modelValue)
 
 watch(date, () => {
     if (date.value) {
-        const dateObj = new Date(date.value)
-        displayDate.value = `${dateObj.getFullYear()}-${dateObj.getMonth() + 1}-${dateObj.getDate()}`
-        emits('update:modelValue', displayDate.value)
+        emits('update:modelValue', date.value)
         menu.value = false
     }
 })
@@ -32,21 +32,32 @@ const emits = defineEmits<{
 
 const clear = () => {
     emits('update:modelValue', '')
-
 }
 </script>
 <template>
-    <v-menu v-model="menu" :close-on-content-click="false" offset-y min-width="290px">
-        <template v-slot:activator="{ isActive, props }">
-            <v-text-field :model-value="displayDate" readonly v-bind="props" @click="isActive" :label="label"
-                color="primary" clearable @click:clear="clear" append-inner-icon="mdi-calendar-range"
-                :class="isActive ? 'change-icon' : ''">
-            </v-text-field>
-        </template>
-        <v-date-picker v-model="date" color="primary" :max="new Date()" @click:cancel="menu = false"
-            input-placeholder="mm/dd/yyyy" hide-weekdays>
-        </v-date-picker>
-    </v-menu>
+    <div>
+        <v-menu v-model="menu" :close-on-content-click="false" location="right" transition="scale-transition">
+            <template v-slot:activator="{ isActive, props }">
+                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary" v-if="!date">
+                    <template v-slot:append>
+                        <v-icon>
+                            {{ `mdi-menu-${isActive ? 'up' : 'down'}` }}
+                        </v-icon>
+                    </template>
+                    date
+                </v-btn>
+                <v-btn class="rounded-lg" variant="outlined" color="primary" v-else>
+                    {{ `${dateHelper.format(date, 'normalDateWithWeekday')}` }}
+                    <template v-slot:append>
+                        <v-icon @click="clear">mdi-close</v-icon>
+                    </template>
+                </v-btn>
+            </template>
+            <v-date-picker v-model="date" color="primary" :max="new Date()" @click:cancel="menu = false"
+                input-placeholder="mm/dd/yyyy" hide-weekdays>
+            </v-date-picker>
+        </v-menu>
+    </div>
 </template>
 <style >
 .change-icon>div.v-input__control>.v-field>.v-field__append-inner>.v-icon {

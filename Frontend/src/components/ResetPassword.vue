@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { ref, type Ref, onMounted } from 'vue'
+import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { AccountStore } from '@/stores'
+import { AccountStore, GlobalStore } from '@/stores'
 import TextField from '@/components/Custom/TextField.vue'
 import { RouterEnum } from '@/Models/enum'
 
 const form = ref()
-
+const props = defineProps<{
+    email: string
+}>()
 const errorMessages: Ref<string> = ref('')
 const Password: Ref<string> = ref('')
 const confirmPassword: Ref<string> = ref('')
 const router = useRouter()
-const { email } = storeToRefs(AccountStore())
-const { PasswordReset } = AccountStore()
 
+const { PasswordReset } = AccountStore()
+const { Loading } = storeToRefs(GlobalStore())
 const ChangePassWord = async () => {
     errorMessages.value = ''
     const { valid } = await form.value.validate()
@@ -24,16 +26,12 @@ const ChangePassWord = async () => {
         return
     }
     await PasswordReset({
-        email: email.value,
+        email: props.email,
         password: Password.value
     })
     router.push({ name: RouterEnum.LOGIN })
 }
-onMounted(() => {
-    if (email.value == '') {
-        router.go(-1)
-    }
-})
+
 </script>
 <template>
     <v-form ref="form" validate-on="submit">
@@ -41,7 +39,7 @@ onMounted(() => {
         <text-field label="Confirm Password" v-model="confirmPassword" is-required is-password
             placeholder="Enter confirm Password" :error-messages="errorMessages" />
         <div class="d-flex justify-center pa-4">
-            <v-btn color="primary" @click="ChangePassWord">Change Password</v-btn>
+            <v-btn color="primary" @click="ChangePassWord" :loading="Loading" :disabled="Loading">Change Password</v-btn>
         </div>
     </v-form>
 </template>
