@@ -20,22 +20,35 @@ namespace Keeper.Repos.Repositories
                 .Include(k => k.Tag)
                 .Include(k => k.CreatedBy)
                 .Include(k => k.UpdatedBy)
+                .AsNoTracking()
                 .Where(x => x.ProjectId == ProjectId && !x.IsDeleted)
                 .ToListAsync();
         }
+
         public async Task<List<KeepModel>> GetAllShared(Guid projectId, Guid UserId)
         {
-            return await (from k in _db.Keeps
-                          join sk in _db.SharedKeeps on new { KeepId = k.Id, k.ProjectId, UserId } equals new { sk.KeepId, sk.ProjectId, sk.UserId }
-                          select k).ToListAsync();
+            List<KeepModel> keeps = await (
+                from k in _db.Keeps
+                .Include(k => k.Tag)
+                .Include(k => k.CreatedBy)
+                .Include(k => k.UpdatedBy)
+                join sk in _db.SharedKeeps on
+                  new { KeepId = k.Id, k.ProjectId, UserId } equals
+                  new { sk.KeepId, sk.ProjectId, sk.UserId }
+                where !k.IsDeleted
+                select k)
+                .AsNoTracking()
+                .ToListAsync();
+            return keeps;
         }
+
         public async Task<KeepModel?> GetAsync(Guid id)
         {
             return await _db.Keeps
                 .Include(k => k.Tag)
                 .Include(k => k.CreatedBy)
                 .Include(k => k.UpdatedBy)
-                .Where(x => x.Id == id && x.IsDeleted == false)
+                .Where(x => x.Id == id && !x.IsDeleted)
                 .FirstOrDefaultAsync();
         }
 
@@ -52,6 +65,7 @@ namespace Keeper.Repos.Repositories
             await _db.SaveChangesAsync();
             return Keep.Id;
         }
+
         public async Task DeleteAsync(KeepModel keep)
         {
             keep.IsDeleted = true;

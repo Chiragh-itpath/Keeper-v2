@@ -1,6 +1,6 @@
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IProject, IAddProject, IEditProject, IProjectMembers } from '@/Models/ProjectModels'
+import type { IProject, IAddProject, IEditProject } from '@/Models/ProjectModels'
 import { ProjectService } from '@/Services/ProjectService'
 import { useToster } from '@/composable/useToaster'
 
@@ -50,8 +50,13 @@ const ProjectStore = defineStore('ProjectStore', () => {
         }
     }
 
-    const GetInvitedMembers = async (id: string): Promise<IProjectMembers[]> =>
-        (await projectService.InvitedUser(id)) ?? []
+    const GetInvitedMembers = async (id: string): Promise<void> => {
+        const project = await GetSingalProject(id)
+        if (project) {
+            project.users = (await projectService.InvitedUser(id)) ?? []
+            Projects.value.splice(FindIndex(id), 1, project)
+        }
+    }
 
     const RemoveUser = async (id: string): Promise<boolean> =>
         (await projectService.RemoveFromProject(id)) != null

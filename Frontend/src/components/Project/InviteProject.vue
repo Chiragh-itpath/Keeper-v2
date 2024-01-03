@@ -28,7 +28,7 @@ const projectStore = ProjectStore()
 const handleInvite = async (): Promise<void> => {
     if (props.project) {
         await InviteUsersToProject(props.project.id, inviteUser.value)
-        InvitedUsers.value = await projectStore.GetInvitedMembers(props.project.id)
+        await projectStore.GetInvitedMembers(props.project.id)
         inviteUser.value = []
         visible.value = false
     }
@@ -42,7 +42,8 @@ const handleRemove = async (id: string) => {
 }
 watch(props, async () => {
     visible.value = props.modelValue
-    InvitedUsers.value = props.project?.users ?? []
+    if (props.modelValue && props.project)
+        InvitedUsers.value = props.project.users
 })
 watch(visible, () => {
     if (!visible.value)

@@ -20,7 +20,7 @@ export class KeepService {
     }
 
     public Update = async (editKeep: IEditKeep): Promise<IKeep | null> => {
-        const response: IKeep = await http.put('${this.baseUrl}', editKeep)
+        const response: IKeep = await http.put(`${this.baseUrl}`, editKeep)
         return response
     }
     public Delete = async (keepId: string): Promise<boolean> =>

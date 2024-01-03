@@ -3,18 +3,16 @@ import { type Ref, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { InviteDropDown } from '@/components/Contact/'
 import { DeletePropmt } from '@/components/Custom/'
-import { ContactStore, GlobalStore, GroupStore, InviteStore, KeepStore, ProjectStore } from '@/stores'
+import { GlobalStore, InviteStore, KeepStore, ProjectStore } from '@/stores'
 import type { IUser } from '@/Models/UserModels'
-import type { IKeepMembers } from '@/Models/KeepModels'
-import type { IProjectMembers } from '@/Models/ProjectModels'
+import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
+import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
 
 const props = withDefaults(defineProps<{
-    id: string,
-    projectId: string
+    keep: IKeep | undefined
+    project: IProject
     modelValue: boolean
 }>(), {
-    id: '',
-    projectId: '',
     modelValue: false
 })
 
@@ -26,16 +24,16 @@ const projectInvitedUsers: Ref<IProjectMembers[]> = ref([])
 const errorMessage: Ref<string> = ref('')
 const shareId: Ref<string> = ref('')
 const deleteVisible: Ref<boolean> = ref(false)
-const { GetContacts } = ContactStore()
-const { GetGroups } = GroupStore()
-const { isContactFetched } = storeToRefs(ContactStore())
-const { isGroupFetched } = storeToRefs(GroupStore())
 const { Loading } = storeToRefs(GlobalStore())
 
 const handleInvite = async (): Promise<void> => {
-    await InviteStore().InviteUsersToKeep(props.id, props.projectId, inviteUser.value)
-    visible.value = false
-    inviteUser.value = []
+    if (props.keep) {
+        await InviteStore().InviteUsersToKeep(props.keep.id, props.project.id, inviteUser.value)
+        await KeepStore().GetInvitedMembers(props.keep.id)
+        visible.value = false
+        inviteUser.value = []
+
+    }
 }
 const handleRemove = async (shareId: string): Promise<void> => {
     const res: boolean = await KeepStore().RemoveUser(shareId)
@@ -44,15 +42,11 @@ const handleRemove = async (shareId: string): Promise<void> => {
     }
     deleteVisible.value = false
 }
-watch(props, async () => {
+watch(props, () => {
     visible.value = props.modelValue
-    if (visible.value) {
-        if (!isContactFetched.value)
-            await GetContacts()
-        if (!isGroupFetched.value)
-            await GetGroups()
-        keepInvitedUsers.value = await KeepStore().GetInvitedMembers(props.id)
-        projectInvitedUsers.value = await ProjectStore().GetInvitedMembers(props.projectId)
+    if (visible.value && props.keep) {
+        keepInvitedUsers.value = props.keep.users
+        projectInvitedUsers.value = props.project.users
     }
     errorMessage.value = ''
 })
@@ -95,7 +89,7 @@ const emits = defineEmits<{
                             No users invited yet
                         </v-list-item>
                         <template v-for="share in keepInvitedUsers">
-                            <v-list-item class="border rounded-lg" :title="share.invitedUser.userName"
+                            <v-list-item class="py-2 mb-1 border rounded-lg" :title="share.invitedUser.userName"
                                 :subtitle="share.invitedUser.email">
                                 <template v-slot:prepend>
                                     <v-avatar color="primary">

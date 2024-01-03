@@ -14,35 +14,46 @@ namespace Keeper.Services.Services
         private readonly IProjectRepo _projectRepo;
         private readonly IProjectShareRepo _projectShareRepo;
         private readonly IKeepShareRepo _keepShareRepo;
-        private readonly ITagService _tag;
-        private readonly IUserService _user;
+        private readonly ITagService _tagService;
+        private readonly IUserService _userService;
         public KeepService(IKeepRepo keepRepo, ITagService tagService, IProjectRepo projectRepo, IProjectShareRepo projectShareRepo, IKeepShareRepo keepShareRepo, IUserService user)
         {
             _keepRepo = keepRepo;
-            _tag = tagService;
+            _tagService = tagService;
             _projectRepo = projectRepo;
             _projectShareRepo = projectShareRepo;
             _keepShareRepo = keepShareRepo;
-            _user = user;
+            _userService = user;
         }
         public async Task<List<KeepViewModel>> GetAllAsync(Guid projectId, Guid userId)
         {
-            List<KeepModel> result;
-            var project = await _projectRepo.GetByIdAsync(projectId);
-            var sharedProject = await _projectShareRepo.GetAsync(projectId, userId);
+            List<KeepModel> keeps = new();
+            ProjectModel project = await _projectRepo.GetByIdAsync(projectId) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            SharedProjectsModel? sharedProject = await _projectShareRepo.GetAsync(projectId, userId);
             if (project?.CreatedById == userId || sharedProject != null)
-                result = await _keepRepo.GetAllAsync(projectId);
+                keeps = await _keepRepo.GetAllAsync(projectId);
             else
-                result = await _keepRepo.GetAllShared(projectId, userId);
+                keeps = await _keepRepo.GetAllShared(projectId, userId);
 
-            var keeps = result.Select(item => Mapper(item)).ToList();
-            return keeps;
+            List<KeepViewModel> keepViews = keeps
+                .Select(item => MapToKeepViewModel(item))
+                .ToList();
+            if (project?.CreatedById == userId)
+            {
+                foreach (var item in keepViews)
+                {
+                    item.Users = await AllInvitedUser(item.Id);
+                }
+            }
+            return keepViews;
         }
+
         public async Task<KeepViewModel> GetAsync(Guid id)
         {
-            var result = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
-            return Mapper(result);
+            KeepModel result = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            return MapToKeepViewModel(result);
         }
+
         public async Task<KeepViewModel> AddAsync(AddKeep addKeep, Guid userId)
         {
             KeepModel keep = new()
@@ -55,37 +66,40 @@ namespace Keeper.Services.Services
 
             if (!string.IsNullOrEmpty(addKeep.Tag))
             {
-                var project = await _projectRepo.GetByIdAsync(addKeep.ProjectId);
-                var tag = await _tag.AddAsync(addKeep.Tag, project!.CreatedById, TagType.KEEP);
+                ProjectModel? project = await _projectRepo.GetByIdAsync(addKeep.ProjectId);
+                TagModel? tag = await _tagService.AddAsync(addKeep.Tag, project!.CreatedById, TagType.KEEP);
                 keep.TagId = tag?.Id;
             }
             var keepId = await _keepRepo.SaveAsync(keep);
             var res = await GetAsync(keepId);
             return res;
         }
+
         public async Task<KeepViewModel> UpdateAsync(EditKeep editKeep, Guid userId)
         {
-            var keep = await _keepRepo.GetAsync(editKeep.Id) ?? throw new InnerException("", StatusType.SUCCESS);
+            KeepModel keep = await _keepRepo.GetAsync(editKeep.Id) ?? throw new InnerException("", StatusType.SUCCESS);
             keep.Title = editKeep.Title;
             keep.UpdatedOn = DateTime.Now;
             keep.UpdatedById = userId;
             if (!string.IsNullOrEmpty(editKeep.Tag))
             {
-                var project = await _projectRepo.GetByIdAsync(editKeep.ProjectId);
-                var tag = await _tag.AddAsync(editKeep.Tag, project!.CreatedById, TagType.KEEP);
+                ProjectModel? project = await _projectRepo.GetByIdAsync(editKeep.ProjectId);
+                TagModel? tag = await _tagService.AddAsync(editKeep.Tag, project!.CreatedById, TagType.KEEP);
                 keep.TagId = tag?.Id;
             }
             var keepId = await _keepRepo.UpdateAsync(keep);
             var res = await GetAsync(keepId);
             return res;
         }
+
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var keep = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            KeepModel keep = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             await _keepRepo.DeleteAsync(keep);
             return true;
         }
-        private static KeepViewModel Mapper(KeepModel keep)
+
+        private static KeepViewModel MapToKeepViewModel(KeepModel keep)
         {
             return new KeepViewModel
             {
@@ -99,16 +113,16 @@ namespace Keeper.Services.Services
                 Tag = keep.Tag?.Title,
             };
         }
+
         public async Task<List<KeepUserViewModel>> AllInvitedUser(Guid keepId)
         {
-            await Task.CompletedTask;
-            var userList = await _keepShareRepo.GetAllAsync(keepId);
+            List<SharedKeepsModel> userList = await _keepShareRepo.GetAllAsync(keepId);
             return userList
                 .Select(share => new KeepUserViewModel
                 {
                     ShareId = share.Id,
                     IsAccepted = share.IsAccepted,
-                    InvitedUser = _user.MapToUserVM(share.User)
+                    InvitedUser = _userService.MapToUserVM(share.User)
                 })
                 .ToList();
         }
