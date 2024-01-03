@@ -35,7 +35,7 @@ namespace Keeper.Repos.Repositories
                 join sk in _db.SharedKeeps on
                   new { KeepId = k.Id, k.ProjectId, UserId } equals
                   new { sk.KeepId, sk.ProjectId, sk.UserId }
-                where !k.IsDeleted
+                where !k.IsDeleted && k.ProjectId == projectId
                 select k)
                 .AsNoTracking()
                 .ToListAsync();

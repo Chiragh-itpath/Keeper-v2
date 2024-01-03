@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { reactive, ref, watch, type Ref } from 'vue'
-import { type ItemType } from '@/Models/types'
+import { reactive, ref, watch, type Ref, computed, onMounted } from 'vue'
 import { ItemStore } from '@/stores'
-import TextField from '@/components/Custom/TextField.vue'
-import TextEditor from '@/components/Custom/TextEditor.vue'
-import ContactDropDown from '../Contact/ContactDropDown.vue'
+import { TextField, TextEditor } from '@/components/Custom/'
 import type { IEditItem } from '@/Models/ItemModels'
+import type { ItemType } from '@/Models/types'
+import type { IProject } from '@/Models/ProjectModels'
+import type { IKeep } from '@/Models/KeepModels'
+
+const props = withDefaults(defineProps<{
+    modelValue: boolean,
+    id: string,
+    project: IProject,
+    keep: IKeep
+}>(), {
+    modelValue: false
+})
 
 const visible: Ref<boolean> = ref(false)
 const form = ref()
@@ -18,8 +27,8 @@ const editItem: IEditItem = reactive({
     userId: '',
     number: '',
     type: 'Ticket',
-    to: '',
-    discussedBy: '',
+    to: undefined,
+    discussedBy: undefined,
     files: null
 })
 const { getSingalItem, EditItem } = ItemStore()
@@ -32,27 +41,35 @@ const submitHandler = async (): Promise<void> => {
     await EditItem(editItem)
     visible.value = false
 }
-
-const props = withDefaults(defineProps<{
-    modelValue: boolean,
-    id: string
-}>(), {
-    modelValue: false
+const users = computed(() => {
+    return [
+        ...props.project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
+            return {
+                title: u.invitedUser.userName,
+                value: u.invitedUser.email
+            }
+        }),
+        ...props.keep.users.filter(u => u.isAccepted).map(u => {
+            return {
+                title: u.invitedUser.userName,
+                value: u.invitedUser.email
+            }
+        })
+    ]
 })
-
 watch(props, () => {
     visible.value = props.modelValue
     if (props.modelValue) {
-        const item = getSingalItem(props.id)
-        editItem.id = item!.id
-        editItem.keepId = item!.keepId
-        editItem.title = item!.title
-        editItem.number = item!.number
-        editItem.description = item!.description
-        editItem.url = item!.url
-        editItem.to = item!.to
-        editItem.discussedBy = item!.discussedBy
-        editItem.type = item!.type == 0 ? 'Ticket' : 'PR'
+        const item = getSingalItem(props.id)!
+        editItem.id = item.id
+        editItem.keepId = item.keepId
+        editItem.title = item.title
+        editItem.number = item.number
+        editItem.description = item.description
+        editItem.url = item.url
+        editItem.to = item.to
+        editItem.discussedBy = item.discussedBy
+        editItem.type = item.type == 0 ? 'Ticket' : 'PR'
     }
 })
 watch(visible, () => {
@@ -63,7 +80,9 @@ watch(visible, () => {
 const emits = defineEmits<{
     (e: 'update:modelValue', modelValue: boolean): void
 }>()
+onMounted(async () => {
 
+})
 </script>
 <template>
     <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="900">
@@ -76,7 +95,8 @@ const emits = defineEmits<{
                 <v-form ref="form" @submit.prevent>
                     <v-row>
                         <v-col cols="6" lg="3" md="3" sm="6">
-                            <v-select :items="['Ticket', 'PR']" label="Type" color="primary" v-model="itemType" />
+                            <v-select :items="['Ticket', 'PR']" label="Type" color="primary" v-model="itemType"
+                                density="comfortable" />
                         </v-col>
                         <v-col cols="6" lg="3" md="3" sm="6">
                             <text-field label="Number" placeholder="Ticker | PR number" is-number
@@ -104,8 +124,22 @@ const emits = defineEmits<{
                             <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to" />
                         </v-col>
                         <v-col cols="12" sm="6">
-                            <contact-drop-down label="Discussed by" v-model="editItem.discussedBy"
-                                v-model:email="editItem.discussedBy" :multiple="false"></contact-drop-down>
+                            <v-select label="Discuss By" color="primary" :items="users" v-model="editItem.discussedBy"
+                                clearable density="comfortable">
+                                <template v-slot:clear>
+                                    <v-icon @click="editItem.discussedBy = undefined" color="primary">
+                                        mdi-close-circle-outline
+                                    </v-icon>
+                                </template>
+                                <template v-slot:item="{ props, item }">
+                                    <v-list-item v-bind="props" :title="item.title" :subtitle="item.value"
+                                        :value="item.value">
+                                    </v-list-item>
+                                </template>
+                                <template v-slot:selection="{ item }">
+                                    <v-chip color="primary" v-if="editItem.discussedBy">{{ item.value }}</v-chip>
+                                </template>
+                            </v-select>
                         </v-col>
                     </v-row>
                 </v-form>

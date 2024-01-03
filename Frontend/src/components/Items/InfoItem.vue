@@ -67,24 +67,18 @@ const emits = defineEmits<{
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
                             <div v-if="Item.url" class="mb-3">
-                                URL: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
+                                Ticket | PR: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
                             </div>
                             <div>
                                 <div class="mb-3">Discuss with:
-                                    <template v-if="Item.to">
-                                        <v-chip color="primary">{{ Item.to }}</v-chip>
-                                    </template>
-                                    <template v-else>
-                                        <v-chip class="bg-grey-darkken-3">
-                                            -
-                                        </v-chip>
-                                    </template>
+                                    <v-chip v-if="Item.to" color="primary">{{ Item.to }}</v-chip>
+                                    <span class="text-grey text-h5" v-else>-</span>
                                 </div>
                                 <div class="mb-3">Discussed by:
-                                    <template v-if="Item.discussedBy">
-                                        <v-chip class="bg-primary">{{ Item.discussedBy }}
-                                        </v-chip>
-                                    </template>
+                                    <v-chip color="primary" v-if="Item.discussedBy">
+                                        {{ Item.discussedBy }}
+                                    </v-chip>
+                                    <span v-else class="text-grey text-h5">-</span>
                                 </div>
                             </div>
                             <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
@@ -111,13 +105,16 @@ const emits = defineEmits<{
                                 <v-col cols="6">
                                     {{ dateHelper.format(Item.createdOn, 'keyboardDate') }}
                                 </v-col>
-                                <v-col cols="6">updated by:</v-col>
-                                <v-col cols="6">{{ Item.updatedBy ?? '-' }}</v-col>
-                                <v-col cols="6">updated on:</v-col>
+                                <v-col cols="6">modified by:</v-col>
                                 <v-col cols="6">
-                                    <span v-if="dateHelper.isValid(Item.updatedOn)">
+                                    {{ Item.updatedBy ?? '-' }}
+                                </v-col>
+                                <v-col cols="6">modified on:</v-col>
+                                <v-col cols="6">
+                                    <span v-if="Item.updatedOn">
                                         {{ dateHelper.format(Item.updatedOn, 'keyboardDate') }}
                                     </span>
+                                    <span>-</span>
                                 </v-col>
                             </v-row>
                         </v-window-item>

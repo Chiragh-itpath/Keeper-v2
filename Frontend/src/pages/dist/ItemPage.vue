@@ -24,7 +24,22 @@ const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
 })
-
+const breadcrumbsItems = [
+    {
+        title: 'Projects',
+        disabled: false,
+        to: '/Project'
+    },
+    {
+        title: 'Keeps',
+        disabled: false,
+        to: `/Project/${projectId.value}`
+    },
+    {
+        title: 'Item',
+        disabled: true
+    }
+]
 onMounted(async () => {
     loading.value = true
     await GetAllItems(keepId.value)
@@ -42,32 +57,17 @@ onMounted(async () => {
         </v-row>
         <v-row v-if="!loading && project && keep">
             <v-col cols="12">
-                <v-breadcrumbs divider="/" :items="[
-                    {
-                        title: 'Projects',
-                        disabled: false,
-                        to: '/Project'
-                    },
-                    {
-                        title: 'Keeps',
-                        disabled: false,
-                        to: `/Project/${projectId}`
-                    },
-                    {
-                        title: 'Item',
-                        disabled: true
-                    }
-                ]"></v-breadcrumbs>
+                <v-breadcrumbs divider="/" :items="breadcrumbsItems"></v-breadcrumbs>
             </v-col>
             <v-col>
                 <date-picker label="Select a date" v-model="date"></date-picker>
             </v-col>
             <v-col class="my-auto d-flex justify-end">
-                <add-item :keep-id="keepId"></add-item>
+                <add-item :keep="keep" :project="project"></add-item>
             </v-col>
         </v-row>
         <v-row v-if="!loading && project && keep">
-            <all-items :items="Items" :date="date"></all-items>
+            <all-items :items="Items" :date="date" :project="project" :keep="keep"></all-items>
         </v-row>
         <v-row v-if="!loading && (!project || !keep)">
             <no-item :title="!project ? 'No Project found with this id' : 'No Keep found with this id'"></no-item>

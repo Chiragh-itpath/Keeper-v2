@@ -29,6 +29,15 @@ namespace Keeper.Services.Services
             {
                 ProjectViewModel project = ProjectViewModelMapper(item, UserId);
                 project.Users = await AllInvitedUsers(item.Id);
+                UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy);
+                if (user != null)
+                {
+                    project.Users.Add(new()
+                    {
+                        ShareId = null,
+                        InvitedUser = user,
+                    });
+                }
                 projects.Add(project);
             }
             return projects;
@@ -38,6 +47,15 @@ namespace Keeper.Services.Services
             ProjectModel project = await _projectRepo.GetByIdAsync(Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             ProjectViewModel projectViewModel = ProjectViewModelMapper(project, userId);
             projectViewModel.Users = await AllInvitedUsers(project.Id);
+            UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy.Email);
+            if (user != null)
+            {
+                projectViewModel.Users.Add(new()
+                {
+                    ShareId = null,
+                    InvitedUser = user,
+                });
+            }
             return projectViewModel;
         }
         public async Task<ProjectViewModel> SaveAsync(AddProject addProject, Guid userId)
