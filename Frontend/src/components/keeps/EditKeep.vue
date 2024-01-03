@@ -2,18 +2,18 @@
 import { ref, watch, type Ref, reactive } from 'vue'
 import TextField from '@/components/Custom/TextField.vue'
 import { GlobalStore, KeepStore } from '@/stores'
-import type { IEditKeep } from '@/Models/KeepModels'
-import { storeToRefs } from 'pinia';
+import type { IEditKeep, IKeep } from '@/Models/KeepModels'
+import { storeToRefs } from 'pinia'
 
 const props = withDefaults(defineProps<{
     modelValue: boolean,
-    id: string,
+    keep: IKeep | undefined
     projectId: string
 }>(), {
     modelValue: false
 })
 
-const { Updatekeep, getSingleKeep, } = KeepStore()
+const { Updatekeep } = KeepStore()
 const { Loading } = storeToRefs(GlobalStore())
 const visible: Ref<boolean> = ref(false)
 const form = ref()
@@ -32,14 +32,13 @@ const submitHandler = async (): Promise<void> => {
     }
 }
 
-watch(props, () => {
+watch(props, async () => {
     visible.value = props.modelValue
-    if (props.modelValue) {
-        const keep = getSingleKeep(props.id)
-        editKeep.id = keep!.id
-        editKeep.title = keep!.title
-        editKeep.tag = keep!.tag
-        editKeep.projectId = keep!.projectId
+    if (props.modelValue && props.keep) {
+        editKeep.id = props.keep.id
+        editKeep.title = props.keep.title
+        editKeep.tag = props.keep.tag
+        editKeep.projectId = props.keep.projectId
     }
 })
 watch(visible, () => {

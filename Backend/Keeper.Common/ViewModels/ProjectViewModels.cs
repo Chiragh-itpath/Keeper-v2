@@ -22,7 +22,7 @@
     }
     public class ProjectUsersViewModel
     {
-        public Guid ShareId{ get; set; }
+        public Guid? ShareId{ get; set; }
         public bool IsAccepted { get; set; }
         public UserViewModel InvitedUser { get; set; } = new();
     }

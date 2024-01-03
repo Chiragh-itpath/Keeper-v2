@@ -7,21 +7,22 @@ import { EditKeep, InfoKeep, InviteKeep } from '@/components/keeps'
 import { HoverEffect, NoItem, DeletePropmt } from '@/components/Custom'
 import type { IKeep } from '@/Models/KeepModels'
 import { useDate } from 'vuetify'
+import type { IProject } from '@/Models/ProjectModels'
 const dateHelper = useDate()
 const props = withDefaults(defineProps<{
     keeps: IKeep[],
     date?: string | null | Date,
     tags: string[]
+    project: IProject
 }>(), {
     date: null
 })
 
 const router = useRouter()
 const id: Ref<string> = ref('')
-const keep: Ref<IKeep | undefined> = ref()
+const selectedKeep: Ref<IKeep | undefined> = ref()
 const KeepsToDisplay: Ref<IKeep[]> = ref(props.keeps)
-
-const projectId: Ref<string> = ref('')
+const projectId: Ref<string> = ref(props.project.id)
 const editVisible: Ref<boolean> = ref(false)
 const deleteVisible: Ref<boolean> = ref(false)
 const infoVisible: Ref<boolean> = ref(false)
@@ -62,19 +63,20 @@ onMounted(() => {
                     <v-menu location="bottom" width="250">
                         <v-list>
                             <v-list-item role="button" class="ma-0 pa-0"
-                                @click="() => { infoVisible = true; id = keep.id; projectId = keep.projectId }">
+                                @click="() => { infoVisible = true; selectedKeep = keep; projectId = keep.projectId }">
                                 <hover-effect icon="information-outline" icon-color="info">
                                     Info
                                 </hover-effect>
                             </v-list-item>
                             <v-list-item role="button" class="ma-0 pa-0"
-                                @click="() => { inviteVisible = true; id = keep.id; projectId = keep.projectId }">
+                                @click="() => { inviteVisible = true; selectedKeep = keep; projectId = keep.projectId }"
+                                v-if="!project.isShared">
                                 <hover-effect icon="account-plus-outline" icon-color="info">
                                     Invite
                                 </hover-effect>
                             </v-list-item>
                             <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                @click="() => { editVisible = true; id = keep.id }">
+                                @click="() => { editVisible = true; selectedKeep = keep }">
                                 <hover-effect icon="folder-edit-outline" icon-color="edit">
                                     Edit
                                 </hover-effect>
@@ -97,8 +99,8 @@ onMounted(() => {
             </v-card>
         </v-hover>
     </v-col>
-    <edit-keep v-model="editVisible" :id="id" :project-id="projectId"></edit-keep>
+    <edit-keep v-model="editVisible" :keep="selectedKeep" :project-id="projectId"></edit-keep>
     <delete-propmt v-model="deleteVisible" @click:yes="deleteHandler" title="Delete Keep">Keep</delete-propmt>
-    <invite-keep v-model="inviteVisible" :id="id" :project-id="projectId"></invite-keep>
-    <info-keep v-model="infoVisible" :id="id" :keep="keep"></info-keep>
+    <invite-keep v-model="inviteVisible" :keep="selectedKeep" :project="project"></invite-keep>
+    <info-keep v-model="infoVisible" :id="id" :keep="selectedKeep"></info-keep>
 </template>

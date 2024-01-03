@@ -4,6 +4,7 @@ using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Interfaces;
 using Keeper.Services.Interfaces;
+using System.Reflection.Metadata.Ecma335;
 
 namespace KeeperCore.Services
 {
@@ -16,8 +17,8 @@ namespace KeeperCore.Services
         }
         public UserViewModel MapToUserVM(UserModel user)
         {
-            return new UserViewModel 
-            { 
+            return new UserViewModel
+            {
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
@@ -39,6 +40,12 @@ namespace KeeperCore.Services
             var result = await _userRepo.GetEmailList(email, userId);
             var userList = result.Select(x => MapToUserVM(x)).ToList();
             return userList;
+        }
+
+        public async Task<UserViewModel?> GetByEmailAsync(string email)
+        {
+            UserModel? user = await _userRepo.GetByEmailAsync(email);
+            return user != null ? MapToUserVM(user) : null;
         }
     }
 }

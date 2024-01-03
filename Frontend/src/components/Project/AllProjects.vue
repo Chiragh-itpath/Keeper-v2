@@ -72,13 +72,13 @@ const filterFunction = (project: IProject) => {
                         </template>
                         <v-list>
                             <v-list-item role="button" class="ma-0 pa-0"
-                                @click="() => { visible.info = true; id = project.id }">
+                                @click="() => { visible.info = true; selectedProject = project }">
                                 <hover-effect icon="information-outline" icon-color="info">
                                     Info
                                 </hover-effect>
                             </v-list-item>
                             <v-list-item role="button" class="ma-0 pa-0" v-if="!project.isShared"
-                                @click="() => { visible.invite = true; id = project.id }">
+                                @click="() => { visible.invite = true; selectedProject = project }">
                                 <hover-effect icon="account-plus-outline" icon-color="info">
                                     Invite
                                 </hover-effect>
@@ -116,10 +116,10 @@ const filterFunction = (project: IProject) => {
             </v-card>
         </v-hover>
     </v-col>
-    <edit-project v-model="visible.edit" :project="selectedProject!"> </edit-project>
+    <edit-project v-model="visible.edit" :project="selectedProject"> </edit-project>
     <delete-propmt v-model="visible.delete" @click:yes="deleteHandler" title="Delete Project">Project</delete-propmt>
-    <info-project :id="id" v-model="visible.info"></info-project>
-    <invite-project :id="id" v-model="visible.invite"></invite-project>
+    <info-project :project="selectedProject" v-model="visible.info"></info-project>
+    <invite-project :project="selectedProject" v-model="visible.invite"></invite-project>
 </template>
 <style scoped>
 .v-chip {

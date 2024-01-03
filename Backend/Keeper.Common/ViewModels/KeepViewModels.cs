@@ -17,6 +17,7 @@
         public string? Updatedby { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
+        public List<KeepUserViewModel> Users { get; set; } = new();
     }
     public class KeepUserViewModel
     {

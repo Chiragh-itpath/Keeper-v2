@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { ref, watch, type Ref, reactive } from 'vue'
+import { useDate } from 'vuetify'
 import { ItemStore } from '@/stores'
 import { EditItem, InfoItem } from '@/components/Items/'
 import { HoverEffect, DeletePropmt, NoItem } from '@/components/Custom/'
 import type { IItem } from '@/Models/ItemModels'
-import { useDate } from 'vuetify'
+import type { IProject } from '@/Models/ProjectModels'
+import type { IKeep } from '@/Models/KeepModels'
+
 const dateHelper = useDate()
 const props = defineProps<{
     items: IItem[],
-    date: Date | null | string
+    date: Date | null | string,
+    project: IProject,
+    keep: IKeep
 }>()
 const itemToDisplay = ref(props.items)
 const { DeleteItem } = ItemStore()
@@ -38,7 +43,7 @@ watch(props, () => {
 })
 </script>
 <template>
-    <edit-item :id="id" v-model="visible.edit"></edit-item>
+    <edit-item :id="id" v-model="visible.edit" :project="props.project" :keep="props.keep"></edit-item>
     <info-item :id="id" v-model="visible.info"></info-item>
     <delete-propmt v-model="visible.delete" @click:yes="deleteHandler" title="Delete Item">Item</delete-propmt>
     <no-item v-if="itemToDisplay.length == 0" title="No Item Found"

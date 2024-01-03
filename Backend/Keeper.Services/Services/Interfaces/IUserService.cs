@@ -9,5 +9,6 @@ namespace Keeper.Services.Interfaces
         Task<UserViewModel> CheckEmail(string email);
         Task<List<UserViewModel>> EmailSearch(string email, Guid userId);
         UserViewModel MapToUserVM(UserModel user);
+        Task<UserViewModel?> GetByEmailAsync(string email);
     }
 }

@@ -43,7 +43,7 @@ onMounted(async () => {
                 <v-row class="mt-10 align-center">
                     <v-col>
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
-                            hide-details v-model="contactSearch">
+                            hide-details v-model="contactSearch" density="comfortable">
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
                             </template>
@@ -63,7 +63,7 @@ onMounted(async () => {
                 <v-row class="mt-10 align-center">
                     <v-col>
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
-                            hide-details v-model="groupSearch">
+                            hide-details v-model="groupSearch" density="comfortable">
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
                             </template>

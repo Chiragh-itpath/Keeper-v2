@@ -1,6 +1,6 @@
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IKeep, IAddKeep, IEditKeep, IKeepMembers } from '@/Models/KeepModels'
+import type { IKeep, IAddKeep, IEditKeep } from '@/Models/KeepModels'
 import { KeepService } from '@/Services/KeepService'
 import { useToster } from '@/composable/useToaster'
 
@@ -53,8 +53,13 @@ const KeepStore = defineStore('KeepStore', () => {
             Keeps.value.splice(index, 1, response)
         }
     }
-    const GetInvitedMembers = async (id: string): Promise<IKeepMembers[]> =>
-        (await keepService.InvitedUser(id)) ?? []
+    const GetInvitedMembers = async (id: string): Promise<void> => {
+        const keep = await getSingleKeep(id)
+        if (keep) {
+            keep.users = (await keepService.InvitedUser(id)) ?? []
+            Keeps.value.splice(FindIndex(id), 1, keep)
+        }
+    }
 
     const RemoveUser = async (id: string): Promise<boolean> =>
         (await keepService.RemoveFromKeep(id)) != null

@@ -33,10 +33,12 @@ const submitHandler = async (): Promise<void> => {
 }
 watch(props, () => {
     visible.value = props.modelValue
-    editProject.id = props.project!.id
-    editProject.title = props.project!.title
-    editProject.description = props.project!.description
-    editProject.tag = props.project!.tag
+    if (props.project) {
+        editProject.id = props.project.id
+        editProject.title = props.project.title
+        editProject.description = props.project.description
+        editProject.tag = props.project.tag
+    }
 })
 watch(visible, () => {
     if (!visible.value)
@@ -48,7 +50,7 @@ const emits = defineEmits<{
 
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700">
+    <v-dialog transition="scale-transition" v-model="visible" max-width="700" v-if="project">
         <v-card>
             <v-card-title class="text-center bg-primary">
                 Edit Project

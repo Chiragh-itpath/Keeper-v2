@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia';
-import { InviteStore, ContactStore, GroupStore, GlobalStore, ProjectStore } from '@/stores'
+import { InviteStore, GlobalStore, ProjectStore } from '@/stores'
 import { InviteDropDown } from '@/components/Contact'
 import { DeletePropmt } from '@/components/Custom'
 import type { IUser } from '@/Models/UserModels'
-import type { IProjectMembers } from '@/Models/ProjectModels';
+import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
 
 const props = withDefaults(defineProps<{
-    id: string,
+    project: IProject | undefined,
     modelValue: boolean
 }>(), {
-    id: '',
     modelValue: false
 })
 
@@ -23,35 +22,28 @@ const selectedUsers: Ref<IUser[]> = ref([])
 const InvitedUsers: Ref<IProjectMembers[]> = ref([])
 const errorMessage: Ref<string> = ref('')
 const { InviteUsersToProject } = InviteStore()
-const { GetContacts } = ContactStore()
-const { GetGroups } = GroupStore()
 const { Loading } = storeToRefs(GlobalStore())
-const { isContactFetched } = storeToRefs(ContactStore())
-const { isGroupFetched } = storeToRefs(GroupStore())
-const { GetInvitedMembers, RemoveUser } = ProjectStore()
+const projectStore = ProjectStore()
 
 const handleInvite = async (): Promise<void> => {
-    await InviteUsersToProject(props.id, inviteUser.value)
-    visible.value = false
-    inviteUser.value = []
+    if (props.project) {
+        await InviteUsersToProject(props.project.id, inviteUser.value)
+        await projectStore.GetInvitedMembers(props.project.id)
+        inviteUser.value = []
+        visible.value = false
+    }
 }
 const handleRemove = async (id: string) => {
-    var res = await RemoveUser(id)
+    var res = await projectStore.RemoveUser(id)
     if (res) {
         InvitedUsers.value.splice(InvitedUsers.value.findIndex(x => x.shareId == shareId.value), 1)
     }
     deleteVisible.value = false
 }
 watch(props, async () => {
-    if (props.modelValue) {
-        if (!isContactFetched.value)
-            await GetContacts()
-        if (!isGroupFetched.value)
-            await GetGroups()
-        InvitedUsers.value = await GetInvitedMembers(props.id)
-
-    }
     visible.value = props.modelValue
+    if (props.modelValue && props.project)
+        InvitedUsers.value = props.project.users
 })
 watch(visible, () => {
     if (!visible.value)

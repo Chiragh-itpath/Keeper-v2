@@ -10,30 +10,53 @@ namespace Keeper.Services.Services
 {
     public class ProjectService : IProjectService
     {
-        private readonly IProjectRepo _repo;
-        private readonly ITagService _tag;
-        private readonly IProjectShareRepo _projectShare;
-        private readonly IUserService _user;
-        public ProjectService(IProjectRepo repo, ITagService tagService, IProjectShareRepo projectShare, IUserService user)
+        private readonly IProjectRepo _projectRepo;
+        private readonly ITagService _tagService;
+        private readonly IProjectShareRepo _projectShareRepo;
+        private readonly IUserService _userService;
+        public ProjectService(IProjectRepo projectRepo, ITagService tagService, IProjectShareRepo projectShareRepo, IUserService userService)
         {
-            _repo = repo;
-            _tag = tagService;
-            _projectShare = projectShare;
-            _user = user;
+            _projectRepo = projectRepo;
+            _tagService = tagService;
+            _projectShareRepo = projectShareRepo;
+            _userService = userService;
         }
         public async Task<List<ProjectViewModel>> GetAllAsync(Guid UserId)
         {
-            var result = await _repo.GetAllAsync(UserId);
-
-            var projects = result
-                .Select(project => ProjectViewModelMapper(project,UserId))
-                .ToList();
+            List<ProjectModel> result = await _projectRepo.GetAllAsync(UserId);
+            List<ProjectViewModel> projects = new();
+            foreach (var item in result)
+            {
+                ProjectViewModel project = ProjectViewModelMapper(item, UserId);
+                project.Users = await AllInvitedUsers(item.Id);
+                UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy);
+                if (user != null)
+                {
+                    project.Users.Add(new()
+                    {
+                        ShareId = null,
+                        InvitedUser = user,
+                    });
+                }
+                projects.Add(project);
+            }
             return projects;
         }
         public async Task<ProjectViewModel> GetByIdAsync(Guid Id, Guid userId)
         {
-            var result = await _repo.GetByIdAsync(Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
-            return ProjectViewModelMapper(result,userId);
+            ProjectModel project = await _projectRepo.GetByIdAsync(Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            ProjectViewModel projectViewModel = ProjectViewModelMapper(project, userId);
+            projectViewModel.Users = await AllInvitedUsers(project.Id);
+            UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy.Email);
+            if (user != null)
+            {
+                projectViewModel.Users.Add(new()
+                {
+                    ShareId = null,
+                    InvitedUser = user,
+                });
+            }
+            return projectViewModel;
         }
         public async Task<ProjectViewModel> SaveAsync(AddProject addProject, Guid userId)
         {
@@ -46,37 +69,37 @@ namespace Keeper.Services.Services
             };
             if (!string.IsNullOrEmpty(addProject.Tag))
             {
-                var tag = await _tag.AddAsync(addProject.Tag, userId, TagType.PROJECT);
+                TagModel? tag = await _tagService.AddAsync(addProject.Tag, userId, TagType.PROJECT);
                 project.TagId = tag?.Id;
             }
-            var projectId = await _repo.SaveAsync(project);
-            var res = await GetByIdAsync(projectId, userId);
-            return res;
+            Guid ProjectId = await _projectRepo.SaveAsync(project);
+            ProjectModel savedProject = await _projectRepo.GetByIdAsync(ProjectId) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            ProjectViewModel projectView = ProjectViewModelMapper(savedProject, userId);
+            return projectView;
         }
         public async Task<ProjectViewModel> UpdateAsync(EditProject editProject, Guid userId)
         {
-            var project = await _repo.GetByIdAsync(editProject.Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
+            ProjectModel project = await _projectRepo.GetByIdAsync(editProject.Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             project.Title = editProject.Title;
             project.Description = editProject.Description;
             project.UpdatedById = userId;
             project.UpdatedOn = DateTime.Now;
             if (!string.IsNullOrEmpty(editProject.Tag))
             {
-                var tag = await _tag.AddAsync(editProject.Tag, project.CreatedById, TagType.PROJECT);
+                TagModel? tag = await _tagService.AddAsync(editProject.Tag, project.CreatedById, TagType.PROJECT);
                 project.TagId = tag?.Id;
             }
-            else
-            {
-                project.TagId = null;
-            }
-            var projectId = await _repo.UpdateAsync(project);
-            var res = await GetByIdAsync(projectId, userId);
-            return res;
+            Guid projectId = await _projectRepo.UpdateAsync(project);
+            ProjectViewModel projectView = await GetByIdAsync(projectId, userId);
+            return projectView;
         }
         public async Task<bool> DeleteByIdAsync(Guid id)
         {
-            var project = await _repo.GetByIdAsync(id);
-            await _repo.DeleteAsync(project!);
+            ProjectModel? project = await _projectRepo.GetByIdAsync(id);
+            if (project != null)
+            {
+                await _projectRepo.DeleteAsync(project);
+            }
             return true;
         }
         public static ProjectViewModel ProjectViewModelMapper(ProjectModel project, Guid userId)
@@ -96,12 +119,12 @@ namespace Keeper.Services.Services
         }
         public async Task<List<ProjectUsersViewModel>> AllInvitedUsers(Guid ProjectId)
         {
-            var userList = await _projectShare.GetAllAsync(ProjectId);
+            List<SharedProjectsModel> userList = await _projectShareRepo.GetAllAsync(ProjectId);
             return userList
                 .Select(shared => new ProjectUsersViewModel
                 {
                     ShareId = shared.Id,
-                    InvitedUser = _user.MapToUserVM(shared.User),
+                    InvitedUser = _userService.MapToUserVM(shared.User),
                     IsAccepted = shared.IsAccepted
                 })
                 .ToList();

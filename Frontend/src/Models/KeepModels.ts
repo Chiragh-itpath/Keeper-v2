@@ -14,6 +14,7 @@ interface IKeep extends IAddKeep {
     updatedBy: string
     createdOn: string
     updatedOn: string
+    users: IKeepMembers[]
 }
 interface IKeepMembers {
     shareId: string

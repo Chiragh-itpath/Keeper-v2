@@ -43,7 +43,7 @@ const Props = withDefaults(
     }
 )
 const _value: Ref<string> = ref(Props.modelValue ?? '')
-const error: Ref<boolean> = ref(false)
+const error: Ref<boolean> = ref(Props.errorMessages ? true : false)
 
 const type: Ref<string> = ref(Props.isEmail ? 'email' : Props.isPassword ? 'password' : 'text')
 let Rules: TRule[] = []
@@ -66,13 +66,9 @@ const changeVisibility = (): void => {
     isPasswordVisible.value = !isPasswordVisible.value
     type.value = isPasswordVisible.value ? 'text' : 'password'
 }
-if (Props.errorMessages) {
-    if (Props.errorMessages.length > 0) {
-        error.value = true
-    }
-}
 watch(Props, () => {
     _value.value = Props.modelValue ?? '';
+    error.value = Props.errorMessages ? true : false
 })
 watch(_value, () => {
     emits('update:modelValue', _value.value?.trim() ?? '')
@@ -87,8 +83,8 @@ const emits = defineEmits<{
 <template>
     <v-text-field v-model="_value" :label="Props.label" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
         :append-inner-icon="!isPassword ? '' : isPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :error="error"
-        :placeholder="placeholder" :error-messages="errorMessages" @click:append-inner="changeVisibility" class="mb-4"
-        @input="() => {
+        density="comfortable" :placeholder="placeholder" :error-messages="errorMessages"
+        @click:append-inner="changeVisibility" class="mb-4" @input="() => {
             _value = _value.slice(0, Props.maxLimit)
             if (Props.isContact || Props.isNumber) {
                 _value = _value.replace(/[^\d]/g, '')
