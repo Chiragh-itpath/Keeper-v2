@@ -67,7 +67,8 @@ const emits = defineEmits<{
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified By:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
-                        {{ keep.updatedBy ?? '-' }}
+                        <span v-if="keep.updatedBy">{{ keep.updatedBy  }}</span> 
+                        <span v-else class="text-grey">-</span>
                     </v-col>
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified:</v-col>
@@ -75,7 +76,7 @@ const emits = defineEmits<{
                         <span v-if="keep.updatedOn">
                             {{ dateHelper.format(keep.updatedOn, 'keyboardDate') }}
                         </span>
-                        <span v-else>-</span>
+                        <span v-else class="text-grey">-</span>
                     </v-col>
                 </v-row>
             </v-card-text>

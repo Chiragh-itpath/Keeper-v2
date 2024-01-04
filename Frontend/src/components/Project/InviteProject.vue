@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia';
-import { InviteStore, GlobalStore, ProjectStore } from '@/stores'
+import { InviteStore, GlobalStore, ProjectStore, UserStore } from '@/stores'
 import { InviteDropDown } from '@/components/Contact'
 import { DeletePropmt } from '@/components/Custom'
 import type { IUser } from '@/Models/UserModels'
@@ -43,7 +43,7 @@ const handleRemove = async (id: string) => {
 watch(props, async () => {
     visible.value = props.modelValue
     if (props.modelValue && props.project)
-        InvitedUsers.value = props.project.users
+        InvitedUsers.value = props.project.users.filter(u => u.invitedUser.id != UserStore().User.id)
 })
 watch(visible, () => {
     if (!visible.value)
@@ -81,7 +81,7 @@ const emits = defineEmits<{
                             class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
                             No users invited yet
                         </v-list-item>
-                        <template v-for="share in InvitedUsers">
+                        <template v-for="share in InvitedUsers" :key="share.shareId">
                             <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.invitedUser.userName"
                                 :subtitle="share.invitedUser.email">
                                 <template v-slot:prepend>

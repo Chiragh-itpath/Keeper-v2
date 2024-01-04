@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type Ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { AddKeep, AllKeeps } from '@/components/keeps'
 import { DatePicker, TagSelector, NoItem } from '@/components/Custom'
@@ -15,9 +15,13 @@ const selectedTags: Ref<string[]> = ref([])
 const project: Ref<IProject | undefined> = ref()
 const { Keeps, keepTags } = storeToRefs(KeepStore())
 const showAddButton: Ref<boolean> = ref(false)
+const router = useRouter()
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
+})
+const hasAccess = computed((): boolean => {
+    return (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false)
 })
 onMounted(async () => {
     loading.value = true
@@ -27,6 +31,7 @@ onMounted(async () => {
     if (project.value) {
         showAddButton.value = (project.value.createdBy == UserStore().User.email || project.value.users.some(u => u.invitedUser.id == UserStore().User.id))
     }
+    if (!hasAccess.value) router.go(-1)
 })
 </script>
 <template>

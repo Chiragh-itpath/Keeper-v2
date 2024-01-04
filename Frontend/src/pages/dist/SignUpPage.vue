@@ -12,7 +12,7 @@ const signupClicked: Ref<boolean> = ref(false)
 const SignUpForm = reactive<IRegister>({
     userName: '',
     email: '',
-    contact: '',
+    mobile: '',
     password: '',
     confirmPassword: ''
 })
@@ -49,7 +49,7 @@ async function register(): Promise<void> {
                             <text-field v-model="SignUpForm.userName" label="Full Name" icon="mdi-account" is-required />
                             <text-field v-model="SignUpForm.email" label="Email" icon="mdi-email" is-required is-email
                                 :error-messages="errors.email" />
-                            <text-field v-model="SignUpForm.contact" label="Mobile Number" icon="mdi-account" is-required
+                            <text-field v-model="SignUpForm.mobile" label="Mobile Number" icon="mdi-account" is-required
                                 is-contact :max-limit="10" />
                             <text-field v-model="SignUpForm.password" label="Password" icon="mdi-lock" is-required
                                 is-password :max-limit="16" />

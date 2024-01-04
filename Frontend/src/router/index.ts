@@ -38,30 +38,45 @@ const requireLoggedIn = (
         next({ name: RouterEnum.LOGIN })
     }
 }
+const AlreadyLoggedIn = (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: NavigationGuardNext
+) => {
+    if (IsLoggedIn()) {
+        next({ name: RouterEnum.PROJECT })
+    } else {
+        next()
+    }
+}
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
         component: HomePage,
-        name: RouterEnum.HOME
+        name: RouterEnum.HOME,
+        beforeEnter: AlreadyLoggedIn
     },
     {
         path: '/login',
         component: LoginPage,
-        name: RouterEnum.LOGIN
+        name: RouterEnum.LOGIN,
+        beforeEnter: AlreadyLoggedIn
     },
     {
         path: '/signup',
         component: SignUpPage,
-        name: RouterEnum.SIGNUP
+        name: RouterEnum.SIGNUP,
+        beforeEnter: AlreadyLoggedIn
     },
     {
         path: '/PasswordReset',
         component: ForgotPasswordPage,
-        name: RouterEnum.PASSWORD_RESET
+        name: RouterEnum.PASSWORD_RESET,
+        beforeEnter: AlreadyLoggedIn
     },
     {
         path: '/:pathMatch(.*)*',
-        components: { default: PageNotFound },
+        component: PageNotFound,
         name: RouterEnum.PAGE_NOT_FOUND
     },
     {

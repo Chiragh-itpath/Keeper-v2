@@ -91,7 +91,7 @@ watch(visible, () => {
                     <v-row>
                         <v-col cols="12">
                             <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
-                                icon="mdi-link-box-variant-outline" />
+                                :max-limit="200" icon="mdi-link-box-variant-outline" />
                         </v-col>
                         <v-col cols="12">
                             <text-editor v-model="addItem.description"></text-editor>

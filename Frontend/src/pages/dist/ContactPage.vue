@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, type Ref } from 'vue'
 import { AllContacts, AddContact, AllGroups, AddGroup } from '@/components/Contact'
 import { ContactStore, GroupStore } from '@/stores'
 import { storeToRefs } from 'pinia'
@@ -47,6 +47,9 @@ onMounted(async () => {
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
                             </template>
+                            <template v-slot:clear>
+                                <v-icon @click="contactSearch = ''">mdi-close-circle-outline</v-icon>
+                            </template>
                         </v-text-field>
                     </v-col>
                     <v-col cols="auto" class="text-end me-2">
@@ -66,6 +69,9 @@ onMounted(async () => {
                             hide-details v-model="groupSearch" density="comfortable">
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
+                            </template>
+                            <template v-slot:clear>
+                                <v-icon @click="groupSearch = ''">mdi-close-circle-outline</v-icon>
                             </template>
                         </v-text-field>
                     </v-col>

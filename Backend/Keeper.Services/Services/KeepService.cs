@@ -108,7 +108,7 @@ namespace Keeper.Services.Services
                 ProjectId = keep.ProjectId,
                 CreatedBy = keep.CreatedBy.Email,
                 CreatedOn = keep.CreatedOn,
-                Updatedby = keep.UpdatedBy?.Email,
+                UpdatedBy = keep.UpdatedBy?.Email,
                 UpdatedOn = keep.UpdatedOn,
                 Tag = keep.Tag?.Title,
             };

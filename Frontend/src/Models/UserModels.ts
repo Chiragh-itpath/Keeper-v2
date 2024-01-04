@@ -5,7 +5,7 @@ interface ILogin {
 
 interface IRegister extends ILogin {
     userName: string
-    contact: string
+    mobile: string
     confirmPassword: string
 }
 

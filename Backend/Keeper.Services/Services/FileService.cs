@@ -4,6 +4,7 @@ using Keeper.Repos.Repositories.Interfaces;
 using Keeper.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Keeper.Services.Services
 {
@@ -12,11 +13,13 @@ namespace Keeper.Services.Services
         private readonly IFileRepo _file;
         private readonly IItemFileLInkerRepo _linker;
         private readonly IWebHostEnvironment _env;
-        public FileService(IFileRepo file, IItemFileLInkerRepo linker, IWebHostEnvironment env)
+        private readonly string imagePath;
+        public FileService(IFileRepo file, IItemFileLInkerRepo linker, IWebHostEnvironment env, IConfiguration config)
         {
             _file = file;
             _linker = linker;
             _env = env;
+            imagePath = config["ImagePath"];
         }
         public async Task AddAsync(Guid UserId, Guid KeepId, Guid ItemId, List<IFormFile> files)
         {
@@ -52,13 +55,12 @@ namespace Keeper.Services.Services
         public async Task<List<FileViewModel>> GetAllFiles(Guid itemId)
         {
             List<string> imageExtensions = new() { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG", ".JFIF" };
-            string imagePath = "https://localhost:7134/Images";
             var files = (await _file.GetFilesAsync(itemId))
                 .Select(x => new FileViewModel
                 {
                     FileName = x.OriginalName,
-                    FileUrl = Path.Combine(imagePath, x.FilePath),
-                    IsImage = imageExtensions.Contains(Path.GetExtension(x.FilePath)?.ToUpperInvariant())
+                    FileUrl = Path.Combine(this.imagePath, x.FilePath),
+                    IsImage = imageExtensions.Contains(Path.GetExtension(x.FilePath)?.ToUpperInvariant() ?? "")
                 })
                 .ToList();
             return files;
