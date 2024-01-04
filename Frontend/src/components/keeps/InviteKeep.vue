@@ -3,7 +3,7 @@ import { type Ref, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { InviteDropDown } from '@/components/Contact/'
 import { DeletePropmt } from '@/components/Custom/'
-import { GlobalStore, InviteStore, KeepStore, ProjectStore } from '@/stores'
+import { GlobalStore, InviteStore, KeepStore } from '@/stores'
 import type { IUser } from '@/Models/UserModels'
 import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
 import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
@@ -88,7 +88,7 @@ const emits = defineEmits<{
                             class="text-grey text-center bg-grey-lighten-4 border rounded-lg">
                             No users invited yet
                         </v-list-item>
-                        <template v-for="share in keepInvitedUsers">
+                        <template v-for="share in keepInvitedUsers" :key="share.shareId">
                             <v-list-item class="py-2 mb-1 border rounded-lg" :title="share.invitedUser.userName"
                                 :subtitle="share.invitedUser.email">
                                 <template v-slot:prepend>

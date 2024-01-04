@@ -2,7 +2,8 @@
 import { computed, ref, watch, type Ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ContactStore, GroupStore } from '@/stores'
-import type { IUser } from '@/Models/UserModels';
+import type { IUser } from '@/Models/UserModels'
+
 defineProps<{
     errorMessage?: string
 }>()
@@ -11,23 +12,30 @@ const { Contacts, isContactFetched } = storeToRefs(ContactStore())
 const { Groups, isGroupFetched } = storeToRefs(GroupStore())
 const menu: Ref<boolean> = ref(false)
 const items = computed(() => {
-    let item: any[] = []
-    item = [
-        ...(Groups.value.filter(x => x.contacts.length > 0).map(x => {
+    let groups = Groups.value
+        .filter(x => x.contacts.length > 0)
+        .map(x => {
             return {
                 title: x.name,
-                subtitle: 'group',
                 value: { id: x.id, type: 'group' }
             }
-        })),
-        ...(Contacts.value.map(x => {
+        })
+    let contacts = Contacts.value
+        .map(x => {
             return {
                 title: x.addedPerson.email,
-                subtitle: 'contact',
                 value: { id: x.id, type: 'contact' }
             }
-        }))
-    ]
+        })
+
+    let item: any[] = [];
+    
+    if (groups.length > 0)
+        item.push({ title: 'Groups', type: 'header' }, ...groups);
+
+    if (contacts.length > 0)
+        item.push({ title: 'Contacts', type: 'header' }, ...contacts);
+
     return item
 })
 const getContactCount = (id: string): number => {
@@ -60,10 +68,10 @@ const emits = defineEmits<{
     (e: 'update:users', users: IUser[]): void
 }>()
 onMounted(async () => {
-    if(!isContactFetched.value) {
+    if (!isContactFetched.value) {
         await ContactStore().GetContacts()
     }
-    if(!isGroupFetched.value) {
+    if (!isGroupFetched.value) {
         await GroupStore().GetGroups()
     }
 })
@@ -76,13 +84,12 @@ onMounted(async () => {
             <v-chip color="primary">{{ item.title }}</v-chip>
         </template>
         <template v-slot:item="{ item, props: itemProp }">
-            <v-list-item :title="item.title" :subtitle="item.raw.subtitle" v-bind="itemProp" class="px-0 mx-0">
+            <v-list-item :title="item.title" v-bind="itemProp" :disabled="!!item.raw.type" class="py-0 ma-0" lines="one">
                 <template v-slot:prepend="{ isActive }">
-                    <v-checkbox :model-value="isActive" hide-details></v-checkbox>
+                    <v-checkbox :model-value="isActive" hide-details v-if="!item.raw.type"></v-checkbox>
                 </template>
-                <template v-slot:subtitle="{ subtitle }">
-                    {{ subtitle }}
-                    <span v-if="subtitle == 'group'">
+                <template v-slot:append>
+                    <span v-if="item.props.value.type == 'group'">
                         ({{ getContactCount(item.value.id) }})
                     </span>
                 </template>
