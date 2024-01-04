@@ -108,7 +108,7 @@ onMounted(async () => {
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url"
+                            <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url" :max-limit="200"
                                 icon="mdi-link-box-variant-outline" />
                         </v-col>
                         <v-col cols="12">
