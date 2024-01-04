@@ -5,8 +5,8 @@ import { useDisplay } from 'vuetify'
 const { smAndDown, xxl } = useDisplay()
 </script>
 <template>
-    <v-row class="flex-wrap-reverse" :class="!smAndDown ? 'h-screen' : ''">
-        <v-col cols="12" md="6">
+    <v-row class="flex-wrap-reverse ma-0" :class="!smAndDown ? 'h-screen' : ''">
+        <v-col cols="12" md="6" class="pa-0">
             <v-sheet :height="smAndDown ? '400' : '100%'" class="w-100 d-flex align-center">
                 <v-row justify="center">
                     <v-col cols="12" class="text-center text-xl-h1 text-sm-h3 text-h4" :class="xxl ? 'my-2' : ''">
@@ -40,7 +40,7 @@ const { smAndDown, xxl } = useDisplay()
                 </v-row>
             </v-sheet>
         </v-col>
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="6" class="pa-0">
             <v-img :src="homeimg" class="w-100 h-100" :aspect-ratio="0" cover></v-img>
         </v-col>
     </v-row>
