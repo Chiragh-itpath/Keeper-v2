@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, type Ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { AddItem, AllItems } from '@/components/Items'
 import { DatePicker, NoItem } from '@/components/Custom'
-import { ItemStore, ProjectStore, KeepStore } from '@/stores'
+import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
@@ -15,7 +15,7 @@ const loading: Ref<boolean> = ref(false)
 const date = ref(null)
 const project: Ref<IProject | undefined> = ref()
 const keep: Ref<IKeep | undefined> = ref()
-
+const router = useRouter()
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
@@ -23,6 +23,10 @@ const projectId = computed(() => {
 const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
+})
+const hasAccess = computed((): boolean => {
+    return (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false) ||
+        (keep.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false)
 })
 const breadcrumbsItems = [
     {
@@ -46,7 +50,9 @@ onMounted(async () => {
     project.value = await ProjectStore().GetSingalProject(projectId.value)
     keep.value = await KeepStore().getSingleKeep(keepId.value)
     loading.value = false
+    if (!hasAccess.value) router.go(-1)
 })
+
 </script>
 <template>
     <v-container class="px-10 pt-5" fluid>
