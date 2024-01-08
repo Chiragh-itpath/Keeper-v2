@@ -1,42 +1,35 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import type { IKeep } from '@/Models/KeepModels'
-import { UserStore } from '@/stores'
 import { useDate } from 'vuetify'
 
 const dateHelper = useDate()
-const props = withDefaults(defineProps<{
-    modelValue: boolean,
-    keep: IKeep | undefined
+withDefaults(defineProps<{
+    keep: IKeep
 }>(), {
-    modelValue: false
+
 })
 
 const visible: Ref<boolean> = ref(false)
-const { User, myProfile } = UserStore()
-
-watch(props, async () => {
-    visible.value = props.modelValue
-    if (props.modelValue) {
-        if (User.id == '') {
-            await myProfile()
-        }
-    }
-})
 
 watch(visible, () => {
     if (!visible.value) {
-        emits('update:modelValue', visible.value)
+        emits('close')
     }
 })
-
 const emits = defineEmits<{
-    (e: 'update:modelValue', modelValue: boolean): void
+    (e: 'close'): void
 }>()
 
 </script>
 <template>
     <v-dialog transition="scale-transition" v-model="visible" max-width="500" v-if="keep">
+        <template v-slot:activator="{ props }">
+            <v-list-item role="button" v-bind="props">
+                <v-icon>mdi-information-outline</v-icon>
+                <span class="mx-3">Info</span>
+            </v-list-item>
+        </template>
         <v-card max-height="400" class="overflow-auto">
             <v-card-title class="text-center bg-primary">
                 Keep Details
@@ -67,7 +60,7 @@ const emits = defineEmits<{
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified By:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
-                        <span v-if="keep.updatedBy">{{ keep.updatedBy  }}</span> 
+                        <span v-if="keep.updatedBy">{{ keep.updatedBy }}</span>
                         <span v-else class="text-grey">-</span>
                     </v-col>
 

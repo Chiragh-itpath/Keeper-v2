@@ -34,7 +34,7 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" width="1000">
+    <v-dialog transition="scale-transition" v-model="visible" max-width="800">
         <v-card v-if="Item">
             <v-card-title class="bg-primary d-flex">
                 <span>
@@ -70,7 +70,7 @@ const emits = defineEmits<{
                                 Ticket | PR: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
                             </div>
                             <div>
-                                <div class="mb-3">Discuss with:
+                                <div class="mb-3">Discussed with:
                                     <v-chip v-if="Item.to" color="primary">{{ Item.to }}</v-chip>
                                     <span class="text-grey text-h5" v-else>-</span>
                                 </div>
@@ -114,7 +114,7 @@ const emits = defineEmits<{
                                     <span v-if="Item.updatedOn">
                                         {{ dateHelper.format(Item.updatedOn, 'keyboardDate') }}
                                     </span>
-                                    <span>-</span>
+                                    <span v-else>-</span>
                                 </v-col>
                             </v-row>
                         </v-window-item>
@@ -122,7 +122,6 @@ const emits = defineEmits<{
                 </v-card>
             </v-card-text>
         </v-card>
-
     </v-dialog>
 </template>
 <style scoped>

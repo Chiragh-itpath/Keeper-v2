@@ -29,7 +29,7 @@ const items = computed(() => {
         })
 
     let item: any[] = [];
-    
+
     if (groups.length > 0)
         item.push({ title: 'Groups', type: 'header' }, ...groups);
 
@@ -78,8 +78,8 @@ onMounted(async () => {
 </script>
 
 <template>
-    <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips label="select contact"
-        v-model:menu="menu" :error-messages="errorMessage">
+    <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips label="select contact or group"
+        v-model:menu="menu" :error-messages="errorMessage" hide-details="auto">
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.title }}</v-chip>
         </template>

@@ -1,10 +1,17 @@
-﻿namespace Keeper.Common.ViewModels
+﻿using Keeper.Common.Enums;
+
+namespace Keeper.Common.ViewModels
 {
+    public class InvitingUser : UserViewModel
+    {
+        public Permission Permission { get; set; } = Permission.VIEW;
+    } 
     public class ProjectInviteModel
     {
         public Guid ProjectId { get; set; }
-        public List<UserViewModel> Users{ get; set; } = new (); 
+        public List<InvitingUser> Users{ get; set; } = new (); 
     }
+    
     public class KeepInviteModel : ProjectInviteModel
     {
         public Guid KeepId { get; set; }
@@ -27,5 +34,10 @@
     public class InviteKeepModel : CommonInvitedModel
     {
         public Guid KeepId { get; set; }
+    }
+    public class UpdatePermission
+    {
+        public Guid ShareId { get; set; }
+        public Permission Permission { get; set; }
     }
 }

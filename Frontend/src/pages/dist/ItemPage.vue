@@ -7,10 +7,12 @@ import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
+import { Permission } from '@/Models/enum'
 
 const route = useRoute()
 const { GetAllItems } = ItemStore()
 const { Items } = storeToRefs(ItemStore())
+const { User } = UserStore()
 const loading: Ref<boolean> = ref(false)
 const date = ref(null)
 const project: Ref<IProject | undefined> = ref()
@@ -44,6 +46,20 @@ const breadcrumbsItems = [
         disabled: true
     }
 ]
+const canCreate = (): boolean => {
+    if (!project.value) return false
+    if (!keep.value) return false
+    if (project.value.createdBy == User.email) return true
+    const projectUser = project.value.users.find(u => u.invitedUser.id == User.id)
+    const keepUser = keep.value.users.find(u => u.invitedUser.id == User.id)
+    return (
+        projectUser?.permission == Permission.CREATE ||
+        projectUser?.permission == Permission.ALL ||
+        keepUser?.permission == Permission.CREATE ||
+        keepUser?.permission == Permission.ALL
+    )
+
+}
 onMounted(async () => {
     loading.value = true
     await GetAllItems(keepId.value)
@@ -69,7 +85,7 @@ onMounted(async () => {
                 <date-picker label="Select a date" v-model="date"></date-picker>
             </v-col>
             <v-col class="my-auto d-flex justify-end">
-                <add-item :keep="keep" :project="project"></add-item>
+                <add-item :keep="keep" :project="project" v-if="canCreate()"></add-item>
             </v-col>
         </v-row>
         <v-row v-if="!loading && project && keep">

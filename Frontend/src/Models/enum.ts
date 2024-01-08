@@ -2,8 +2,6 @@ enum RouterEnum {
     HOME = 'Home',
     LOGIN = 'Login',
     SIGNUP = 'SignUp',
-    VERIFY_EMAIL = 'VerifyEmail',
-    VERIFY_OTP = 'VerifyOtp',
     PASSWORD_RESET = 'PasswordReset',
     PROJECT = 'Projects',
     KEEP = 'Keeps',
@@ -23,5 +21,10 @@ const enum StatusType {
     PASSWORD_NOT_MATCHED,
     INTERNAL_SERVER_ERROR
 }
-
-export { RouterEnum, StatusType }
+const enum Permission {
+    VIEW,
+    EDIT,
+    CREATE,
+    ALL
+}
+export { RouterEnum, StatusType, Permission }

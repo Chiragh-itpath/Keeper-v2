@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Keeper.Common.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Keeper.Context.Model
 {
@@ -8,11 +9,12 @@ namespace Keeper.Context.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         [ForeignKey(nameof(User))]
-        public Guid UserId {  get; set; }
+        public Guid UserId { get; set; }
         public virtual UserModel User { get; set; } = default!;
         [ForeignKey(nameof(Project))]
         public Guid ProjectId { get; set; }
         public virtual ProjectModel Project { get; set; } = default!;
         public bool IsAccepted { get; set; } = false;
+        public Permission Permission { get; set; } = Permission.VIEW;
     }
 }

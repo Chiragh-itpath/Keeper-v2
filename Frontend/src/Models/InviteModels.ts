@@ -1,4 +1,5 @@
 import type { IUser } from '@/Models/UserModels'
+import type { Permission } from '@/Models/enum'
 
 interface IInvited {
     name: string
@@ -23,4 +24,19 @@ interface InviteResponse {
     inviteId: string
     response: boolean
 }
-export type { IInvitedKeep, IInvitedProject, IKeepInvite, IProjectInvite, InviteResponse }
+interface IInvitingUser extends IUser {
+    permission: Permission
+}
+interface IUpdatePermission {
+    shareId: string
+    permission: Permission
+}
+export type {
+    IInvitedKeep,
+    IInvitedProject,
+    IKeepInvite,
+    IProjectInvite,
+    InviteResponse,
+    IInvitingUser,
+    IUpdatePermission
+}

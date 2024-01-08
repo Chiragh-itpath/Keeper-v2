@@ -1,5 +1,6 @@
 import { http } from '@/config/ApiClient'
 import type { IAddProject, IEditProject, IProject, IProjectMembers } from '@/Models/ProjectModels'
+import type { IUpdatePermission } from '@/Models/InviteModels'
 
 export class ProjectService {
     private readonly baseUrl: string = 'Project'
@@ -29,5 +30,8 @@ export class ProjectService {
     }
     public RemoveFromProject = async (id: string) => {
         return await http.delete(`${this.baseUrl}/Remove/${id}`)
+    }
+    public UpdatePermission = async (updatePermissions: IUpdatePermission[]) => {
+        return await http.put(`${this.baseUrl}/UpdatePermission`, updatePermissions)
     }
 }

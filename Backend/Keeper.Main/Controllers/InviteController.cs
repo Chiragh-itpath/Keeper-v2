@@ -1,9 +1,9 @@
 ﻿using Keeper.Common.Response;
 using Keeper.Common.ViewModels;
-using Keeper.Services.Services;
 using Keeper.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Keeper.Main.Controllers
 {
@@ -22,11 +22,11 @@ namespace Keeper.Main.Controllers
         [HttpPost("InviteToProject")]
         public async Task<ResponseModel<string>> InviteToProject(ProjectInviteModel invite)
         {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
+            ClaimsIdentity user = User.Identities.First();
+            List<Claim> claims = user.Claims.ToList();
+            Guid userId = Guid.Parse(claims.ElementAt(3).Value);
             await _invite.InviteToProjectAsync(invite, userId);
-            return new ResponseModel<string>
+            return new()
             {
                 Message = "Invited"
             };
@@ -34,23 +34,23 @@ namespace Keeper.Main.Controllers
         [HttpGet("AllInvitedProjects")]
         public async Task<ResponseModel<List<InvitedProjectModel>>> InvitedProjects()
         {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
-            var res = await _invite.GetAllInvitedProject(userId);
-            return new ResponseModel<List<InvitedProjectModel>>
+            ClaimsIdentity user = User.Identities.First();
+            List<Claim> claims = user.Claims.ToList();
+            Guid userId = Guid.Parse(claims.ElementAt(3).Value);
+            List<InvitedProjectModel> invitedProjects = await _invite.GetAllInvitedProject(userId);
+            return new()
             {
-                Data = res
+                Data = invitedProjects
             };
         }
         [HttpPost("ProjectInviteResponse")]
         public async Task<ResponseModel<string>> ProjectInviteResponse(InviteResponseModel response)
         {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
-            var res = await _invite.ResponseToProjectInvite(response, userId);
-            return new ResponseModel<string>
+            ClaimsIdentity user = User.Identities.First();
+            List<Claim> claims = user.Claims.ToList();
+            Guid userId = Guid.Parse(claims.ElementAt(3).Value);
+            bool res = await _invite.ResponseToProjectInvite(response, userId);
+            return new()
             {
                 Message = $"Inviation {(res ? "Accepted" : "Declied")}"
             };
@@ -58,11 +58,11 @@ namespace Keeper.Main.Controllers
         [HttpPost("InviteToKeep")]
         public async Task<ResponseModel<string>> InviteToKeep(KeepInviteModel invite)
         {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
+            ClaimsIdentity user = User.Identities.First();
+            List<Claim> claims = user.Claims.ToList();
+            Guid userId = Guid.Parse(claims.ElementAt(3).Value);
             await _invite.InviteToKeepAsync(invite, userId);
-            return new ResponseModel<string>
+            return new()
             {
                 Message = "Invited"
             };
@@ -70,23 +70,23 @@ namespace Keeper.Main.Controllers
         [HttpGet("InvitedKeeps")]
         public async Task<ResponseModel<List<InviteKeepModel>>> InvitedKeeps()
         {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
-            var res = await _invite.GetAllInvitedKeep(userId);
-            return new ResponseModel<List<InviteKeepModel>>
+            ClaimsIdentity user = User.Identities.First();
+            List<Claim> claims = user.Claims.ToList();
+            Guid userId = Guid.Parse(claims.ElementAt(3).Value);
+            List<InviteKeepModel> invitedKeeps = await _invite.GetAllInvitedKeep(userId);
+            return new()
             {
-                Data = res
+                Data = invitedKeeps
             };
         }
         [HttpPost("keepInviteResponse")]
         public async Task<ResponseModel<string>> KeepInviteResponse(InviteResponseModel response)
         {
-            var user = User.Identities.First();
-            var claims = user.Claims.ToList();
-            var userId = Guid.Parse(claims.ElementAt(3).Value);
-            var res = await _invite.ResponseToKeepInvite(response, userId);
-            return new ResponseModel<string>
+            ClaimsIdentity user = User.Identities.First();
+            List<Claim> claims = user.Claims.ToList();
+            Guid userId = Guid.Parse(claims.ElementAt(3).Value);
+            bool res = await _invite.ResponseToKeepInvite(response, userId);
+            return new()
             {
                 Message = $"Inviation {(res ? "Accepted" : "Declied")}"
             };

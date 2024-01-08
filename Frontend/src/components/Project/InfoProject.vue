@@ -1,32 +1,30 @@
 <script setup lang="ts">
-import { ref, type Ref, watch } from 'vue'
-import { ProjectStore, UserStore } from '@/stores'
+import { ref, type Ref } from 'vue'
 import type { IProject } from '@/Models/ProjectModels'
-import { useDate } from 'vuetify';
-const props = withDefaults(defineProps<{
-    project: IProject | undefined
-    modelValue: boolean
-}>(), {
-    modelValue: false
-})
+import { useDate } from 'vuetify'
+import { watch } from 'vue';
+
+defineProps<{
+    project: IProject
+}>()
 
 const visible: Ref<boolean> = ref(false)
 const dateHelper = useDate()
-
-watch(props, async () => {
-    visible.value = props.modelValue
-})
-watch(visible, () => {
-    if (!visible.value) {
-        emits('update:modelValue', visible.value)
-    }
-})
-const emits = defineEmits<{
-    (e: 'update:modelValue', modelValue: boolean): void
+const emit = defineEmits<{
+    (e: 'close'): void
 }>()
+watch(visible, () => {
+    if (!visible.value) emit('close')
+})
 </script>
 <template>
     <v-dialog transition="scale-transition" v-model="visible" max-width="700" v-if="project">
+        <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props">
+                <v-icon>mdi-information-outline</v-icon>
+                <span class="mx-3">Info</span>
+            </v-list-item>
+        </template>
         <v-card class="overflow-auto">
             <v-card-title class="text-center bg-primary">
                 Project Details
@@ -36,7 +34,6 @@ const emits = defineEmits<{
                 <v-row>
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Title:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">{{ project.title }}</v-col>
-
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Description:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3 description">
                         {{ project.description }}

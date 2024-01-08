@@ -35,6 +35,7 @@ namespace Keeper.Services.Services
                     project.Users.Add(new()
                     {
                         ShareId = null,
+                        IsAccepted = true,
                         InvitedUser = user,
                     });
                 }
@@ -53,6 +54,7 @@ namespace Keeper.Services.Services
                 projectViewModel.Users.Add(new()
                 {
                     ShareId = null,
+                    IsAccepted = true,
                     InvitedUser = user,
                 });
             }
@@ -125,7 +127,8 @@ namespace Keeper.Services.Services
                 {
                     ShareId = shared.Id,
                     InvitedUser = _userService.MapToUserVM(shared.User),
-                    IsAccepted = shared.IsAccepted
+                    IsAccepted = shared.IsAccepted,
+                    Permission = shared.Permission
                 })
                 .ToList();
         }
