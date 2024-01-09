@@ -30,10 +30,6 @@ const canEdit = (index: number): boolean => {
     const projectUser = props.project.users.find(u => u.invitedUser.id == User.id)
     if (projectUser)
         return projectUser.permission == Permission.EDIT || projectUser.permission == Permission.ALL
-    const keepUser = keep.users.find(u => u.invitedUser.id == User.id)
-    if (keepUser) {
-        return keepUser.permission == Permission.EDIT || keepUser.permission == Permission.ALL
-    }
     return false
 }
 const canDelete = (index: number): boolean => {
@@ -43,10 +39,6 @@ const canDelete = (index: number): boolean => {
     const projectUser = props.project.users.find(u => u.invitedUser.id == User.id)
     if (projectUser)
         return projectUser.permission == Permission.EDIT || projectUser.permission == Permission.ALL
-    const keepUser = keep.users.find(u => u.invitedUser.id == User.id)
-    if (keepUser) {
-        return keepUser.permission == Permission.ALL
-    }
     return false
 }
 watch(props, () => {
