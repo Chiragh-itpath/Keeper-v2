@@ -79,7 +79,7 @@ onMounted(async () => {
 
 <template>
     <v-autocomplete :items="items" color="primary" v-model="selectedItem" multiple chips label="select contact or group"
-        v-model:menu="menu" :error-messages="errorMessage" hide-details="auto">
+        v-model:menu="menu" :error-messages="errorMessage" >
         <template v-slot:chip="{ item }">
             <v-chip color="primary">{{ item.title }}</v-chip>
         </template>

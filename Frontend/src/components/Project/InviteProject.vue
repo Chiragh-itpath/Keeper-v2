@@ -83,35 +83,33 @@ const emits = defineEmits<{
                 <v-window v-model="window" :touch="false">
                     <v-window-item value="next">
                         <invite-drop-down v-model:users="selectedUsers" :error-message="errorMessage"></invite-drop-down>
-                        <v-card max-height="400" elevation="0" class="overflow-auto mt-5">
-                            <v-list-item v-if="InvitedUsers.length == 0" height="250"
-                                class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
-                                No Data
-                            </v-list-item>
-                            <v-list>
-                                <template v-for="share in  InvitedUsers " :key="share.shareId">
-                                    <v-list-item class="py-2 mb-1 border rounded-lg" :title="share.invitedUser.userName"
-                                        :subtitle="share.invitedUser.email">
-                                        <template v-slot:prepend>
-                                            <v-avatar color="primary">
-                                                {{ share.invitedUser.email.slice(0, 1).toUpperCase() }}
-                                            </v-avatar>
-                                        </template>
-                                        <template v-slot:append>
-                                            <v-chip color="primary" variant="flat" class="mx-2">
-                                                {{ permissions[share.permission].title }}
-                                            </v-chip>
-                                            <v-icon v-if="share.isAccepted" color="success">
-                                                mdi-account-check
-                                            </v-icon>
-                                            <v-icon v-else color="danger">
-                                                mdi-account-clock
-                                            </v-icon>
-                                        </template>
-                                    </v-list-item>
-                                </template>
-                            </v-list>
-                        </v-card>
+                        <v-list-item v-if="InvitedUsers.length == 0" height="250"
+                            class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
+                            No Data
+                        </v-list-item>
+                        <v-list v-else height="250" class="overflow-y-auto">
+                            <template v-for="share in  InvitedUsers " :key="share.shareId">
+                                <v-list-item class="py-2 mb-1 border rounded-lg" :title="share.invitedUser.userName"
+                                    :subtitle="share.invitedUser.email">
+                                    <template v-slot:prepend>
+                                        <v-avatar color="primary">
+                                            {{ share.invitedUser.email.slice(0, 1).toUpperCase() }}
+                                        </v-avatar>
+                                    </template>
+                                    <template v-slot:append>
+                                        <v-chip color="primary" variant="flat" class="mx-2">
+                                            {{ permissions[share.permission].title }}
+                                        </v-chip>
+                                        <v-icon v-if="share.isAccepted" color="success">
+                                            mdi-account-check
+                                        </v-icon>
+                                        <v-icon v-else color="danger">
+                                            mdi-account-clock
+                                        </v-icon>
+                                    </template>
+                                </v-list-item>
+                            </template>
+                        </v-list>
                     </v-window-item>
                     <v-window-item value="done">
                         <v-list-item class="py-2 px-1 mb-3 rounded-lg" title="Permission">
