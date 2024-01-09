@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { IKeep, IAddKeep, IEditKeep } from '@/Models/KeepModels'
 import { KeepService } from '@/Services/KeepService'
 import { useToster } from '@/composable/useToaster'
+import type { IUpdatePermission } from '@/Models/InviteModels'
 
 const KeepStore = defineStore('KeepStore', () => {
     const keepService = new KeepService()
@@ -61,9 +62,32 @@ const KeepStore = defineStore('KeepStore', () => {
         }
     }
 
-    const RemoveUser = async (id: string): Promise<boolean> =>
-        (await keepService.RemoveFromKeep(id)) != null
-
+    const RemoveUser = async (id: string, keepId: string): Promise<boolean> => {
+        const res = await keepService.RemoveFromKeep(id)
+        if (res) {
+            const keep = Keeps.value.find(x => x.id == keepId)
+            if (keep) {
+                keep.users.splice(keep.users.findIndex(x => x.shareId == id), 1)
+            }
+            return true
+        }
+        return false
+    }
+    const UpdatePermissions = async (updatePermissions: IUpdatePermission[], keepId: string) => {
+        const res = await keepService.UpdatePermission(updatePermissions);
+        if (res) {
+            const index = Keeps.value.findIndex(x => x.id == keepId)
+            if (index != -1) {
+                const users = Keeps.value[index].users
+                Keeps.value[index].users = users.map(x => {
+                    const update = updatePermissions.find(up => up.shareId == x.shareId)
+                    if (update)
+                        return { ...x, permission: update.permission }
+                    return x
+                })
+            }
+        }
+    }
     return {
         Keeps,
         keepTags,
@@ -73,7 +97,8 @@ const KeepStore = defineStore('KeepStore', () => {
         Updatekeep,
         getSingleKeep,
         GetInvitedMembers,
-        RemoveUser
+        RemoveUser,
+        UpdatePermissions
     }
 })
 export { KeepStore }

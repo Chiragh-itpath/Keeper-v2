@@ -59,8 +59,17 @@ const ProjectStore = defineStore('ProjectStore', () => {
         }
     }
 
-    const RemoveUser = async (id: string): Promise<boolean> =>
-        (await projectService.RemoveFromProject(id)) != null
+    const RemoveUser = async (id: string, projectId: string): Promise<boolean> => {
+        const res = await projectService.RemoveFromProject(id)
+        if (res) {
+            const project = Projects.value.find(x => x.id == projectId)
+            if (project) {
+                project.users.splice(project.users.findIndex(x => x.shareId == id), 1)
+            }
+            return true
+        }
+        return false
+    }
 
     const UpdatePermissions = async (updatePermissions: IUpdatePermission[], projectId: string) => {
         const res = await projectService.UpdatePermission(updatePermissions)

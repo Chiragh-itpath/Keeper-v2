@@ -30,7 +30,7 @@ onMounted(async () => {
         </v-row>
         <v-row v-if="!loading">
             <v-col cols="12">
-                <v-card elevation="0" class="d-flex flex-row-reverse">
+                <v-card elevation="0"  class="d-flex flex-row-reverse bg-transparent">
                     <v-tabs color="primary" v-model="tabs">
                         <v-tab value="contact" class="px-10">Contacts</v-tab>
                         <v-tab value="group" class="px-10">Groups</v-tab>

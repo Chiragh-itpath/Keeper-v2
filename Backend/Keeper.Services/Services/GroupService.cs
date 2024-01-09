@@ -60,14 +60,14 @@ namespace Keeper.Services.Services
         }
         public async Task<GroupViewModel> AddContacts(AddContactsToGroup addContacts)
         {
-            var addTasks = addContacts.ContactIds.Select(contactId =>
-                _linker.AddAsync(new ContactGroupLinkerModel
+            foreach(var contactId in addContacts.ContactIds)
+            {
+                await _linker.AddAsync(new ContactGroupLinkerModel
                 {
                     GroupId = addContacts.GroupId,
-                    ContactId = contactId
-                }));
-
-            await Task.WhenAll(addTasks);
+                    ContactId = contactId,
+                });
+            }
             var group = await _group.GetByIdAsync(addContacts.GroupId);
             var viewModel = await FillContacts(group!);
             return viewModel;

@@ -15,5 +15,6 @@ namespace Keeper.Services.Services.Interfaces
         Task<int> RemoveFromProject(Guid ShareId);
         Task<int> RemoveFromKeep(Guid shareId);
         Task UpdatePermissionOnProject(List<UpdatePermission> updatePermissionModel);
+        Task UpdatePermissionOnKeep(List<UpdatePermission> updatePermissionModel);
     }
 }

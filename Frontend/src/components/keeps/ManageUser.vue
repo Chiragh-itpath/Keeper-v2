@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, watch, type Ref } from 'vue'
-import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
-import { GlobalStore, ProjectStore, UserStore } from '@/stores'
-import { DeletePropmt } from '@/components/Custom'
-import { permissions } from '@/data/permission'
+import { type Ref, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
+import { GlobalStore, KeepStore } from '@/stores'
+import { permissions } from '@/data/permission'
+import { DeletePropmt } from '@/components/Custom'
 
 const props = defineProps<{
-    project: IProject
+    keep: IKeep
 }>()
 
-const visible: Ref<boolean> = ref(false)
-const permissionForAll = ref(0)
-const InvitedUsers: Ref<IProjectMembers[]> = ref([])
-const updatingUsers: Ref<IProjectMembers[]> = ref([])
-const projectStore = ProjectStore()
 const { Loading } = storeToRefs(GlobalStore())
+const visible: Ref<boolean> = ref(false)
+const InvitedUsers: Ref<IKeepMembers[]> = ref([])
+const updatingUsers: Ref<IKeepMembers[]> = ref([])
+const permissionForAll: Ref<number> = ref(0)
+const keepStore = KeepStore()
 const areAllPermissionsSame = () => {
     if (InvitedUsers.value.length > 0) {
         const firstPermision = InvitedUsers.value[0].permission
@@ -25,7 +25,7 @@ const areAllPermissionsSame = () => {
 }
 const handleValueChanges = (index: number) => {
     const updatingValue = InvitedUsers.value[index]
-    const oldValue = props.project.users[index]
+    const oldValue = props.keep.users[index]
     if (updatingUsers.value.some(x => x.shareId == updatingValue.shareId)) {
         if (updatingValue.permission == oldValue.permission) {
             updatingUsers.value.splice(updatingUsers.value.findIndex(x => x.shareId == updatingValue.shareId), 1)
@@ -40,12 +40,13 @@ const handleValueChanges = (index: number) => {
         permissionForAll.value = firstPermision
     }
 }
-const handleRemove = async (id: string) => {
-    var res = await projectStore.RemoveUser(id, props.project.id)
+const handleRemove = async (shareId: string): Promise<void> => {
+    const res: boolean = await keepStore.RemoveUser(shareId, props.keep.id)
     if (res) {
-        InvitedUsers.value.splice(InvitedUsers.value.findIndex(x => x.shareId == id), 1)
+        InvitedUsers.value.splice(InvitedUsers.value.findIndex(x => x.shareId == shareId), 1)
     }
 }
+
 const handleUpdate = async () => {
     const updatePermissionModel = updatingUsers.value.map(x => {
         return {
@@ -53,10 +54,11 @@ const handleUpdate = async () => {
             permission: x.permission
         }
     })
-    await projectStore.UpdatePermissions(updatePermissionModel, props.project.id)
+    await keepStore.UpdatePermissions(updatePermissionModel, props.keep.id)
     updatingUsers.value = []
     visible.value = false
 }
+
 watch(permissionForAll, () => {
     InvitedUsers.value = InvitedUsers.value.map(x => {
         return { ...x, permission: permissionForAll.value }
@@ -64,12 +66,11 @@ watch(permissionForAll, () => {
     updatingUsers.value = InvitedUsers.value.map(x => {
         return { ...x }
     })
-    InvitedUsers.value.map((val, index) => handleValueChanges(index))
+    InvitedUsers.value.map((x, index) => handleValueChanges(index))
 })
 watch(visible, () => {
     if (!visible.value) emits('close')
-    InvitedUsers.value = props.project.users
-        .filter(u => u.invitedUser.id != UserStore().User.id)
+    InvitedUsers.value = props.keep.users
         .map(x => {
             return { ...x }
         })
@@ -93,18 +94,18 @@ const emits = defineEmits<{
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
+                <v-list-item class="px-1 mb-2">
+                    <template v-slot:append>
+                        <v-sheet width="120">
+                            <v-select density="compact" color="primary" hide-details :items="permissions"
+                                v-model="permissionForAll"></v-select>
+                        </v-sheet>
+                    </template>
+                </v-list-item>
                 <v-list min-height="100" max-height="500" v-if="InvitedUsers.length > 0">
-                    <v-list-item class="px-2 mb-3">
-                        <template v-slot:append>
-                            <v-sheet width="120" class="px-0">
-                                <v-select density="compact" color="primary" hide-details :items="permissions"
-                                    v-model="permissionForAll">
-                                </v-select>
-                            </v-sheet>
-                        </template>
-                    </v-list-item>
+
                     <template v-for="(user, index) in InvitedUsers" :key="index">
-                        <v-list-item class="py-2 mb-1 border rounded-lg" :title="user.invitedUser.userName"
+                        <v-list-item class="border rounded-lg py-2 mb-2" :title="user.invitedUser.userName"
                             :subtitle="user.invitedUser.email">
                             <template v-slot:prepend>
                                 <v-avatar color="primary">
@@ -112,14 +113,14 @@ const emits = defineEmits<{
                                 </v-avatar>
                             </template>
                             <template v-slot:append>
-                                <v-sheet width="120" class="mx-3">
+                                <v-sheet width="120" class="mx-2">
                                     <v-select density="compact" color="primary" hide-details :items="permissions"
                                         v-model="user.permission" @update:model-value="() => handleValueChanges(index)">
                                     </v-select>
                                 </v-sheet>
-                                <delete-propmt title="Remove Member" subtitle="Are you sure you want to remove this user"
+                                <delete-propmt title="Remove user" subtitle="Are you sure you want to remove this user?"
                                     @click:yes="() => handleRemove(user.shareId)">
-                                    <template v-slot:default="{ props }">
+                                    <template v-slot="{ props }">
                                         <v-icon color="danger" v-bind="props">mdi-delete</v-icon>
                                     </template>
                                 </delete-propmt>
@@ -127,16 +128,16 @@ const emits = defineEmits<{
                         </v-list-item>
                     </template>
                 </v-list>
-                <v-card v-else height="100" elevation="0"
+                <v-card v-else elevation="0" height="100"
                     class="d-flex justify-center align-center bg-grey-lighten-3 text-grey">
                     No invited users
                 </v-card>
             </v-card-text>
             <v-card-actions class="justify-end">
-                <v-btn color="primary" variant="elevated" min-width="120" class="mx-4 mb-1 rounded-xl"
-                    :disabled="updatingUsers.length == 0 || Loading" :loading="Loading" @click="handleUpdate">
-                    Update
-                    <span v-if="updatingUsers.length" class="ms-2"> ({{ updatingUsers.length }})</span>
+                <v-btn color="primary" variant="flat" class="rounded-xl px-8" width="auto"
+                    :disabled="updatingUsers.length == 0" :loading="Loading" @click="handleUpdate">
+                    update
+                    <span v-if="updatingUsers.length != 0">({{ updatingUsers.length }})</span>
                 </v-btn>
             </v-card-actions>
         </v-card>

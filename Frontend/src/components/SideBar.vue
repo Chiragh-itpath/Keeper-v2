@@ -14,7 +14,7 @@ onMounted(() => {
 })
 </script>
 <template>
-    <v-navigation-drawer location="left" :model-value="SideBarIsVisible">
+    <v-navigation-drawer location="left" v-model="SideBarIsVisible">
         <v-list nav density="comfortable" variant="flat" class="px-0" lines="one" color="primary">
             <v-list-item role="button" value="project" :to="{ name: RouterEnum.PROJECT }"
                 :active="route.name == RouterEnum.PROJECT">

@@ -4,7 +4,7 @@ import { useDate } from 'vuetify'
 import { useRouter } from 'vue-router'
 import { Permission, RouterEnum } from '@/Models/enum'
 import { UserStore } from '@/stores'
-import { EditKeep, InfoKeep, InviteKeep, DeleteKeep } from '@/components/keeps'
+import { EditKeep, InfoKeep, InviteKeep, DeleteKeep, ManageUser } from '@/components/keeps'
 import { NoItem } from '@/components/Custom'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
@@ -80,9 +80,9 @@ onMounted(() => {
                                 <info-keep :keep="keep" @close="isActive.value = false" />
                                 <invite-keep v-if="!project.isShared" :keep="keep" :project="project"
                                     @close="isActive.value = false" />
+                                <manage-user v-if="!project.isShared" :keep="keep" @close="isActive.value = false" />
                                 <edit-keep :keep="keep" v-if="canEdit(index)" @close="isActive.value = false" />
-                                <delete-keep :id="keep.id" v-if="canDelete(index)"
-                                    @close="isActive.value = false"></delete-keep>
+                                <delete-keep :id="keep.id" v-if="canDelete(index)" @close="isActive.value = false" />
                             </v-list>
                         </template>
                         <template v-slot:activator="{ props }">

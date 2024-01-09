@@ -219,5 +219,14 @@ namespace Keeper.Services.Services
                 await _projectShareRepo.UpdateAsync(shareProjectModel);
             }
         }
+        public async Task UpdatePermissionOnKeep(List<UpdatePermission> updatePermissionModel)
+        {
+            foreach (var permissionModel in updatePermissionModel)
+            {
+                SharedKeepsModel sharedKeepsModel = await _keepShareRepo.GetAsync(permissionModel.ShareId);
+                sharedKeepsModel.Permission = permissionModel.Permission;
+                await _keepShareRepo.UpdateAsync(sharedKeepsModel);
+            }
+        }
     }
 }

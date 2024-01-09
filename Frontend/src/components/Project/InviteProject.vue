@@ -32,7 +32,11 @@ const handleInvite = async (): Promise<void> => {
         visible.value = false
     }
 }
-
+const handleChanges = () => {
+    const firstPermision = inviteUser.value[0].permission
+    if (inviteUser.value.every(x => x.permission == firstPermision))
+        permissionForAll.value = firstPermision
+}
 watch(visible, () => {
     if (!visible.value) {
         window.value = 'next'
@@ -47,7 +51,7 @@ watch(selectedUsers, () => {
         return { ...x, permission: Permission.VIEW }
     });
     errorMessage.value = selectedUsers.value.length != inviteUser.value.length ?
-        'Users already invited in project will be skipped' : '';
+        'Users already invited to this project will not be included' : '';
 })
 watch(permissionForAll, () => {
     inviteUser.value = inviteUser.value.map(u => { return { ...u, permission: permissionForAll.value } })
@@ -76,23 +80,16 @@ const emits = defineEmits<{
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
-                <v-window v-model="window" :touch="false" style="height: 350px;">
+                <v-window v-model="window" :touch="false">
                     <v-window-item value="next">
                         <invite-drop-down v-model:users="selectedUsers" :error-message="errorMessage"></invite-drop-down>
-                        <div class="mt-3 pe-3 d-flex justify-space-between">
-
-                        </div>
-                        <v-card elevation="0" max-height="300">
-                            <v-card-title class="d-flex justify-space-between text-body-1 px-2">
-                                <span>Members with access</span>
-                                <span>permission</span>
-                            </v-card-title>
+                        <v-card max-height="400" elevation="0" class="overflow-auto mt-5">
+                            <v-list-item v-if="InvitedUsers.length == 0" height="250"
+                                class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
+                                No Data
+                            </v-list-item>
                             <v-list>
-                                <v-list-item v-if="InvitedUsers.filter(x => x.isAccepted).length == 0" height="100"
-                                    class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
-                                    No Data
-                                </v-list-item>
-                                <template v-for="share in InvitedUsers.filter(u => u.isAccepted)" :key="share.shareId">
+                                <template v-for="share in  InvitedUsers " :key="share.shareId">
                                     <v-list-item class="py-2 mb-1 border rounded-lg" :title="share.invitedUser.userName"
                                         :subtitle="share.invitedUser.email">
                                         <template v-slot:prepend>
@@ -101,34 +98,15 @@ const emits = defineEmits<{
                                             </v-avatar>
                                         </template>
                                         <template v-slot:append>
-                                            <v-chip color="primary" variant="flat">{{ permissions[share.permission].title
-                                            }}</v-chip>
-                                        </template>
-                                    </v-list-item>
-                                </template>
-                            </v-list>
-                        </v-card>
-                        <v-card elevation="0" max-height="300">
-                            <v-card-title class="d-flex justify-space-between text-body-1 px-2">
-                                <span>Pending Invitation</span>
-                                <span>permission</span>
-                            </v-card-title>
-                            <v-list>
-                                <v-list-item v-if="InvitedUsers.filter(x => !x.isAccepted).length == 0" height="100"
-                                    class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
-                                    No Data
-                                </v-list-item>
-                                <template v-for="share in InvitedUsers.filter(u => !u.isAccepted)" :key="share.shareId">
-                                    <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.invitedUser.userName"
-                                        :subtitle="share.invitedUser.email">
-                                        <template v-slot:prepend>
-                                            <v-avatar color="primary">
-                                                {{ share.invitedUser.email.slice(0, 1).toUpperCase() }}
-                                            </v-avatar>
-                                        </template>
-                                        <template v-slot:append>
-                                            <v-chip color="primary" variant="flat">{{ permissions[share.permission].title
-                                            }}</v-chip>
+                                            <v-chip color="primary" variant="flat" class="mx-2">
+                                                {{ permissions[share.permission].title }}
+                                            </v-chip>
+                                            <v-icon v-if="share.isAccepted" color="success">
+                                                mdi-account-check
+                                            </v-icon>
+                                            <v-icon v-else color="danger">
+                                                mdi-account-clock
+                                            </v-icon>
                                         </template>
                                     </v-list-item>
                                 </template>
@@ -136,36 +114,35 @@ const emits = defineEmits<{
                         </v-card>
                     </v-window-item>
                     <v-window-item value="done">
-                        <v-card max-height="500" elevation="0">
-                            <v-list>
-                                <v-list-item class="py-2 mb-5 rounded-lg" title="Permission">
+                        <v-list-item class="py-2 px-1 mb-3 rounded-lg" title="Permission">
+                            <template v-slot:append>
+                                <v-sheet width="120">
+                                    <v-select color="primary" class="w-100" density="compact" hide-details
+                                        :items="permissions" v-model="permissionForAll">
+                                    </v-select>
+                                </v-sheet>
+                            </template>
+                        </v-list-item>
+                        <v-list height="270" class="overflow-auto">
+                            <template v-for="( share, index ) in  inviteUser " :key="index">
+                                <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.userName"
+                                    :subtitle="share.email">
+                                    <template v-slot:prepend>
+                                        <v-avatar color="primary">
+                                            {{ share.email.slice(0, 1) }}
+                                        </v-avatar>
+                                    </template>
                                     <template v-slot:append>
                                         <v-sheet width="120">
                                             <v-select color="primary" class="w-100" density="compact" hide-details
-                                                :items="permissions" v-model="permissionForAll">
+                                                :items="permissions" v-model="share.permission"
+                                                @update:model-value="handleChanges">
                                             </v-select>
                                         </v-sheet>
                                     </template>
                                 </v-list-item>
-                                <template v-for="(share, index) in inviteUser" :key="index">
-                                    <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.userName"
-                                        :subtitle="share.email">
-                                        <template v-slot:prepend>
-                                            <v-avatar color="primary">
-                                                {{ share.email.slice(0, 1) }}
-                                            </v-avatar>
-                                        </template>
-                                        <template v-slot:append>
-                                            <v-sheet width="120">
-                                                <v-select color="primary" class="w-100" density="compact" hide-details
-                                                    :items="permissions" v-model="share.permission">
-                                                </v-select>
-                                            </v-sheet>
-                                        </template>
-                                    </v-list-item>
-                                </template>
-                            </v-list>
-                        </v-card>
+                            </template>
+                        </v-list>
                     </v-window-item>
                 </v-window>
             </v-card-text>

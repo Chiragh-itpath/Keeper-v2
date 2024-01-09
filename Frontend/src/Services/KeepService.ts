@@ -1,4 +1,5 @@
 import { http } from '@/config/ApiClient'
+import type { IUpdatePermission } from '@/Models/InviteModels'
 import type { IAddKeep, IEditKeep, IKeep, IKeepMembers } from '@/Models/KeepModels'
 
 export class KeepService {
@@ -30,6 +31,10 @@ export class KeepService {
         const response: IKeepMembers[] = await http.get(`${this.baseUrl}/Users/${id}`)
         return response
     }
-    public RemoveFromKeep = async (id: string): Promise<void> =>
+    public RemoveFromKeep = async (id: string): Promise<any> =>
         await http.delete(`${this.baseUrl}/Remove/${id}`)
+
+    public UpdatePermission = async (updatePermissions: IUpdatePermission[]) => {
+        return await http.put(`${this.baseUrl}/UpdatePermission`, updatePermissions)
+    }
 }
