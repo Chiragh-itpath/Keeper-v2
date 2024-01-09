@@ -1,21 +1,26 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
+import { useDate } from 'vuetify'
 import { ItemStore } from '@/stores'
 import type { IItem } from '@/Models/ItemModels'
-import AllComments from '@/components/Comments/AllComments.vue'
-import { useDate } from 'vuetify'
+import { AllComments } from '@/components/Comments/'
 
 const { GetById } = ItemStore()
 const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
 const Item: Ref<IItem | null> = ref(null)
 const dateHelper = useDate()
+
 const props = withDefaults(defineProps<{
     modelValue: boolean,
     id: string
 }>(), {
     modelValue: false
 })
+
+const downloadFile = (path: string) => {
+    window.open(path, '_blank')
+}
 
 watch(props, () => {
     visible.value = props.modelValue
@@ -63,12 +68,9 @@ const emits = defineEmits<{
                         <v-tab value="logs">logs</v-tab>
                     </v-tabs>
                 </div>
-                <v-card height="400" max-height="400" class="overflow-y-auto mx-2 pa-5 " elevation="0">
+                <v-card height="450" max-height="450" class="overflow-y-auto mx-2 pa-5 " elevation="0">
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
-                            <div v-if="Item.url" class="mb-3">
-                                Ticket | PR: <a :href="Item.url" target="_blank">{{ Item.url }}</a>
-                            </div>
                             <div>
                                 <div class="mb-3">Discussed with:
                                     <v-chip v-if="Item.to" color="primary">{{ Item.to }}</v-chip>
@@ -81,18 +83,27 @@ const emits = defineEmits<{
                                     <span v-else class="text-grey text-h5">-</span>
                                 </div>
                             </div>
-                            <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
-                            <div v-for="(file, index) in Item.files" :key="index" class="my-3">
-                                <a :href="file.fileUrl" target="_blank">
-                                    <v-chip color="primary" class="pa-3 cursor-pointer">
-                                        <span class="ma-2">{{ file.fileName }}</span>
-                                    </v-chip>
-                                </a>
-                            </div>
                             <div class="description rounded-lg pa-3 mt-2 ">
                                 <div v-if="Item.description" v-html="Item.description"></div>
                                 <div v-else class="text-grey">No description provided</div>
                             </div>
+                            <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
+                            <v-row class="mt-2">
+                                <v-col v-for="(file, index) in Item.files" :key="index" cols="auto">
+                                    <v-card max-width="200" color="primary" variant="tonal"
+                                        class="d-flex justify-center align-center pa-3">
+                                        <v-tooltip>
+                                            <template v-slot:activator="{ props }">
+                                                <span class="text-black text-truncate" v-bind="props">
+                                                    {{ file.fileName }}
+                                                </span>
+                                            </template>
+                                            {{ file.fileName }}
+                                        </v-tooltip>
+                                        <v-icon class="" @click="() => downloadFile(file.fileUrl)">mdi-download</v-icon>
+                                    </v-card>
+                                </v-col>
+                            </v-row>
                         </v-window-item>
                         <v-window-item value="comments">
                             <all-comments :item-id="Item.id" :comments="Item.comments"></all-comments>

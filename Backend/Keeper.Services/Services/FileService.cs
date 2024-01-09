@@ -59,13 +59,16 @@ namespace Keeper.Services.Services
                 .Select(x => new FileViewModel
                 {
                     FileName = x.OriginalName,
-                    FileUrl = Path.Combine(this.imagePath, x.FilePath),
+                    FileUrl = Path.Combine(this.imagePath, $"{x.Id}"),
                     IsImage = imageExtensions.Contains(Path.GetExtension(x.FilePath)?.ToUpperInvariant() ?? "")
                 })
                 .ToList();
             return files;
         }
-
+        public async Task<FileModel> GetFileDetails(Guid id)
+        {
+            return await _file.GetByIdAsync(id);
+        }
         private static void EnsureDirectoryExists(string directoryPath)
         {
             if (!Directory.Exists(directoryPath))
