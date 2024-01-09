@@ -27,5 +27,9 @@ namespace Keeper.Repos.Repositories
 
             return await query.ToListAsync();
         }
+        public async Task<FileModel> GetByIdAsync(Guid id)
+        {
+            return await _db.Files.AsNoTracking().FirstAsync(x => x.Id == id);
+        }
     }
 }

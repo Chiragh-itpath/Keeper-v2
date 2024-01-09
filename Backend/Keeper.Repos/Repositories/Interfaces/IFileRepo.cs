@@ -6,5 +6,6 @@ namespace Keeper.Repos.Repositories.Interfaces
     {
         Task<FileModel> AddAsync(FileModel file);
         Task<List<FileModel>> GetFilesAsync(Guid itemId);
+        Task<FileModel> GetByIdAsync(Guid id);
     }
 }
