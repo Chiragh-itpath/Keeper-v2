@@ -1,4 +1,5 @@
-import type { IUser } from './UserModels'
+import type { IUser } from '@/Models/UserModels'
+import type { Permission } from '@/Models/enum'
 
 interface IAddProject {
     title: string
@@ -21,6 +22,13 @@ interface IProject extends IAddProject {
 interface IProjectMembers {
     shareId: string
     isAccepted: boolean
+    permission: Permission
     invitedUser: IUser
 }
-export type { IAddProject, IEditProject, IProject, IProjectMembers }
+
+export type {
+    IAddProject,
+    IEditProject,
+    IProject,
+    IProjectMembers
+}

@@ -3,5 +3,14 @@ import AllProject from './AllProjects.vue'
 import EditProject from './EditProject.vue'
 import InfoProject from './InfoProject.vue'
 import InviteProject from './InviteProject.vue'
-
-export { AddProject, AllProject, EditProject, InfoProject, InviteProject }
+import ManageUser from './ManageUsers.vue'
+import DeleteProject from './DeleteProject.vue'
+export {
+    AddProject,
+    AllProject,
+    EditProject,
+    InfoProject,
+    InviteProject,
+    ManageUser,
+    DeleteProject
+}

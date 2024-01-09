@@ -11,41 +11,37 @@ namespace Keeper.Services.Services
 {
     public class InviteService : IInviteService
     {
-        private readonly IProjectShareRepo _projectShare;
-        private readonly IKeepShareRepo _shareKeep;
-        private readonly IUserRepo _user;
-        private readonly IProjectRepo _project;
-        private readonly IKeepRepo _keep;
-        private readonly IMailService _mail;
+        private readonly IProjectShareRepo _projectShareRepo;
+        private readonly IKeepShareRepo _keepShareRepo;
+        private readonly IUserRepo _userRepo;
+        private readonly IProjectRepo _projectRepo;
+        private readonly IKeepRepo _keepRepo;
+        private readonly IMailService _mailService;
         public InviteService(IProjectShareRepo projectShare, IUserRepo user, IProjectRepo project, IKeepShareRepo shareKeep, IKeepRepo keep, IMailService mail)
         {
-            _projectShare = projectShare;
-            _user = user;
-            _project = project;
-            _shareKeep = shareKeep;
-            _keep = keep;
-            _mail = mail;
+            _projectShareRepo = projectShare;
+            _userRepo = user;
+            _projectRepo = project;
+            _keepShareRepo = shareKeep;
+            _keepRepo = keep;
+            _mailService = mail;
         }
         public async Task<bool> InviteToProjectAsync(ProjectInviteModel invite, Guid userId)
         {
-            var sender = await _user.GetById(userId);
-            var project = await _project.GetByIdAsync(invite.ProjectId);
-            int skipCount = 0;
+            var sender = await _userRepo.GetById(userId);
+            var project = await _projectRepo.GetByIdAsync(invite.ProjectId);
             for (int i = 0; i < invite.Users.Count; i++)
             {
-                var shared = await _projectShare.GetAsync(invite.ProjectId, invite.Users[i].Id);
-                if (shared != null)
-                {
-                    skipCount++;
-                    continue;
-                }
+                var shared = await _projectShareRepo.GetAsync(invite.ProjectId, invite.Users[i].Id);
+                if (shared != null) continue;
                 var inviteModel = new SharedProjectsModel()
                 {
                     ProjectId = invite.ProjectId,
-                    UserId = invite.Users[i].Id
+                    UserId = invite.Users[i].Id,
+                    Permission = invite.Users[i].Permission
                 };
-                await _projectShare.AddAsync(inviteModel);
-                await _mail.SendEmailAsync(new MailModel
+                await _projectShareRepo.AddAsync(inviteModel);
+                await _mailService.SendEmailAsync(new MailModel
                 {
                     Category = MailCategory.SendInvitation,
                     From = sender?.Email ?? string.Empty,
@@ -54,19 +50,18 @@ namespace Keeper.Services.Services
                     Message = project?.Title ?? string.Empty
                 });
             }
-            if (skipCount == invite.Users.Count) throw new InnerException("All User already invited", StatusType.NOT_VALID);
             return true;
         }
         public async Task<List<InvitedProjectModel>> GetAllInvitedProject(Guid userId)
         {
-            var invited = (await _projectShare.GetAllInvited(userId))
+            var invited = (await _projectShareRepo.GetAllInvited(userId))
                 .Where(x => !x.IsAccepted)
                 .ToList();
 
             var tasks = invited.Select(async invitation =>
             {
-                var project = await _project.GetByIdAsync(invitation.ProjectId);
-                var user = await _user.GetById(project?.CreatedById ?? Guid.Empty);
+                var project = await _projectRepo.GetByIdAsync(invitation.ProjectId);
+                var user = await _userRepo.GetById(project?.CreatedById ?? Guid.Empty);
 
                 if (project != null && user != null)
                 {
@@ -86,20 +81,20 @@ namespace Keeper.Services.Services
 
         public async Task<bool> ResponseToProjectInvite(InviteResponseModel projectInvite, Guid userId)
         {
-            var shared = await _projectShare.GetAsync(projectInvite.InviteId);
-            var project = await _project.GetByIdAsync(shared.ProjectId);
+            var shared = await _projectShareRepo.GetAsync(projectInvite.InviteId);
+            var project = await _projectRepo.GetByIdAsync(shared.ProjectId);
             var user = project?.CreatedBy;
-            var sender = await _user.GetById(userId);
+            var sender = await _userRepo.GetById(userId);
             if (projectInvite.Response)
             {
                 shared.IsAccepted = true;
-                await _projectShare.UpdateAsync(shared);
+                await _projectShareRepo.UpdateAsync(shared);
             }
             else
             {
-                await _projectShare.DeleteAsync(shared);
+                await _projectShareRepo.DeleteAsync(shared);
             }
-            await _mail.SendEmailAsync(new MailModel
+            await _mailService.SendEmailAsync(new MailModel
             {
                 Category = projectInvite.Response ? MailCategory.AcceptInvitation : MailCategory.RejectInvitation,
                 From = sender?.Email ?? "",
@@ -110,31 +105,23 @@ namespace Keeper.Services.Services
         }
         public async Task<bool> InviteToKeepAsync(KeepInviteModel invite, Guid userId)
         {
-            var sender = await _user.GetById(userId);
-            var keep = await _keep.GetAsync(invite.KeepId);
-            int skipcount = 0;
+            var sender = await _userRepo.GetById(userId);
+            var keep = await _keepRepo.GetAsync(invite.KeepId);
             for (int i = 0; i < invite.Users.Count; i++)
-            {   
-                var projectShared = (await _projectShare.GetAsync(invite.ProjectId, invite.Users[i].Id)) != null;
-                if (projectShared)
-                {
-                    skipcount++;
-                    continue;
-                }
-                var keepShared = (await _shareKeep.GetAsync(keep!.Id, invite.Users[i].Id)) !=null;
-                if (keepShared)
-                {
-                    skipcount++;
-                    continue;
-                }
+            {
+                var projectShared = (await _projectShareRepo.GetAsync(invite.ProjectId, invite.Users[i].Id)) != null;
+                if (projectShared) continue;
+                var keepShared = (await _keepShareRepo.GetAsync(keep!.Id, invite.Users[i].Id)) != null;
+                if (keepShared) continue;
                 var inviteModel = new SharedKeepsModel()
                 {
                     KeepId = invite.KeepId,
                     ProjectId = invite.ProjectId,
+                    Permission = invite.Users[i].Permission,
                     UserId = invite.Users[i].Id
                 };
-                await _shareKeep.AddAsync(inviteModel);
-                await _mail.SendEmailAsync(new MailModel
+                await _keepShareRepo.AddAsync(inviteModel);
+                await _mailService.SendEmailAsync(new MailModel
                 {
                     Category = MailCategory.SendInvitation,
                     From = sender?.Email ?? string.Empty,
@@ -143,18 +130,17 @@ namespace Keeper.Services.Services
                     Message = keep?.Title ?? ""
                 });
             }
-            if (skipcount == invite.Users.Count) throw new InnerException("All User already Invited", StatusType.NOT_VALID);
             return true;
         }
         public async Task<List<InviteKeepModel>> GetAllInvitedKeep(Guid UserId)
         {
-            var invited = await _shareKeep.GetAllInvited(UserId);
+            var invited = await _keepShareRepo.GetAllInvited(UserId);
             invited = invited.Where(x => !x.IsAccepted).ToList();
             List<InviteKeepModel> inviteKeeps = new();
             for (int i = 0; i < invited.Count; i++)
             {
-                var keep = await _keep.GetAsync(invited[i].KeepId);
-                var user = await _user.GetById(keep!.CreatedById);
+                var keep = await _keepRepo.GetAsync(invited[i].KeepId);
+                var user = await _userRepo.GetById(keep!.CreatedById);
                 inviteKeeps.Add(new InviteKeepModel
                 {
                     KeepId = invited[i].Id,
@@ -166,20 +152,20 @@ namespace Keeper.Services.Services
         }
         public async Task<bool> ResponseToKeepInvite(InviteResponseModel keepInvite, Guid userId)
         {
-            var shared = await _shareKeep.GetAsync(keepInvite.InviteId);
-            var project = await _project.GetByIdAsync(shared.ProjectId);
+            var shared = await _keepShareRepo.GetAsync(keepInvite.InviteId);
+            var project = await _projectRepo.GetByIdAsync(shared.ProjectId);
             var user = project?.CreatedBy;
-            var sender = await _user.GetById(userId);
+            var sender = await _userRepo.GetById(userId);
             if (keepInvite.Response)
             {
                 shared.IsAccepted = true;
-                await _shareKeep.UpdateAsync(shared);
+                await _keepShareRepo.UpdateAsync(shared);
             }
             else
             {
-                await _shareKeep.DeleteAsync(shared);
+                await _keepShareRepo.DeleteAsync(shared);
             }
-            await _mail.SendEmailAsync(new MailModel
+            await _mailService.SendEmailAsync(new MailModel
             {
                 Category = keepInvite.Response ? MailCategory.AcceptInvitation : MailCategory.RejectInvitation,
                 From = sender?.Email ?? "",
@@ -190,7 +176,7 @@ namespace Keeper.Services.Services
         }
         public async Task<List<Collaborator>> GetProjectCollaborators(Guid projectId)
         {
-            var SharedProject = await _projectShare.GetAllAsync(projectId);
+            var SharedProject = await _projectShareRepo.GetAllAsync(projectId);
             var collaborator = SharedProject.Select(x => new Collaborator
             {
                 UserName = x.User.UserName,
@@ -202,7 +188,7 @@ namespace Keeper.Services.Services
         }
         public async Task<List<Collaborator>> GetKeepCollaborators(Guid keepId)
         {
-            var sharedkeep = await _shareKeep.GetAllAsync(keepId);
+            var sharedkeep = await _keepShareRepo.GetAllAsync(keepId);
             var collaborator = sharedkeep.Select(x => new Collaborator
             {
                 UserName = x.User.UserName,
@@ -214,14 +200,33 @@ namespace Keeper.Services.Services
 
         public async Task<int> RemoveFromProject(Guid ShareId)
         {
-            var item = await _projectShare.GetAsync(ShareId);
-            return await _projectShare.DeleteAsync(item);
+            var item = await _projectShareRepo.GetAsync(ShareId);
+            return await _projectShareRepo.DeleteAsync(item);
         }
 
         public async Task<int> RemoveFromKeep(Guid shareId)
         {
-            var item = await _shareKeep.GetAsync(shareId);
-            return await _shareKeep.DeleteAsync(item);
+            var item = await _keepShareRepo.GetAsync(shareId);
+            return await _keepShareRepo.DeleteAsync(item);
+        }
+
+        public async Task UpdatePermissionOnProject(List<UpdatePermission> updatePermissionModel)
+        {
+            foreach (var permissionModel in updatePermissionModel)
+            {
+                SharedProjectsModel shareProjectModel = await _projectShareRepo.GetAsync(permissionModel.ShareId);
+                shareProjectModel.Permission = permissionModel.Permission;
+                await _projectShareRepo.UpdateAsync(shareProjectModel);
+            }
+        }
+        public async Task UpdatePermissionOnKeep(List<UpdatePermission> updatePermissionModel)
+        {
+            foreach (var permissionModel in updatePermissionModel)
+            {
+                SharedKeepsModel sharedKeepsModel = await _keepShareRepo.GetAsync(permissionModel.ShareId);
+                sharedKeepsModel.Permission = permissionModel.Permission;
+                await _keepShareRepo.UpdateAsync(sharedKeepsModel);
+            }
         }
     }
 }

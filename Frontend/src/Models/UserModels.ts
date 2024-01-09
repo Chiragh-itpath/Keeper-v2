@@ -9,7 +9,7 @@ interface IRegister extends ILogin {
     confirmPassword: string
 }
 
-interface IPasswordReset extends ILogin {}
+interface IPasswordReset extends ILogin { }
 interface IUser {
     id: string
     email: string

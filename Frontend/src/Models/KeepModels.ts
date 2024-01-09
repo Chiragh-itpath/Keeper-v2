@@ -1,4 +1,5 @@
-import type { IUser } from "./UserModels"
+import type { IUser } from '@/Models/UserModels'
+import type { Permission } from '@/Models/enum'
 
 interface IAddKeep {
     title: string
@@ -19,6 +20,7 @@ interface IKeep extends IAddKeep {
 interface IKeepMembers {
     shareId: string
     isAccepted: boolean
+    permission: Permission
     invitedUser: IUser
 }
 export type { IAddKeep, IEditKeep, IKeep, IKeepMembers }

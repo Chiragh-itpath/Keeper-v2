@@ -5,23 +5,20 @@ import { GlobalStore, ProjectStore } from '@/stores'
 import { TextField } from '@/components/Custom'
 import type { IEditProject, IProject } from '@/Models/ProjectModels'
 
-const props = withDefaults(defineProps<{
-    modelValue: boolean,
-    project?: IProject
-}>(), {
-    modelValue: false
-})
+const props = defineProps<{
+    project: IProject
+}>()
 
 const { UpdateProject } = ProjectStore()
 const { Loading } = storeToRefs(GlobalStore())
 const editProject: IEditProject = reactive({
-    id: '',
-    title: '',
-    description: '',
-    tag: ''
+    id: props.project.id,
+    title: props.project.title,
+    description: props.project.description,
+    tag: props.project.tag
 })
 
-const visible: Ref<boolean> = ref(props.modelValue)
+const visible: Ref<boolean> = ref(false)
 const form = ref()
 
 const submitHandler = async (): Promise<void> => {
@@ -31,26 +28,24 @@ const submitHandler = async (): Promise<void> => {
         visible.value = false
     }
 }
-watch(props, () => {
-    visible.value = props.modelValue
-    if (props.project) {
-        editProject.id = props.project.id
-        editProject.title = props.project.title
-        editProject.description = props.project.description
-        editProject.tag = props.project.tag
-    }
-})
+
 watch(visible, () => {
     if (!visible.value)
-        emits('update:modelValue', visible.value)
+        emits('close')
 })
 const emits = defineEmits<{
-    (e: 'update:modelValue', modelValue: boolean): void
+    (e: 'close'): void
 }>()
 
 </script>
 <template>
     <v-dialog transition="scale-transition" v-model="visible" max-width="700" v-if="project">
+        <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props">
+                <v-icon>mdi-folder-edit-outline</v-icon>
+                <span class="mx-3">Edit</span>
+            </v-list-item>
+        </template>
         <v-card>
             <v-card-title class="text-center bg-primary">
                 Edit Project

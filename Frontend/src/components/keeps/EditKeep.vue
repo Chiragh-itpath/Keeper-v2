@@ -5,23 +5,19 @@ import { GlobalStore, KeepStore } from '@/stores'
 import type { IEditKeep, IKeep } from '@/Models/KeepModels'
 import { storeToRefs } from 'pinia'
 
-const props = withDefaults(defineProps<{
-    modelValue: boolean,
-    keep: IKeep | undefined
-    projectId: string
-}>(), {
-    modelValue: false
-})
+const props = defineProps<{
+    keep: IKeep
+}>()
 
 const { Updatekeep } = KeepStore()
 const { Loading } = storeToRefs(GlobalStore())
 const visible: Ref<boolean> = ref(false)
 const form = ref()
 const editKeep: IEditKeep = reactive({
-    id: '',
-    title: '',
-    tag: '',
-    projectId: ''
+    id: props.keep.id,
+    title: props.keep.title,
+    tag: props.keep.tag,
+    projectId: props.keep.projectId
 })
 
 const submitHandler = async (): Promise<void> => {
@@ -32,27 +28,24 @@ const submitHandler = async (): Promise<void> => {
     }
 }
 
-watch(props, async () => {
-    visible.value = props.modelValue
-    if (props.modelValue && props.keep) {
-        editKeep.id = props.keep.id
-        editKeep.title = props.keep.title
-        editKeep.tag = props.keep.tag
-        editKeep.projectId = props.keep.projectId
-    }
-})
 watch(visible, () => {
     if (!visible.value) {
-        emits('update:modelValue', visible.value)
+        emits('close')
     }
 })
 const emits = defineEmits<{
-    (e: 'update:modelValue', modelValue: boolean): void
+    (e: 'close'): void
 }>()
 </script>
 
 <template>
     <v-dialog transition="scale-transition" v-model="visible" max-width="700" close-on-back>
+        <template v-slot:activator="{ props }">
+            <v-list-item role="button" v-bind="props">
+                <v-icon>mdi-folder-edit-outline</v-icon>
+                <span class="mx-3">Edit</span>
+            </v-list-item>
+        </template>
         <v-card>
             <v-card-title class="text-center bg-primary">
                 Edit keep

@@ -1,4 +1,6 @@
-﻿namespace Keeper.Common.ViewModels
+﻿using Keeper.Common.Enums;
+
+namespace Keeper.Common.ViewModels
 {
     public class AddProject 
     {
@@ -24,6 +26,7 @@
     {
         public Guid? ShareId{ get; set; }
         public bool IsAccepted { get; set; }
+        public Permission Permission { get; set; }
         public UserViewModel InvitedUser { get; set; } = new();
     }
 }

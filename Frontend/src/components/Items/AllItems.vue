@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, type Ref, reactive } from 'vue'
 import { useDate } from 'vuetify'
-import { ItemStore } from '@/stores'
-import { EditItem, InfoItem } from '@/components/Items/'
-import { HoverEffect, DeletePropmt, NoItem } from '@/components/Custom/'
+import { UserStore } from '@/stores'
+import { EditItem, InfoItem, DeleteItem } from '@/components/Items/'
+import { NoItem } from '@/components/Custom/'
 import type { IItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
 import type { IKeep } from '@/Models/KeepModels'
+import { Permission } from '@/Models/enum'
 
 const dateHelper = useDate()
 const props = defineProps<{
@@ -16,22 +17,41 @@ const props = defineProps<{
     keep: IKeep
 }>()
 const itemToDisplay = ref(props.items)
-const { DeleteItem } = ItemStore()
+const { User } = UserStore()
 const id: Ref<string> = ref('')
 
 const visible = reactive<{
-    edit: boolean,
-    delete: boolean,
     info: boolean
 }>({
-    edit: false,
-    delete: false,
     info: false
 })
 
-const deleteHandler = async (): Promise<void> => {
-    await DeleteItem(id.value)
-    visible.delete = false
+
+const canEdit = (index: number): boolean => {
+    if (props.project.createdBy == User.email) return true
+    if (itemToDisplay.value[index].createdBy == User.email) return true
+    const projectUser = props.project.users.find(u => u.invitedUser.id == User.id)
+    if (projectUser) {
+        return projectUser.permission == Permission.EDIT || projectUser.permission == Permission.ALL
+    }
+    const keepUser = props.keep.users.find(u => u.invitedUser.id == User.id)
+    if (keepUser) {
+        return keepUser.permission == Permission.EDIT || keepUser.permission == Permission.ALL
+    }
+    return false
+}
+const canDelete = (index: number): boolean => {
+    if (props.project.createdBy == User.email) return true
+    if (itemToDisplay.value[index].createdBy == User.email) return true
+    const projectUser = props.project.users.find(u => u.invitedUser.id == User.id)
+    if (projectUser) {
+        return projectUser.permission == Permission.ALL
+    }
+    const keepUser = props.keep.users.find(u => u.invitedUser.id == User.id)
+    if (keepUser) {
+        return keepUser.permission == Permission.ALL
+    }
+    return false
 }
 watch(props, () => {
     itemToDisplay.value = props.items.filter(x => {
@@ -43,9 +63,7 @@ watch(props, () => {
 })
 </script>
 <template>
-    <edit-item :id="id" v-model="visible.edit" :project="props.project" :keep="props.keep"></edit-item>
     <info-item :id="id" v-model="visible.info"></info-item>
-    <delete-propmt v-model="visible.delete" @click:yes="deleteHandler" title="Delete Item">Item</delete-propmt>
     <no-item v-if="itemToDisplay.length == 0" title="No Item Found"
         :sub-title="date ? 'No record found on this date' : 'Please click on add button to insert new record'">
     </no-item>
@@ -53,34 +71,18 @@ watch(props, () => {
         <v-hover v-slot="{ isHovering, props }">
             <v-card v-bind="props" :elevation="isHovering ? 8 : 3" @click="() => { visible.info = true; id = item.id }">
                 <v-card-title class="bg-primary d-flex">
-                    <a :href="item.url" class="text-white" target="_blank">
-                        <v-tooltip color="primary">
-                            <template v-slot:activator="{ props }">
-                                <v-chip class="me-4 cursor-pointer" v-bind="props">
-                                    {{ item.type == 0 ? '#' : '!' }} {{ item.number }}
-                                </v-chip>
-                            </template>
-                            {{ item.type == 0 ? 'Ticket' : 'PR' }}
-                        </v-tooltip>
-                    </a>
                     <span class="text-white text-truncate">{{ item.title }}</span>
                     <v-spacer></v-spacer>
-                    <div>
+                    <div v-if="canEdit(index) || canDelete(index)">
                         <v-menu location="bottom" width="250">
-                            <v-list>
-                                <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                    @click="() => { id = item.id; visible.edit = true }">
-                                    <hover-effect icon="file-document-edit-outline" icon-color="edit">
-                                        Edit
-                                    </hover-effect>
-                                </v-list-item>
-                                <v-list-item role="button" class="ma-0 pa-0 mt-2"
-                                    @click="() => { id = item.id; visible.delete = true }">
-                                    <hover-effect icon="delete-outline" icon-color="delete">
-                                        Delete
-                                    </hover-effect>
-                                </v-list-item>
-                            </v-list>
+                            <template v-slot="{ isActive }">
+                                <v-list>
+                                    <edit-item :item="item" :keep="keep" :project="project" v-if="canEdit(index)"
+                                        @close="isActive.value = false" />
+                                    <delete-item :id="item.id" v-if="canDelete(index)"
+                                        @close="isActive.value = false"></delete-item>
+                                </v-list>
+                            </template>
                             <template v-slot:activator="{ props }">
                                 <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
                             </template>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { GlobalStore } from '@/stores';
-import { storeToRefs } from 'pinia';
+import { GlobalStore } from '@/stores'
+import { storeToRefs } from 'pinia'
 import { ref, watch, type Ref } from 'vue'
 
 const props = withDefaults(defineProps<{
-    modelValue: boolean,
+    modelValue?: boolean,
     title?: string,
     subtitle?: string
 }>(), {
@@ -28,6 +28,9 @@ const emits = defineEmits<{
 </script>
 <template>
     <v-dialog v-model="visible" transition="scale-transition" max-width="400">
+        <template v-slot:activator="{ props }">
+            <slot v-bind="{ props }"></slot>
+        </template>
         <v-card>
             <v-card-title class="bg-primary">
                 {{ title }}

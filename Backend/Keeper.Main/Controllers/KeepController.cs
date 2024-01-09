@@ -72,6 +72,15 @@ namespace Keeper.Main.Controllers
             var res = await _inviteService.RemoveFromKeep(shareId);
             return new() { Data = res.ToString() };
         }
-
+        [HttpPut("UpdatePermission")]
+        public async Task<ResponseModel<string>> UpdatePermission(List<UpdatePermission> updateModel)
+        {
+            await _inviteService.UpdatePermissionOnKeep(updateModel);
+            return new()
+            {
+                Message = "Permission updated",
+                Data = "success"
+            };
+        }
     }
 }

@@ -6,31 +6,38 @@ import { AddKeep, AllKeeps } from '@/components/keeps'
 import { DatePicker, TagSelector, NoItem } from '@/components/Custom'
 import { KeepStore, ProjectStore, UserStore } from '@/stores'
 import type { IProject } from '@/Models/ProjectModels'
-
+import { Permission } from '@/Models/enum'
 
 const date = ref()
 const route = useRoute()
 const loading: Ref<boolean> = ref(false)
+const { User } = UserStore()
 const selectedTags: Ref<string[]> = ref([])
 const project: Ref<IProject | undefined> = ref()
 const { Keeps, keepTags } = storeToRefs(KeepStore())
-const showAddButton: Ref<boolean> = ref(false)
 const router = useRouter()
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
 })
 const hasAccess = computed((): boolean => {
-    return (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false)
+    return (
+        (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false) ||
+        Keeps.value.length > 0
+    )
 })
+const canCreate = (): boolean => {
+    if (!project.value) return false
+    if (project.value.createdBy == User.email) return true
+    const projectUser = project.value.users.find(u => u.invitedUser.id == User.id)
+    if (!projectUser) return false
+    return projectUser.permission == Permission.CREATE || projectUser.permission == Permission.ALL
+}
 onMounted(async () => {
     loading.value = true
     await KeepStore().GetKeeps(projectId.value)
     project.value = await ProjectStore().GetSingalProject(projectId.value)
     loading.value = false
-    if (project.value) {
-        showAddButton.value = (project.value.createdBy == UserStore().User.email || project.value.users.some(u => u.invitedUser.id == UserStore().User.id))
-    }
     if (!hasAccess.value) router.go(-1)
 })
 </script>
@@ -64,7 +71,7 @@ onMounted(async () => {
                 <date-picker label="Select a Date" v-model="date"></date-picker>
             </v-col>
             <v-col class="my-auto d-flex justify-end">
-                <add-keep :project-id="projectId" v-if="showAddButton"></add-keep>
+                <add-keep :project-id="projectId" v-if="canCreate()"></add-keep>
             </v-col>
         </v-row>
         <v-row v-if="!loading && project" class="mt-10">

@@ -38,12 +38,10 @@ namespace Keeper.Services.Services
             List<KeepViewModel> keepViews = keeps
                 .Select(item => MapToKeepViewModel(item))
                 .ToList();
-            if (project?.CreatedById == userId)
+
+            foreach (var item in keepViews)
             {
-                foreach (var item in keepViews)
-                {
-                    item.Users = await AllInvitedUser(item.Id);
-                }
+                item.Users = await AllInvitedUser(item.Id);
             }
             return keepViews;
         }
@@ -51,7 +49,9 @@ namespace Keeper.Services.Services
         public async Task<KeepViewModel> GetAsync(Guid id)
         {
             KeepModel result = await _keepRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
-            return MapToKeepViewModel(result);
+            KeepViewModel keep = MapToKeepViewModel(result);
+            keep.Users = await AllInvitedUser(result.Id);
+            return keep;
         }
 
         public async Task<KeepViewModel> AddAsync(AddKeep addKeep, Guid userId)
@@ -122,6 +122,7 @@ namespace Keeper.Services.Services
                 {
                     ShareId = share.Id,
                     IsAccepted = share.IsAccepted,
+                    Permission = share.Permission,
                     InvitedUser = _userService.MapToUserVM(share.User)
                 })
                 .ToList();

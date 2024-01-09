@@ -80,7 +80,7 @@ const routes: RouteRecordRaw[] = [
         name: RouterEnum.PAGE_NOT_FOUND
     },
     {
-        path: '/Project/',
+        path: '/Project',
         name: RouterEnum.PROJECT,
         components: {
             default: ProjectPage,

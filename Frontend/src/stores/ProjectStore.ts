@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { IProject, IAddProject, IEditProject } from '@/Models/ProjectModels'
 import { ProjectService } from '@/Services/ProjectService'
 import { useToster } from '@/composable/useToaster'
+import type { IUpdatePermission } from '@/Models/InviteModels'
 
 const ProjectStore = defineStore('ProjectStore', () => {
     const projectService = new ProjectService()
@@ -58,9 +59,34 @@ const ProjectStore = defineStore('ProjectStore', () => {
         }
     }
 
-    const RemoveUser = async (id: string): Promise<boolean> =>
-        (await projectService.RemoveFromProject(id)) != null
+    const RemoveUser = async (id: string, projectId: string): Promise<boolean> => {
+        const res = await projectService.RemoveFromProject(id)
+        if (res) {
+            const project = Projects.value.find(x => x.id == projectId)
+            if (project) {
+                project.users.splice(project.users.findIndex(x => x.shareId == id), 1)
+            }
+            return true
+        }
+        return false
+    }
 
+    const UpdatePermissions = async (updatePermissions: IUpdatePermission[], projectId: string) => {
+        const res = await projectService.UpdatePermission(updatePermissions)
+        if (res) {
+            const index = Projects.value.findIndex(x => x.id == projectId)
+            if (index != -1) {
+                const users = Projects.value[index].users
+                Projects.value[index].users = users.map(x => {
+                    const update = updatePermissions.find(up => up.shareId == x.shareId)
+                    if (update) {
+                        return { ...x, permission: update.permission }
+                    }
+                    return x
+                })
+            }
+        }
+    }
     return {
         Projects,
         ProjectTags,
@@ -70,7 +96,8 @@ const ProjectStore = defineStore('ProjectStore', () => {
         DeleteProject,
         GetProjects,
         GetInvitedMembers,
-        RemoveUser
+        RemoveUser,
+        UpdatePermissions
     }
 })
 
