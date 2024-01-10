@@ -22,6 +22,7 @@ const projectId = computed(() => {
 })
 const hasAccess = computed((): boolean => {
     return (
+        project.value?.createdBy == User.email ||
         (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false) ||
         Keeps.value.length > 0
     )
