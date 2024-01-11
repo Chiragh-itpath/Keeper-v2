@@ -37,11 +37,11 @@ namespace Keeper.Repos.Repositories
                 .ToListAsync();
         }
 
-        public async Task<SharedProjectsModel> GetAsync(Guid id)
+        public async Task<SharedProjectsModel?> GetByIdAsync(Guid id)
         {
             return await _db.SharedProjects
                 .Where(x => x.Id == id)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<SharedProjectsModel> UpdateAsync(SharedProjectsModel share)

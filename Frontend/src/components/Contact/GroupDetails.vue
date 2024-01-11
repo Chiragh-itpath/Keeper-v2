@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import { ContactStore, GlobalStore, GroupStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import type { IGroup } from '@/Models/GroupModels'
 import { AllContacts } from '@/components/Contact/'
-import { computed } from 'vue'
-import { watch } from 'vue'
+
 
 const { AddContacts } = GroupStore()
 const { Contacts } = storeToRefs(ContactStore())

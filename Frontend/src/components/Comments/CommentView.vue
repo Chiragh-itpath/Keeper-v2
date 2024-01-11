@@ -31,5 +31,6 @@ defineProps<{
 .border {
     border: none !important;
     border-left: 2px solid grey !important;
+    border-top-left-radius: 0 !important;
 }
 </style>

@@ -45,7 +45,7 @@ namespace Keeper.Repos.Repositories
                 .Include(p => p.Tag)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.UpdatedBy)
-                .Where(p => p.Id == Id)
+                .Where(p => p.Id == Id && !p.IsDeleted)
                 .FirstOrDefaultAsync();
         }
 

@@ -21,9 +21,9 @@ namespace Keeper.Common.ViewModels
         public Guid InviteId { get; set; }
         public bool Response { get; set; }
     }
-
     public class CommonInvitedModel
     {
+        public Guid InviteId { get; set; }
         public string Name { get; set; } = default!;
         public string Email { get; set; } = default!;
     }
@@ -31,7 +31,7 @@ namespace Keeper.Common.ViewModels
     {
         public Guid ProjectId { get; set; }
     }
-    public class InviteKeepModel : CommonInvitedModel
+    public class InviteKeepModel : InvitedProjectModel
     {
         public Guid KeepId { get; set; }
     }

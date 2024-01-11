@@ -13,6 +13,7 @@ namespace Keeper.Services.Services
     public class MailService : IMailService
     {
         private readonly MailSettings _mailSettings;
+        private readonly static string _siteUrl = "http://ipskeeper.project-demo.info:8073/";
         public MailService(IOptions<MailSettings> mailSettings)
         {
             _mailSettings = mailSettings.Value;
@@ -39,7 +40,7 @@ namespace Keeper.Services.Services
             messageBody.Append("<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 1000px;overflow: auto;line-height: 2;\">");
             messageBody.Append("<div style=\"margin: 50px auto; width: 70%; padding: 20px 0\">");
             messageBody.Append("<div style=\"border-bottom: 1px solid #eee\">");
-            messageBody.Append("<a href=\"http://localhost:5173/\" target=\"_blank\"  ");
+            messageBody.Append($"<a href=\"{_siteUrl}\" target=\"_blank\"  ");
             messageBody.Append("style=\"font-size: 1.4em; color: #4db6ac;text-decoration: none; font-weight: 600;\">Keeper</a></div>");
             messageBody.Append("<p style=\"text-align: center; font-size: 30px;\">");
             messageBody.Append($"<b>{subject}</b></p>");
@@ -50,7 +51,7 @@ namespace Keeper.Services.Services
                 messageBody.Append("has invited you to collaborate on");
                 messageBody.Append($"<span style=\"color: #4db6ac\"> {extra} </span> </p> ");
                 messageBody.Append("<p>Please Check your notification on &nbsp");
-                messageBody.Append("<a href=\"http://localhost:5173/\" target=\"_blank\" style=\"color: #4db6ac;\" >Site</a></p>");
+                messageBody.Append($"<a href=\"{_siteUrl}\" target=\"_blank\" style=\"color: #4db6ac;\" >Keeper</a></p>");
             }
             if (category == MailCategory.AcceptInvitation)
             {

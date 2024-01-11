@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { ref, watch, type Ref } from 'vue'
 import type { IProject } from '@/Models/ProjectModels'
 import { useDate } from 'vuetify'
-import { watch } from 'vue';
 
 defineProps<{
     project: IProject
@@ -44,6 +43,10 @@ watch(visible, () => {
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
                         <v-chip color="primary" v-if="project.tag">{{ project.tag }}</v-chip>
                         <span v-else>-</span>
+                    </v-col>
+                    <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Members:</v-col>
+                    <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
+                        {{ project.users.length }}
                     </v-col>
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Owner:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">

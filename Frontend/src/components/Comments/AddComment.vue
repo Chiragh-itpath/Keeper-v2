@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import TextField from '@/components/Custom/TextField.vue'
-import { GlobalStore, ItemStore, UserStore } from '@/stores';
+import { GlobalStore, ItemStore, UserStore } from '@/stores'
 import type { IComment } from '@/Models/CommentModel'
-import { storeToRefs } from 'pinia';
 
 const props = withDefaults(defineProps<{
     itemId: string
@@ -29,7 +29,6 @@ const submitHandler = async () => {
         res.user = User.userName
         emits('latestComment', res)
         form.value.reset()
-
     }
 }
 const emits = defineEmits<{
@@ -37,11 +36,9 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <div>
-        <v-form ref="form" validate-on="submit" class="d-flex mt-5" @submit.prevent="submitHandler">
-            <text-field v-model="comment" is-required label="Add your comment"></text-field>
-            <v-btn icon="mdi-arrow-up" class="ms-4 mt-1" color="primary" @click="submitHandler" :loading="Loading"
-                :disabled="Loading"></v-btn>
-        </v-form>
-    </div>
+    <v-form ref="form" validate-on="submit" class="d-flex mt-5" @submit.prevent="submitHandler">
+        <text-field v-model="comment" is-required label="Add your comment"></text-field>
+        <v-btn icon="mdi-arrow-up" class="ms-4 mt-1" color="primary" @click="submitHandler" :loading="Loading"
+            :disabled="Loading"></v-btn>
+    </v-form>
 </template>
