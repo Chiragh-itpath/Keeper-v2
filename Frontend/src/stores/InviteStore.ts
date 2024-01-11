@@ -20,11 +20,11 @@ const InviteStore = defineStore('inviteStore', () => {
             InvitedProjectList.value = response
         }
     }
-    const ProjectInviteResponse = async (inviteId: string, inviteResponse: boolean) => {
-        await inviteService.ResponseToProjectInvite({
+    const ProjectInviteResponse = async (inviteId: string, inviteResponse: boolean): Promise<boolean> => {
+        return (await inviteService.ResponseToProjectInvite({
             inviteId,
             response: inviteResponse
-        })
+        })) != null
     }
     const FetchInvitedKeeps = async () => {
         const response = await inviteService.GetAllInvitedKeeps()
@@ -39,11 +39,11 @@ const InviteStore = defineStore('inviteStore', () => {
             users
         })
     }
-    const keepInviteResponse = async (inviteId: string, inviteResponse: boolean) => {
-        await inviteService.ResponseToKeepInvite({
+    const keepInviteResponse = async (inviteId: string, inviteResponse: boolean): Promise<boolean> => {
+        return (await inviteService.ResponseToKeepInvite({
             inviteId,
             response: inviteResponse
-        })
+        })) != null
     }
     return {
         InvitedProjectList,

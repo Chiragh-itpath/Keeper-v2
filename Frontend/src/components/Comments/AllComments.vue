@@ -7,11 +7,9 @@ const props = defineProps<{
     itemId: string,
     comments: IComment[]
 }>()
-
 const allComments: Ref<IComment[]> = ref(props.comments)
 </script>
 <template>
-    <v-card-title class="text-body-2 px-0">Comments:</v-card-title>
     <div class="mt-5">
         <add-comment :item-id="itemId" @latest-comment="(comment) => { allComments.unshift(comment) }"></add-comment>
     </div>

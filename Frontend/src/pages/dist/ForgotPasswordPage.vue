@@ -3,7 +3,7 @@ import { ref, type Ref } from 'vue'
 import VerifyEmail from '@/components/VerifyEmail.vue'
 import VerifyOtp from '@/components/VerifyOtp.vue'
 import ResetPassword from '@/components/ResetPassword.vue'
-import { AccountStore } from '@/stores';
+import { AccountStore } from '@/stores'
 
 const email: Ref<string> = ref('')
 const otp: Ref<string> = ref('')

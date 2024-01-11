@@ -2,16 +2,16 @@ import type { IUser } from '@/Models/UserModels'
 import type { Permission } from '@/Models/enum'
 
 interface IInvited {
+    inviteId: string
     name: string
     email: string
-}
-interface IInvitedKeep extends IInvited {
-    keepId: string
 }
 interface IInvitedProject extends IInvited {
     projectId: string
 }
-
+interface IInvitedKeep extends IInvitedProject {
+    keepId: string
+}
 interface IProjectInvite {
     projectId: string
     users: IUser[]

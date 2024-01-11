@@ -30,7 +30,7 @@ const emits = defineEmits<{
                 <span class="mx-3">Info</span>
             </v-list-item>
         </template>
-        <v-card max-height="400" class="overflow-auto">
+        <v-card class="overflow-auto">
             <v-card-title class="text-center bg-primary">
                 Keep Details
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
@@ -47,7 +47,10 @@ const emits = defineEmits<{
                         </v-chip>
                         <span class="text-grey" v-else>-</span>
                     </v-col>
-
+                    <v-col cols="6" class="text-grey pb-0 pb-sm-3">Members:</v-col>
+                    <v-col cols="6" class="pb-0 pb-sm-3">
+                        {{ keep.users.length }}
+                    </v-col>
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Owner:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
                         {{ keep.createdBy }}

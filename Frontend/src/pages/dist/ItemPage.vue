@@ -26,9 +26,13 @@ const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
 })
+const filter = ref([])
 const hasAccess = computed((): boolean => {
-    return (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false) ||
-        (keep.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false)
+    return (
+        (project.value?.createdBy == User.email) ||
+        (project.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false) ||
+        (keep.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false)
+    )
 })
 const breadcrumbsItems = [
     {
@@ -58,15 +62,14 @@ const canCreate = (): boolean => {
         keepUser?.permission == Permission.CREATE ||
         keepUser?.permission == Permission.ALL
     )
-
 }
 onMounted(async () => {
     loading.value = true
     await GetAllItems(keepId.value)
     project.value = await ProjectStore().GetSingalProject(projectId.value)
     keep.value = await KeepStore().getSingleKeep(keepId.value)
-    loading.value = false
     if (!hasAccess.value) router.go(-1)
+    else loading.value = false
 })
 
 </script>
@@ -77,19 +80,38 @@ onMounted(async () => {
                 <v-skeleton-loader type="text,image,actions"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading && project && keep">
+        <v-row v-if="!loading && project && keep" class="align-center">
             <v-col cols="12">
                 <v-breadcrumbs divider="/" :items="breadcrumbsItems"></v-breadcrumbs>
             </v-col>
-            <v-col>
+            <v-col cols="auto">
                 <date-picker label="Select a date" v-model="date"></date-picker>
             </v-col>
-            <v-col class="my-auto d-flex justify-end">
+            <v-col>
+                <v-menu :transition="false">
+                    <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" color="primary" variant="outlined" class="rounded-lg" width="120"
+                            append-icon="mdi-menu-down" v-if="filter.length == 0">
+                            Item Type
+                        </v-btn>
+                        <v-btn color="primary" variant="outlined" class="rounded-lg" width="120" v-else>
+                            <template v-slot:append>
+                                <v-icon @click="filter = []" class="ms-end">mdi-close</v-icon>
+                            </template>
+                            {{ filter[0] == 0 ? 'Ticket' : 'PR' }}
+                        </v-btn>
+                    </template>
+                    <v-list v-model:selected="filter" select-strategy="single-independent"
+                        :items="[{ title: 'Ticket', value: 0 }, { title: 'PR', value: 1 }]">
+                    </v-list>
+                </v-menu>
+            </v-col>
+            <v-col cols="auto">
                 <add-item :keep="keep" :project="project" v-if="canCreate()"></add-item>
             </v-col>
         </v-row>
         <v-row v-if="!loading && project && keep">
-            <all-items :items="Items" :date="date" :project="project" :keep="keep"></all-items>
+            <all-items :items="Items" :date="date" :project="project" :keep="keep" :filter="filter[0]"></all-items>
         </v-row>
         <v-row v-if="!loading && (!project || !keep)">
             <no-item :title="!project ? 'No Project found with this id' : 'No Keep found with this id'"></no-item>

@@ -6,7 +6,7 @@ import type { ItemType } from '@/Models/types'
 import type { IAddItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
 import type { IKeep } from '@/Models/KeepModels'
-
+import { fileRule } from '@/data/ValidationRules'
 const props = defineProps<{
     keep: IKeep,
     project: IProject
@@ -64,7 +64,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true">
+    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true" class="ms-auto">
         New Item
     </v-btn>
     <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="800">
@@ -99,8 +99,9 @@ watch(visible, () => {
                                 <text-editor v-model="addItem.description"></text-editor>
                             </v-col>
                             <v-col cols="12">
-                                <v-file-input color="primary" v-model="addItem.files" prepend-inner-icon="mdi-paperclip"
-                                    prepend-icon="" />
+                                <v-file-input color="primary" v-model="addItem.files" label="Select Files"
+                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips :rules="[fileRule]">
+                                </v-file-input>
                             </v-col>
                         </v-row>
                         <v-row>

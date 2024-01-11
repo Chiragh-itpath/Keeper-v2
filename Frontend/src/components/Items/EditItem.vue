@@ -6,9 +6,9 @@ import type { IEditItem, IItem } from '@/Models/ItemModels'
 import type { ItemType } from '@/Models/types'
 import type { IProject } from '@/Models/ProjectModels'
 import type { IKeep } from '@/Models/KeepModels'
-
+import { fileRule } from '@/data/ValidationRules'
 const props = withDefaults(defineProps<{
-    modelValue: boolean,
+    modelValue?: boolean,
     item: IItem
     project: IProject,
     keep: IKeep
@@ -31,8 +31,7 @@ const editItem: IEditItem = reactive({
     files: null
 })
 const { EditItem } = ItemStore()
-const itemType: Ref<ItemType> = ref('Ticket')
-
+const itemType: Ref<ItemType> = ref(props.item.type == 0 ? 'Ticket' : 'PR')
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
     if (!valid) return
@@ -104,8 +103,9 @@ const emits = defineEmits<{
                                 <text-editor v-model="editItem.description" />
                             </v-col>
                             <v-col cols="12">
-                                <v-file-input color="primary" v-model="editItem.files" prepend-inner-icon="mdi-paperclip"
-                                    prepend-icon="" />
+                                <v-file-input color="primary" v-model="editItem.files" label="Select Files"
+                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
+                                    :rules="[fileRule]" />
                             </v-col>
                         </v-row>
                         <v-row>
@@ -142,4 +142,3 @@ const emits = defineEmits<{
         </v-card>
     </v-dialog>
 </template>
-<style></style>

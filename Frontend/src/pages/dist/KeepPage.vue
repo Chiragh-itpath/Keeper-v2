@@ -6,7 +6,7 @@ import { AddKeep, AllKeeps } from '@/components/keeps'
 import { DatePicker, TagSelector, NoItem } from '@/components/Custom'
 import { KeepStore, ProjectStore, UserStore } from '@/stores'
 import type { IProject } from '@/Models/ProjectModels'
-import { Permission } from '@/Models/enum'
+import { Permission, RouterEnum } from '@/Models/enum'
 
 const date = ref()
 const route = useRoute()
@@ -22,9 +22,9 @@ const projectId = computed(() => {
 })
 const hasAccess = computed((): boolean => {
     return (
-        project.value?.createdBy == User.email ||
+        (project.value?.createdBy == User.email) ||
         (project.value?.users.some(u => u.invitedUser.id == UserStore().User.id) ?? false) ||
-        Keeps.value.length > 0
+        (Keeps.value.length > 0)
     )
 })
 const canCreate = (): boolean => {
@@ -38,8 +38,8 @@ onMounted(async () => {
     loading.value = true
     await KeepStore().GetKeeps(projectId.value)
     project.value = await ProjectStore().GetSingalProject(projectId.value)
-    loading.value = false
-    if (!hasAccess.value) router.go(-1)
+    if (!hasAccess.value) router.push({ name: RouterEnum.PROJECT })
+    else loading.value = false
 })
 </script>
 <template>

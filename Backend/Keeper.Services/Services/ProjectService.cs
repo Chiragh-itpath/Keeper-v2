@@ -90,6 +90,10 @@ namespace Keeper.Services.Services
             {
                 TagModel? tag = await _tagService.AddAsync(editProject.Tag, project.CreatedById, TagType.PROJECT);
                 project.TagId = tag?.Id;
+            } 
+            else
+            {
+                project.TagId = null;
             }
             Guid projectId = await _projectRepo.UpdateAsync(project);
             ProjectViewModel projectView = await GetByIdAsync(projectId, userId);
