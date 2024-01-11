@@ -86,6 +86,10 @@ namespace Keeper.Services.Services
                 ProjectModel? project = await _projectRepo.GetByIdAsync(editKeep.ProjectId);
                 TagModel? tag = await _tagService.AddAsync(editKeep.Tag, project!.CreatedById, TagType.KEEP);
                 keep.TagId = tag?.Id;
+            } 
+            else
+            {
+                keep.TagId = null;
             }
             var keepId = await _keepRepo.UpdateAsync(keep);
             var res = await GetAsync(keepId);

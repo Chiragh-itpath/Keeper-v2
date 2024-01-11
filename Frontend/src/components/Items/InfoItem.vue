@@ -68,7 +68,7 @@ const emits = defineEmits<{
                         <v-tab value="logs">logs</v-tab>
                     </v-tabs>
                 </div>
-                <v-card height="450" max-height="450" class="overflow-y-auto mx-2 pa-5 " elevation="0">
+                <v-card height="450" max-height="450" class="overflow-y-auto mx-2 pa-3 " elevation="0">
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
                             <div>
@@ -92,7 +92,7 @@ const emits = defineEmits<{
                                 <v-col v-for="(file, index) in Item.files" :key="index" cols="auto">
                                     <v-card max-width="200" color="primary" variant="tonal"
                                         class="d-flex justify-center align-center pa-3">
-                                        <v-tooltip>
+                                        <v-tooltip location="top">
                                             <template v-slot:activator="{ props }">
                                                 <span class="text-black text-truncate" v-bind="props">
                                                     {{ file.fileName }}
@@ -100,7 +100,7 @@ const emits = defineEmits<{
                                             </template>
                                             {{ file.fileName }}
                                         </v-tooltip>
-                                        <v-icon class="" @click="() => downloadFile(file.fileUrl)">mdi-download</v-icon>
+                                        <v-icon @click="() => downloadFile(file.fileUrl)">mdi-download</v-icon>
                                     </v-card>
                                 </v-col>
                             </v-row>

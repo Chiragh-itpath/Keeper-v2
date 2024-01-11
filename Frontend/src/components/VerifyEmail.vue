@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { onMounted, ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import TextField from '@/components/Custom/TextField.vue'
 import { UserStore, GlobalStore } from '@/stores'
-import { watch } from 'vue';
+
 
 defineProps<{
     modelValue: string
@@ -31,6 +31,9 @@ watch(email, () => {
     if (email.value) {
         emit('update:modelValue', email.value.trim())
     }
+})
+onMounted(() => {
+    errors.value = {}
 })
 </script>
 <template>

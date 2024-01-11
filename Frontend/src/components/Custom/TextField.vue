@@ -6,8 +6,7 @@ import {
     requiredRule,
     urlRules
 } from '@/data/ValidationRules'
-import { watch } from 'vue';
-import { ref, type Ref } from 'vue'
+import { ref, watch, type Ref } from 'vue'
 
 type TRule = (arg: string) => boolean | string
 

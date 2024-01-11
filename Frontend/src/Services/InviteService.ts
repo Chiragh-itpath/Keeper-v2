@@ -12,8 +12,8 @@ export class InviteService {
     public InviteToProject = async (projectInvite: IProjectInvite): Promise<void> => {
         await http.post(`${this.baseUrl}/InviteToProject`, projectInvite)
     }
-    public ResponseToProjectInvite = async (inviteResponse: InviteResponse): Promise<void> => {
-        await http.post(`${this.baseUrl}/ProjectInviteResponse`, inviteResponse)
+    public ResponseToProjectInvite = async (inviteResponse: InviteResponse): Promise<string | null> => {
+        return await http.post(`${this.baseUrl}/ProjectInviteResponse`, inviteResponse)
     }
     public GetAllInvitedProject = async (): Promise<IInvitedProject[] | null> => {
         const response: IInvitedProject[] = await http.get(`${this.baseUrl}/AllInvitedProjects`)
@@ -22,8 +22,8 @@ export class InviteService {
     public InviteToKeep = async (keepInvite: IKeepInvite): Promise<void> => {
         await http.post(`${this.baseUrl}/InviteToKeep`, keepInvite)
     }
-    public ResponseToKeepInvite = async (inviteResponse: InviteResponse): Promise<void> => {
-        await http.post(`${this.baseUrl}/keepInviteResponse`, inviteResponse)
+    public ResponseToKeepInvite = async (inviteResponse: InviteResponse): Promise<string | null> => {
+        return await http.post(`${this.baseUrl}/keepInviteResponse`, inviteResponse)
     }
     public GetAllInvitedKeeps = async (): Promise<IInvitedKeep[] | null> => {
         const response: IInvitedKeep[] = await http.get(`${this.baseUrl}/InvitedKeeps`)

@@ -49,10 +49,11 @@ namespace Keeper.Main.Controllers
             ClaimsIdentity user = User.Identities.First();
             List<Claim> claims = user.Claims.ToList();
             Guid userId = Guid.Parse(claims.ElementAt(3).Value);
-            bool res = await _invite.ResponseToProjectInvite(response, userId);
+            var res = await _invite.ResponseToProjectInvite(response, userId);
             return new()
             {
-                Message = $"Inviation {(res ? "Accepted" : "Declied")}"
+                Message = $"Inviation {(res ? "Accepted" : "Declied")}",
+                Data = $"{res}"
             };
         }
         [HttpPost("InviteToKeep")]
@@ -85,10 +86,11 @@ namespace Keeper.Main.Controllers
             ClaimsIdentity user = User.Identities.First();
             List<Claim> claims = user.Claims.ToList();
             Guid userId = Guid.Parse(claims.ElementAt(3).Value);
-            bool res = await _invite.ResponseToKeepInvite(response, userId);
+            var res = await _invite.ResponseToKeepInvite(response, userId);
             return new()
             {
-                Message = $"Inviation {(res ? "Accepted" : "Declied")}"
+                Message = $"Inviation {(res ? "Accepted" : "Declied")}",
+                Data = $"{res}"
             };
         }
     }

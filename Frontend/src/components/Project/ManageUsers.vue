@@ -93,7 +93,7 @@ const emits = defineEmits<{
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
-                <v-list min-height="100" max-height="500" v-if="InvitedUsers.length > 0">
+                <v-list min-height="300" max-height="500" v-if="InvitedUsers.length > 0">
                     <v-list-item class="px-2 mb-3">
                         <template v-slot:append>
                             <v-sheet width="120" class="px-0">

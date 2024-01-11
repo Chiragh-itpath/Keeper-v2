@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, type Ref } from 'vue'
+import { ref, reactive, type Ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { RouterEnum } from '@/Models/enum'
 import { TextField } from '@/components/Custom'
@@ -30,7 +30,9 @@ async function register(): Promise<void> {
     if (!valid) return
     await registerUser(SignUpForm)
 }
-
+onMounted(() => {
+    errors.value = {}
+})
 </script>
 <template>
     <v-container fluid class="my-10 mb-md-0">

@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { GlobalStore, InviteStore } from '@/stores'
+import { useRoute } from 'vue-router'
+import { GlobalStore, InviteStore, ProjectStore } from '@/stores'
+import type { IInvitedKeep, IInvitedProject } from '@/Models/InviteModels'
+import { RouterEnum } from '@/Models/enum'
 
 const menu: Ref<boolean> = ref(false)
+const route = useRoute()
 const { NotificationCount, Loading } = storeToRefs(GlobalStore())
 const { InvitedProjectList, InvitedKeepList } = storeToRefs(InviteStore())
 const {
@@ -12,37 +16,33 @@ const {
     FetchInvitedProjects,
     FetchInvitedKeeps
 } = InviteStore()
-const selectedIndex: Ref<undefined | number> = ref()
+const { GetSingalProject } = ProjectStore()
+const selectedIndex: Ref<undefined | string> = ref()
 
-const onProjectInviteAccept = async (id: string, index: number): Promise<void> => {
-    selectedIndex.value = index
-    await ProjectInviteResponse(id, true)
-    InvitedProjectList.value = InvitedProjectList.value.filter(x => x.projectId != id)
-    menu.value = false
+const onProjectInviteReponse = async (invite: IInvitedProject, response: boolean): Promise<void> => {
+    if (Loading.value) return
+    selectedIndex.value = invite.inviteId
+    const res = await ProjectInviteResponse(invite.inviteId, response)
+    if (res) {
+        if (route.name == RouterEnum.PROJECT && response) {
+            await GetSingalProject(invite.projectId)
+        }
+        InvitedProjectList.value = InvitedProjectList.value.filter(x => x.inviteId != invite.inviteId)
+        menu.value = false
+    }
     selectedIndex.value = undefined
 }
-const onProjectInviteDecline = async (id: string, index: number): Promise<void> => {
+const onKeepInviteResponse = async (invite: IInvitedKeep, response: boolean) => {
     if (Loading.value) return
-    selectedIndex.value = index
-    await ProjectInviteResponse(id, false)
-    InvitedProjectList.value = InvitedProjectList.value.filter(x => x.projectId != id)
-    menu.value = false
-    selectedIndex.value = undefined
-}
-const onKeepInviteAccept = async (id: string, index: number): Promise<void> => {
-    if (Loading.value) return
-    selectedIndex.value = index
-    await keepInviteResponse(id, true)
-    InvitedKeepList.value = InvitedKeepList.value.filter(x => x.keepId != id)
-    menu.value = false
-    selectedIndex.value = undefined
-}
-const onKeepInviteDecline = async (id: string, index: number): Promise<void> => {
-    if (Loading.value) return
-    selectedIndex.value = index
-    await keepInviteResponse(id, false)
-    InvitedKeepList.value = InvitedKeepList.value.filter(x => x.keepId != id)
-    menu.value = false
+    selectedIndex.value = invite.inviteId
+    const res = await keepInviteResponse(invite.inviteId, true)
+    if (res) {
+        if (route.name == RouterEnum.PROJECT && response) {
+            await GetSingalProject(invite.projectId)
+        }
+        InvitedKeepList.value = InvitedKeepList.value.filter(x => x.inviteId != invite.inviteId)
+        menu.value = false
+    }
     selectedIndex.value = undefined
 }
 onMounted(async (): Promise<void> => {
@@ -78,14 +78,14 @@ onMounted(async (): Promise<void> => {
                     </v-card-text>
                     <v-card-actions class="d-flex justify-end ma-0 pa-0 px-3 ">
                         <v-progress-circular indeterminate color="primary"
-                            v-if="Loading && selectedIndex == index"></v-progress-circular>
+                            v-if="Loading && selectedIndex == notification.inviteId"></v-progress-circular>
                         <template v-else>
                             <v-icon color="green" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
-                                class="mx-4" @click="onProjectInviteAccept(notification.projectId, index)">
+                                class="mx-4" @click="onProjectInviteReponse(notification, true)">
                                 mdi-check-circle-outline
                             </v-icon>
                             <v-icon color="red" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
-                                @click="onProjectInviteDecline(notification.projectId, index)">
+                                @click="onProjectInviteReponse(notification, false)">
                                 mdi-close-circle-outline
                             </v-icon>
                         </template>
@@ -106,14 +106,14 @@ onMounted(async (): Promise<void> => {
                     </v-card-text>
                     <v-card-actions class="d-flex justify-end ma-0 pa-0 px-3 ">
                         <v-progress-circular indeterminate color="primary"
-                            v-if="Loading && selectedIndex == index"></v-progress-circular>
+                            v-if="Loading && selectedIndex == notification.inviteId"></v-progress-circular>
                         <template v-else>
                             <v-icon color="green" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
-                                class="mx-4" @click="onKeepInviteAccept(notification.keepId, index)">
+                                class="mx-4" @click="onKeepInviteResponse(notification, true)">
                                 mdi-check-circle-outline
                             </v-icon>
                             <v-icon color="red" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
-                                @click="onKeepInviteDecline(notification.keepId, index)">
+                                @click="onKeepInviteResponse(notification, false)">
                                 mdi-close-circle-outline
                             </v-icon>
                         </template>
