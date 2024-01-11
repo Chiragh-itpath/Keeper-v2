@@ -94,16 +94,15 @@ const emits = defineEmits<{
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
-                <v-list-item class="px-1 mb-2">
-                    <template v-slot:append>
-                        <v-sheet width="120">
-                            <v-select density="compact" color="primary" hide-details :items="permissions"
-                                v-model="permissionForAll"></v-select>
-                        </v-sheet>
-                    </template>
-                </v-list-item>
-                <v-list min-height="100" max-height="500" v-if="InvitedUsers.length > 0">
-
+                <v-list min-height="300" max-height="500" v-if="InvitedUsers.length > 0">
+                    <v-list-item class="px-1 mb-2">
+                        <template v-slot:append>
+                            <v-sheet width="120">
+                                <v-select density="compact" color="primary" hide-details :items="permissions"
+                                    v-model="permissionForAll"></v-select>
+                            </v-sheet>
+                        </template>
+                    </v-list-item>
                     <template v-for="(user, index) in InvitedUsers" :key="index">
                         <v-list-item class="border rounded-lg py-2 mb-2" :title="user.invitedUser.userName"
                             :subtitle="user.invitedUser.email">
