@@ -50,6 +50,12 @@ namespace Keeper.Main.Controllers
             var res = await _itemService.UpdateAsync(editItem, userId);
             return new ResponseModel<ItemViewModel> { Data = res };
         }
+        [HttpPut("UpdateStatus")]
+        public async Task<ResponseModel<string>> UpdateStatus(UpdateItemStatus newStatusDetails)
+        {
+            await _itemService.UpdateStatus(newStatusDetails);
+            return new() { Data = "true" };
+        }
         [HttpDelete("{Id}")]
         public async Task<ResponseModel<string>> Delete(Guid id)
         {

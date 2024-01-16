@@ -135,12 +135,7 @@ const emits = defineEmits<{
         </v-card>
     </v-dialog>
 </template>
-<style scoped>
-.v-col-4,
-.v-col-8 {
-    padding: 8px 12px;
-}
-
+<style>
 .description {
     min-height: 150px;
     max-height: 300px;
@@ -149,7 +144,8 @@ const emits = defineEmits<{
     overflow-x: auto;
 }
 
-.scroll-y-reverse-transition {
-    transition-duration: 1s !important;
+.description>div>ol,
+.description>div>ul {
+    margin: 0 15px;
 }
 </style>

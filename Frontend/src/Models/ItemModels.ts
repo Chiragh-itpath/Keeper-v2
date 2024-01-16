@@ -1,5 +1,6 @@
 import type { IComment } from './CommentModel'
 import type { ItemType } from '@/Models/types'
+import type { ItemStatus } from '@/Models/enum'
 type NullableString = string | undefined
 
 interface CommonItem {
@@ -29,6 +30,7 @@ interface IItem extends CommonItem {
     createdOn: string
     updatedBy: NullableString
     updatedOn: NullableString
+    status: ItemStatus
     files: FileModel[]
     comments: IComment[]
 }

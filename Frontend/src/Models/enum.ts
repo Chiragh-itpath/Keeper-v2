@@ -21,10 +21,19 @@ const enum StatusType {
     PASSWORD_NOT_MATCHED,
     INTERNAL_SERVER_ERROR
 }
+
 const enum Permission {
     VIEW,
     EDIT,
     CREATE,
     ALL
 }
-export { RouterEnum, StatusType, Permission }
+
+const enum ItemStatus {
+    NEW,
+    PENDING,
+    FOLLOW_UP,
+    COMPLETED,
+    RE_OPEN
+}
+export { RouterEnum, StatusType, Permission, ItemStatus }

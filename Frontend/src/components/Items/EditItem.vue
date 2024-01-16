@@ -67,10 +67,10 @@ const emits = defineEmits<{
 <template>
     <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="800">
         <template v-slot:activator="{ props }">
-            <v-list-item role="button" v-bind="props">
+            <v-list-item v-bind="props">
                 <v-icon>mdi-folder-edit-outline</v-icon>
                 <span class="mx-3">Edit</span>
-            </v-list-item>
+            </v-list-item> 
         </template>
         <v-card class="position-relative">
             <v-card-title class="bg-primary text-center position-sticky">

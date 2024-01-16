@@ -30,7 +30,13 @@ namespace Keeper.Common.ViewModels
         public DateTime? UpdatedOn { get; set; }
         public string CreatedBy { get; set; } = default!;
         public string? UpdatedBy { get; set; }
+        public ItemStatus Status { get; set; }
         public List<FileViewModel>? Files { get; set; }
         public List<CommentViewModel>? Comments { get; set; }
+    }
+    public class UpdateItemStatus
+    {
+        public Guid Id { get; set; }
+        public ItemStatus Status { get; set; }
     }
 }

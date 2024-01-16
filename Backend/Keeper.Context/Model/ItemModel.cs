@@ -17,6 +17,7 @@ namespace Keeper.Context.Model
         public string Number { get; set; } = default!;
         public string? To { get; set; }
         public string? DiscussedBy { get; set; }
+        public ItemStatus Status { get; set; } = ItemStatus.NEW;
         public bool IsDeleted { get; set; } = false;
         [ForeignKey("KeepId")]
         public Guid KeepId { get; set; }

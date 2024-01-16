@@ -8,7 +8,10 @@ import Toster from '@/components/VToster.vue'
         <router-view name="NavBar" />
         <router-view name="SideBar" />
         <v-main>
-            <router-view>
+            <router-view v-slot="{ Component }">
+                <v-fade-transition leave-absolute >
+                    <component :is="Component" />
+                </v-fade-transition>
             </router-view>
         </v-main>
     </v-layout>

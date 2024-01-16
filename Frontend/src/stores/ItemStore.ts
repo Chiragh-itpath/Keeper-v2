@@ -4,6 +4,7 @@ import type { IItem, IAddItem, IEditItem } from '@/Models/ItemModels'
 import { ItemService } from '@/Services/ItemService'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
 import { useToster } from '@/composable/useToaster'
+import type { ItemStatus } from '@/Models/enum'
 
 const ItemStore = defineStore('item', () => {
     const Items: Ref<IItem[]> = ref([])
@@ -96,6 +97,9 @@ const ItemStore = defineStore('item', () => {
         const comment = await itemService.PostComment(addCommnet)
         return comment
     }
+    const updateStatus = async (itemId: string, status: ItemStatus): Promise<boolean> => {
+        return await itemService.UpdateStatus(itemId, status)
+    }
     return {
         Items,
         KeepId,
@@ -105,7 +109,8 @@ const ItemStore = defineStore('item', () => {
         GetAllItems,
         GetById,
         getSingalItem,
-        AddComment
+        AddComment,
+        updateStatus
     }
 })
 export { ItemStore }

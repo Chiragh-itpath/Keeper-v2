@@ -9,5 +9,6 @@ namespace Keeper.Services.Services.Interfaces
         Task<ItemViewModel> SaveAsync(AddItem addItem,Guid userId);
         Task<ItemViewModel> UpdateAsync(EditItem editItem, Guid userId);
         Task<bool> DeleteAsync(Guid id);
+        Task<bool> UpdateStatus(UpdateItemStatus newStatusDetails);
     }
 }

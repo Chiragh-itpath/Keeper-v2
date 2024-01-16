@@ -2,7 +2,7 @@
 import { ref, watch, type Ref } from 'vue'
 import { useDate } from 'vuetify'
 import { UserStore } from '@/stores'
-import { EditItem, InfoItem, DeleteItem } from '@/components/Items/'
+import { EditItem, InfoItem, DeleteItem, UpdateStatus, StatusList } from '@/components/Items/'
 import { NoItem } from '@/components/Custom/'
 import type { IItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
@@ -109,6 +109,18 @@ watch(props, () => {
                         <div v-else class="text-grey">No Description</div>
                     </v-sheet>
                 </v-card-text>
+                <v-card-actions>
+                    <update-status :item="item" v-model:status="item.status">
+                        <template v-slot="{ props, isActive }">
+                            <v-chip color="primary" variant="flat" v-bind="props">
+                                {{ StatusList[item.status].title }}
+                                <template v-slot:append>
+                                    <v-icon>{{ (isActive ? 'mdi-menu-up' : 'mdi-menu-down') }}</v-icon>
+                                </template>
+                            </v-chip>
+                        </template>
+                    </update-status>
+                </v-card-actions>
             </v-card>
         </v-hover>
     </v-col>
