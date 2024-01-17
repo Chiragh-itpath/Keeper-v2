@@ -4,7 +4,8 @@ import EditItem from './EditItem.vue'
 import InfoItem from './InfoItem.vue'
 import DeleteItem from './DeleteItem.vue'
 import UpdateStatus from './UpdateStatus.vue'
-import { ItemStatus } from '@/Models/enum'
+import ItemFilter from './ItemFilter.vue'
+import { ItemStatus, ItemType } from '@/Models/enum'
 
 export {
     AddItem,
@@ -12,14 +13,16 @@ export {
     EditItem,
     InfoItem,
     DeleteItem,
-    UpdateStatus
+    UpdateStatus,
+    ItemFilter
 }
 
-export type StatusListType = {
+export type ListItemsType = {
     title: string,
-    value: ItemStatus
+    value: ItemStatus | ItemType
 }
-export const StatusList: StatusListType[] = [
+
+export const StatusList: ListItemsType[] = [
     {
         title: 'New',
         value: ItemStatus.NEW
@@ -42,3 +45,13 @@ export const StatusList: StatusListType[] = [
     }
 ]
 
+export const TypeList: ListItemsType[] = [
+    {
+        title: 'Ticket',
+        value: ItemType.TICKET
+    },
+    {
+        title: 'PR',
+        value: ItemType.PR
+    }
+]

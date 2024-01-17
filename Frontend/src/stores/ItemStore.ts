@@ -98,7 +98,16 @@ const ItemStore = defineStore('item', () => {
         return comment
     }
     const updateStatus = async (itemId: string, status: ItemStatus): Promise<boolean> => {
-        return await itemService.UpdateStatus(itemId, status)
+
+        const res = await itemService.UpdateStatus(itemId, status)
+        if (res) {
+            const index = Items.value.findIndex(x => x.id == itemId)
+            if (index != -1) {
+                Items.value[index] = res
+            }
+            return true
+        }
+        return false
     }
     return {
         Items,

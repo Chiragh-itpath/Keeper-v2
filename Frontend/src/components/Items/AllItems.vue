@@ -7,15 +7,17 @@ import { NoItem } from '@/components/Custom/'
 import type { IItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
 import type { IKeep } from '@/Models/KeepModels'
-import { Permission } from '@/Models/enum'
+import { ItemStatus, ItemType, Permission } from '@/Models/enum'
 
 const dateHelper = useDate()
 const props = defineProps<{
     items: IItem[],
-    date: Date | null | string,
+    date?: Date,
     project: IProject,
     keep: IKeep,
-    filter?: number
+    itemType?: ItemType,
+    itemStatus?: ItemStatus,
+    itemOwner?: string
 }>()
 const itemToDisplay = ref(props.items)
 const { User } = UserStore()
@@ -57,9 +59,15 @@ const openModel = (_id: string) => {
 }
 watch(props, () => {
     itemToDisplay.value = props.items.filter(x => {
-        return ((!props.date ||
-            dateHelper.format(x.createdOn, 'keyboardDate') == dateHelper.format(props.date, 'keyboardDate')) &&
-            (props.filter == undefined || x.type == props.filter)
+        return (
+            (
+                !props.date ||
+                dateHelper.format(x.createdOn, 'keyboardDate') == dateHelper.format(props.date, 'keyboardDate') ||
+                dateHelper.format(x.updatedOn, 'keyboardDate') == dateHelper.format(props.date, 'keyboardDate')
+            ) &&
+            (props.itemType == undefined || x.type == props.itemType) &&
+            (props.itemStatus == undefined || x.status == props.itemStatus) &&
+            (!props.itemOwner || x.createdBy == props.itemOwner || x.updatedBy == props.itemOwner)
         )
     })
 })
@@ -67,8 +75,7 @@ watch(props, () => {
 <template>
     <info-item :id="id" v-model="visible"></info-item>
     <no-item v-if="itemToDisplay.length == 0" title="No Item Found" :sub-title="date ? 'No record found on this date' :
-        filter ? 'No Record found with this item type' :
-            'Please click on add button to insert new record'">
+        'Please click on add button to insert new record'">
     </no-item>
     <v-col cols="12" lg="4" md="6" v-for="(item, index) of itemToDisplay" :key="index">
         <v-hover v-slot="{ isHovering, props }">
@@ -110,7 +117,7 @@ watch(props, () => {
                     </v-sheet>
                 </v-card-text>
                 <v-card-actions>
-                    <update-status :item="item" v-model:status="item.status">
+                    <update-status :item="item" :status="item.status" v-if="canEdit(index)">
                         <template v-slot="{ props, isActive }">
                             <v-chip color="primary" variant="flat" v-bind="props">
                                 {{ StatusList[item.status].title }}
@@ -120,6 +127,9 @@ watch(props, () => {
                             </v-chip>
                         </template>
                     </update-status>
+                    <v-chip color="primary" variant="flat" v-else>
+                        {{ StatusList[item.status].title }}
+                    </v-chip>
                 </v-card-actions>
             </v-card>
         </v-hover>

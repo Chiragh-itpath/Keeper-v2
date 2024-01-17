@@ -72,11 +72,17 @@ const emits = defineEmits<{
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
                             <div>
-                                <div class="mb-3">Discussed with:
-                                    <v-chip v-if="Item.to" color="primary">{{ Item.to }}</v-chip>
+                                <div class="mb-3">Discuss with:
+                                    <span v-if="Item.to">
+                                        <template v-for="(item, index) in Item.to.split(/,/)" :key="index">
+                                            <v-chip color="primary" class="mx-1" v-if="item.trim()">
+                                                {{ item.trim() }}
+                                            </v-chip>
+                                        </template>
+                                    </span>
                                     <span class="text-grey text-h5" v-else>-</span>
                                 </div>
-                                <div class="mb-3">Discussed by:
+                                <div class="mb-3">Discuss by:
                                     <v-chip color="primary" v-if="Item.discussedBy">
                                         {{ Item.discussedBy }}
                                     </v-chip>

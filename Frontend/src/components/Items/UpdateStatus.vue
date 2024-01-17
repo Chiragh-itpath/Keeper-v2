@@ -17,7 +17,6 @@ const { Loading } = storeToRefs(GlobalStore())
 const emit = defineEmits<{
     (e: 'update:status', status: ItemStatus): void
 }>()
-
 watch(selected, async (newValue, oldValue) => {
     if (isUpdating.value) return
     if (oldValue[0] == newValue[0]) return

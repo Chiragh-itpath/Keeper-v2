@@ -84,12 +84,14 @@ namespace Keeper.Services.Services
             var response = await GetAsync(itemId);
             return response;
         }
-        public async Task<bool> UpdateStatus(UpdateItemStatus newStatusDetails)
+        public async Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails,Guid userId)
         {
             var item = await _itemRepo.GetAsync(newStatusDetails.Id) ?? throw new InnerException("No Item found with id", StatusType.NOT_FOUND);
             item.Status = newStatusDetails.Status;
+            item.UpdatedById = userId;
+            item.UpdatedOn = DateTime.Now;
             await _itemRepo.Update(item);
-            return true;
+            return Mapper(item);
         }
         public async Task<bool> DeleteAsync(Guid id)
         {

@@ -1,23 +1,28 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, type Ref } from 'vue'
+import { computed, ref, onMounted, type Ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { AddItem, AllItems } from '@/components/Items'
+import { AddItem, AllItems, ItemFilter } from '@/components/Items'
 import { DatePicker, NoItem } from '@/components/Custom'
 import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
-import { Permission } from '@/Models/enum'
+import { ItemStatus, ItemType, Permission } from '@/Models/enum'
 
 const route = useRoute()
 const { GetAllItems } = ItemStore()
 const { Items } = storeToRefs(ItemStore())
 const { User } = UserStore()
 const loading: Ref<boolean> = ref(false)
-const date = ref(null)
 const project: Ref<IProject | undefined> = ref()
 const keep: Ref<IKeep | undefined> = ref()
 const router = useRouter()
+const filters = reactive<{
+    date?: Date,
+    itemType?: ItemType,
+    itemStatus?: ItemStatus,
+    itemOwner?: string
+}>({})
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
@@ -26,13 +31,36 @@ const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
 })
-const filter = ref([])
 const hasAccess = computed((): boolean => {
     return (
         (project.value?.createdBy == User.email) ||
         (project.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false) ||
         (keep.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false)
     )
+})
+const users = computed(() => {
+    const _users: { title: string, value: string }[] = []
+    if (project.value) {
+        _users.push(
+            ...project.value.users.map(x => {
+                return {
+                    title: x.invitedUser.userName,
+                    value: x.invitedUser.email
+                }
+            })
+        )
+    }
+    if (keep.value) {
+        _users.push(
+            ...keep.value.users.map(x => {
+                return {
+                    title: x.invitedUser.userName,
+                    value: x.invitedUser.email
+                }
+            })
+        )
+    }
+    return _users
 })
 const breadcrumbsItems = [
     {
@@ -71,7 +99,6 @@ onMounted(async () => {
     if (!hasAccess.value) router.go(-1)
     else loading.value = false
 })
-
 </script>
 <template>
     <v-container class="px-10 pt-5" fluid>
@@ -80,38 +107,23 @@ onMounted(async () => {
                 <v-skeleton-loader type="text,image,actions"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading && project && keep" class="align-center">
+        <v-row v-if="!loading && project && keep" class="align-center flex-wrap">
             <v-col cols="12">
                 <v-breadcrumbs divider="/" :items="breadcrumbsItems"></v-breadcrumbs>
             </v-col>
             <v-col cols="auto">
-                <date-picker label="Select a date" v-model="date"></date-picker>
+                <date-picker label="Select a date" v-model="filters.date"></date-picker>
             </v-col>
-            <v-col>
-                <v-menu :transition="false">
-                    <template v-slot:activator="{ props }">
-                        <v-btn v-bind="props" color="primary" variant="outlined" class="rounded-lg" width="120"
-                            append-icon="mdi-menu-down" v-if="filter.length == 0">
-                            Item Type
-                        </v-btn>
-                        <v-btn color="primary" variant="outlined" class="rounded-lg" width="120" v-else>
-                            <template v-slot:append>
-                                <v-icon @click="filter = []" class="ms-end">mdi-close</v-icon>
-                            </template>
-                            {{ filter[0] == 0 ? 'Ticket' : 'PR' }}
-                        </v-btn>
-                    </template>
-                    <v-list v-model:selected="filter" select-strategy="single-independent"
-                        :items="[{ title: 'Ticket', value: 0 }, { title: 'PR', value: 1 }]">
-                    </v-list>
-                </v-menu>
-            </v-col>
-            <v-col cols="auto">
+            <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus" :users="users"
+                v-model:item-owner="filters.itemOwner">
+            </item-filter>
+            <v-col class="d-flex justify-end">
                 <add-item :keep="keep" :project="project" v-if="canCreate()"></add-item>
             </v-col>
         </v-row>
         <v-row v-if="!loading && project && keep">
-            <all-items :items="Items" :date="date" :project="project" :keep="keep" :filter="filter[0]"></all-items>
+            <all-items :items="Items" :project="project" :keep="keep" :date="filters.date" :item-type="filters.itemType"
+                :item-status="filters.itemStatus" :item-owner="filters.itemOwner"></all-items>
         </v-row>
         <v-row v-if="!loading && (!project || !keep)">
             <no-item :title="!project ? 'No Project found with this id' : 'No Keep found with this id'"></no-item>

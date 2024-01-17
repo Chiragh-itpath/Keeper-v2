@@ -37,11 +37,10 @@ export class ItemService {
         return response
     }
 
-    public UpdateStatus = async (itemId: string, status: ItemStatus): Promise<boolean> => {
-        const response: string | null = await http.put(`${this.baseUrl}/UpdateStatus`, {
+    public UpdateStatus = async (itemId: string, status: ItemStatus): Promise<IItem | null> => {
+        return await http.put(`${this.baseUrl}/UpdateStatus`, {
             id: itemId,
             status
         })
-        return response != null
     }
 }

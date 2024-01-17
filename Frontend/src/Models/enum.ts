@@ -36,4 +36,15 @@ const enum ItemStatus {
     COMPLETED,
     RE_OPEN
 }
-export { RouterEnum, StatusType, Permission, ItemStatus }
+const enum ItemType {
+    TICKET,
+    PR
+}
+
+export {
+    RouterEnum,
+    StatusType,
+    Permission,
+    ItemStatus,
+    ItemType
+}
