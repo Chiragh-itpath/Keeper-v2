@@ -53,5 +53,17 @@ export const TypeList: ListItemsType[] = [
     {
         title: 'PR',
         value: ItemType.PR
+    },
+    {
+        title: 'Mail',
+        value: ItemType.MAIL
+    },
+    {
+        title: 'Summary Mail',
+        value: ItemType.SUMMARY_MAIL
+    },
+    {
+        title: 'Custom',
+        value: ItemType.CUSTOM
     }
 ]

@@ -3,10 +3,12 @@ import { reactive, ref, watch, type Ref, computed } from 'vue'
 import { ItemStore } from '@/stores'
 import { TextField, TextEditor } from '@/components/Custom/'
 import type { IEditItem, IItem } from '@/Models/ItemModels'
-import type { ItemType } from '@/Models/types'
 import type { IProject } from '@/Models/ProjectModels'
 import type { IKeep } from '@/Models/KeepModels'
 import { fileRule } from '@/data/ValidationRules'
+import { ItemType } from '@/Models/enum'
+import { TypeList } from '@/components/Items'
+
 const props = withDefaults(defineProps<{
     modelValue?: boolean,
     item: IItem
@@ -18,24 +20,21 @@ const props = withDefaults(defineProps<{
 
 const visible: Ref<boolean> = ref(false)
 const form = ref()
-const editItem: IEditItem = reactive({
+const editItem = reactive<IEditItem>({
     id: props.item.id,
     title: props.item.title,
     description: props.item.description,
     url: props.item.url,
     keepId: props.keep.id,
     number: props.item.number,
-    type: props.item.type == 0 ? 'Ticket' : 'PR',
+    type: props.item.type,
     to: props.item.to,
-    discussedBy: props.item.discussedBy,
-    files: null
+    discussedBy: props.item.discussedBy
 })
 const { EditItem } = ItemStore()
-const itemType: Ref<ItemType> = ref(props.item.type == 0 ? 'Ticket' : 'PR')
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
     if (!valid) return
-    editItem.type = itemType.value
     await EditItem(editItem)
     visible.value = false
 }
@@ -65,12 +64,12 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="800">
+    <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="850">
         <template v-slot:activator="{ props }">
             <v-list-item v-bind="props">
                 <v-icon>mdi-folder-edit-outline</v-icon>
                 <span class="mx-3">Edit</span>
-            </v-list-item> 
+            </v-list-item>
         </template>
         <v-card class="position-relative">
             <v-card-title class="bg-primary text-center position-sticky">
@@ -81,34 +80,26 @@ const emits = defineEmits<{
                 <v-card max-height="450" elevation="0" class="mx-5 px-2 overflow-y-auto">
                     <v-form ref="form" @submit.prevent>
                         <v-row>
-                            <v-col cols="6" lg="3" md="3" sm="6">
-                                <v-select :items="['Ticket', 'PR']" label="Type" color="primary" v-model="itemType"
-                                    density="comfortable" />
+                            <v-col>
+                                <v-select :items="TypeList" label="Type" color="primary" v-model="editItem.type"
+                                    density="comfortable">
+                                    <template v-slot:item="{ item, props }">
+                                        <v-list-item v-bind="props" :title="item.title" density="compact"></v-list-item>
+                                    </template>
+                                </v-select>
                             </v-col>
-                            <v-col cols="6" lg="3" md="3" sm="6">
-                                <text-field label="Number" placeholder="Ticker | PR number" is-number
+                            <v-col v-if="editItem.type == ItemType.TICKET || editItem.type == ItemType.PR">
+                                <text-field label="Number*" placeholder="Ticker | PR number" is-number
                                     v-model="editItem.number" />
                             </v-col>
-                            <v-col>
+                            <v-col cols="12" md="6">
                                 <text-field label="Item Name*" placeholder="Item title" is-required
                                     v-model="editItem.title" />
                             </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
+                            <v-col cols="12" v-if="editItem.type == ItemType.TICKET || editItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url"
                                     :max-limit="200" icon="mdi-link-box-variant-outline" />
                             </v-col>
-                            <v-col cols="12">
-                                <text-editor v-model="editItem.description" />
-                            </v-col>
-                            <v-col cols="12">
-                                <v-file-input color="primary" v-model="editItem.files" label="Select Files"
-                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
-                                    :rules="[fileRule]" />
-                            </v-col>
-                        </v-row>
-                        <v-row>
                             <v-col cols="12" sm="6">
                                 <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to" />
                             </v-col>
@@ -126,9 +117,19 @@ const emits = defineEmits<{
                                         </v-list-item>
                                     </template>
                                     <template v-slot:selection="{ item }">
-                                        <v-chip color="primary" v-if="editItem.discussedBy">{{ item.value }}</v-chip>
+                                        {{ item.value }}
                                     </template>
                                 </v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12">
+                                <text-editor v-model="editItem.description" />
+                            </v-col>
+                            <v-col cols="12">
+                                <v-file-input color="primary" v-model="editItem.files" label="Select Files"
+                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
+                                    :rules="[fileRule]" />
                             </v-col>
                         </v-row>
                     </v-form>

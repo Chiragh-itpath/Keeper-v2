@@ -38,7 +38,10 @@ const enum ItemStatus {
 }
 const enum ItemType {
     TICKET,
-    PR
+    PR,
+    MAIL,
+    SUMMARY_MAIL,
+    CUSTOM
 }
 
 export {

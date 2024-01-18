@@ -45,7 +45,7 @@ const clear = () => {
                 </template>
                 date
             </v-btn>
-            <v-btn class="rounded-lg" variant="outlined" color="primary" v-else>
+            <v-btn class="rounded-lg" variant="flat" color="primary" v-else>
                 {{ `${dateHelper.format(date, 'normalDateWithWeekday')}` }}
                 <template v-slot:append>
                     <v-icon @click="clear">mdi-close</v-icon>

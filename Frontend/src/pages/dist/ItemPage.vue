@@ -117,7 +117,7 @@ onMounted(async () => {
             <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus" :users="users"
                 v-model:item-owner="filters.itemOwner">
             </item-filter>
-            <v-col class="d-flex justify-end">
+            <v-col>
                 <add-item :keep="keep" :project="project" v-if="canCreate()"></add-item>
             </v-col>
         </v-row>

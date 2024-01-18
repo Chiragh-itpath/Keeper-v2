@@ -46,7 +46,7 @@ const emits = defineEmits<{
                     {{ TypeList[selectedType[0]].title }}
                 </v-btn>
             </template>
-            <v-list v-model:selected="selectedType" select-strategy="single-independent" :items="TypeList"
+            <v-list density="compact" v-model:selected="selectedType" select-strategy="single-independent" :items="TypeList"
                 @update:selected="() => emits('update:itemType', selectedType[0])">
             </v-list>
         </v-menu>

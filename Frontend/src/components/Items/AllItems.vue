@@ -2,7 +2,7 @@
 import { ref, watch, type Ref } from 'vue'
 import { useDate } from 'vuetify'
 import { UserStore } from '@/stores'
-import { EditItem, InfoItem, DeleteItem, UpdateStatus, StatusList } from '@/components/Items/'
+import { EditItem, InfoItem, DeleteItem, UpdateStatus, StatusList, TypeList } from '@/components/Items/'
 import { NoItem } from '@/components/Custom/'
 import type { IItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
@@ -83,10 +83,19 @@ watch(props, () => {
                 <v-card-title class="bg-primary">
                     <v-row class="align-center">
                         <v-col cols="auto" class="px-1">
-                            <v-chip class="me-1"
-                                @click="() => !!item.url ? redirectionHandler(item.url) : openModel(item.id)">
-                                {{ item.type == 0 ? '#' : '!' }} {{ item.number }}
-                            </v-chip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props }">
+                                    <v-chip class="me-1" v-bind="props"
+                                        v-if="item.type == ItemType.TICKET || item.type == ItemType.PR"
+                                        @click="() => !!item.url ? redirectionHandler(item.url) : openModel(item.id)">
+                                        {{ item.type == 0 ? '#' : '!' }} {{ item.number }}
+                                    </v-chip>
+                                    <v-icon size="small" v-bind="props"
+                                        v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
+                                        :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file'"></v-icon>
+                                </template>
+                                {{ TypeList[item.type].title }}
+                            </v-tooltip>
                         </v-col>
                         <v-col class="px-0 text-white text-truncate cursor-pointer" @click="openModel(item.id)">
                             {{ item.title }}

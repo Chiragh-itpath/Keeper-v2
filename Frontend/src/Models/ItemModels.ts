@@ -1,35 +1,33 @@
 import type { IComment } from './CommentModel'
-import type { ItemType } from '@/Models/types'
-import type { ItemStatus } from '@/Models/enum'
-type NullableString = string | undefined
+import type { ItemStatus, ItemType } from '@/Models/enum'
+
 
 interface CommonItem {
     title: string
-    description: NullableString
-    url: NullableString
-    number: string
-    to: NullableString
-    discussedBy: NullableString
+    type: ItemType
+    description?: string
+    url?: string
+    number?: string
+    to?: string
+    discussedBy?: string
     keepId: string
 }
 interface IAddItem extends CommonItem {
-    type: ItemType
-    files: any
+    files?: File[]
 }
 
 interface IEditItem extends CommonItem {
-    type: ItemType
     id: string
-    files: any
+    files?: File[]
 }
 
 interface IItem extends CommonItem {
     id: string
-    type: number
+    type: ItemType
     createdBy: string
     createdOn: string
-    updatedBy: NullableString
-    updatedOn: NullableString
+    updatedBy?: string
+    updatedOn?: string
     status: ItemStatus
     files: FileModel[]
     comments: IComment[]

@@ -33,46 +33,31 @@ const ItemStore = defineStore('item', () => {
         }
         return null
     }
-
-    const AddItem = async (addItem: IAddItem): Promise<void> => {
-        const formData = new FormData()
-        formData.append('title', addItem.title)
-        formData.append('type', addItem.type == 'Ticket' ? '0' : '1')
-        formData.append('number', addItem.number.toString())
-        formData.append('url', addItem.url ?? '')
-        formData.append('description', addItem.description ?? '')
-        formData.append('keepId', addItem.keepId)
-        formData.append('to', addItem.to ?? '')
-        formData.append('discussedBy', addItem.discussedBy ?? '')
-        if (addItem.files != null) {
-            for (const file of addItem.files) {
-                formData.append('files', file)
+    const CreateForm = (item: IAddItem | IEditItem): FormData => {
+        const formData = new FormData();
+        formData.append('type', String(item.type));
+        for (const [key, value] of Object.entries(item)) {
+            if (value !== null && value !== undefined && key !== 'files') {
+                formData.append(key, String(value));
             }
         }
+        if (item.files) {
+            item.files.forEach((file) => {
+                formData.append('files', file);
+            });
+        }
+        return formData;
+    };
 
-        const response = await itemService.Add(formData)
+    const AddItem = async (addItem: IAddItem): Promise<void> => {
+        const response = await itemService.Add(CreateForm(addItem))
         if (response) {
             AllItems.value.push(response)
             fetchItems()
         }
     }
     const EditItem = async (editItem: IEditItem): Promise<void> => {
-        const formData = new FormData()
-        formData.append('id', editItem.id)
-        formData.append('title', editItem.title)
-        formData.append('type', editItem.type == 'Ticket' ? '0' : '1')
-        formData.append('number', editItem.number.toString())
-        formData.append('url', editItem.url ?? '')
-        formData.append('description', editItem.description ?? '')
-        formData.append('keepId', editItem.keepId)
-        formData.append('to', editItem.to ?? '')
-        formData.append('discussedBy', editItem.discussedBy ?? '')
-        if (editItem.files != null) {
-            for (const file of editItem.files) {
-                formData.append('files', file)
-            }
-        }
-        const response = await itemService.Update(formData)
+        const response = await itemService.Update(CreateForm(editItem))
         if (response) {
             const index = Items.value.findIndex((x) => x.id == editItem.id)
             AllItems.value.splice(index, 1, response)
