@@ -28,10 +28,12 @@ const close = () => {
 }
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true" class="w-sm-100"> 
-        New Project
-    </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" width="700" @update:model-value="close">
+    <v-dialog v-model="visible" width="700" @update:model-value="close">
+        <template v-slot:activator="{ props }">
+            <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" class="w-sm-100" v-bind="props">
+                New Project
+            </v-btn>
+        </template>
         <v-card>
             <v-card-title class="text-center bg-primary">
                 New Project

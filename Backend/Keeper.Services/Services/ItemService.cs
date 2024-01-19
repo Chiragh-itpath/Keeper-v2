@@ -22,12 +22,11 @@ namespace Keeper.Services.Services
         {
             var data = await _itemRepo.GetAllAsync(keepId);
             List<ItemViewModel> items = new();
-            for (int i = 0; i < data.Count; i++)
+            foreach (var item in data)
             {
-                var item = Mapper(data[i]);
-                item.Files = await _fileService.GetAllFiles(data[i].Id);
-                item.Comments = await _commentService.GetAllCommnets(data[i].Id);
-                items.Add(item);
+                var _item = Mapper(item);
+                _item.Files = await _fileService.GetAllFiles(item.Id);
+                items.Add(_item);
             }
             return items;
         }
@@ -84,7 +83,7 @@ namespace Keeper.Services.Services
             var response = await GetAsync(itemId);
             return response;
         }
-        public async Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails,Guid userId)
+        public async Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails, Guid userId)
         {
             var item = await _itemRepo.GetAsync(newStatusDetails.Id) ?? throw new InnerException("No Item found with id", StatusType.NOT_FOUND);
             item.Status = newStatusDetails.Status;

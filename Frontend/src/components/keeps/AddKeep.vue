@@ -3,7 +3,7 @@ import { reactive, ref, type Ref, watch } from 'vue'
 import { TextField } from '@/components/Custom'
 import { KeepStore, GlobalStore } from '@/stores'
 import type { IAddKeep } from '@/Models/KeepModels'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 
 const props = withDefaults(defineProps<{
     projectId: string,
@@ -14,7 +14,7 @@ const { AddKeep } = KeepStore()
 const visible: Ref<boolean> = ref(false)
 const { Loading } = storeToRefs(GlobalStore())
 const form = ref()
-const addKeep: IAddKeep = reactive({
+const addKeep = reactive<IAddKeep>({
     title: '',
     tag: '',
     projectId: ''
@@ -24,28 +24,28 @@ const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
     if (valid) {
         await AddKeep(addKeep)
-        close()
     }
 }
 watch(visible, () => {
     if (visible.value) {
         addKeep.projectId = props.projectId
     }
+    if (form.value)
+        form.value.reset()
 })
-const close = () => {
-    visible.value = false
-    form.value.reset()
-}
+
 </script>
 <template>
-    <v-btn @click="visible = true" color="primary" variant="elevated" prepend-icon="mdi-plus">
-        New Keep
-    </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700" @update:model-value="close">
+    <v-dialog v-model="visible" max-width="700">
+        <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" color="primary" variant="elevated" prepend-icon="mdi-plus">
+                New Keep
+            </v-btn>
+        </template>
         <v-card>
             <v-card-title class="text-center bg-primary">
                 New keep
-                <v-icon class="float-end" @click="close">mdi-close</v-icon>
+                <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
                 <v-form @submit.prevent="submitHandler" ref="form" validate-on="submit">

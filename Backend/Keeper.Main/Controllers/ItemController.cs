@@ -12,11 +12,11 @@ namespace Keeper.Main.Controllers
     public class ItemController : ControllerBase
     {
         private readonly IItemService _itemService;
-        private readonly ICommentService _comment;
+        private readonly ICommentService _commentService;
         public ItemController(IItemService itemService, ICommentService comment)
         {
             _itemService = itemService;
-            _comment = comment;
+            _commentService = comment;
         }
         [HttpGet("{id}")]
         public async Task<ResponseModel<ItemViewModel>> GetById([FromRoute] Guid id)
@@ -71,14 +71,17 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            var res = await _comment.AddCommentAsync(addComment, userId);
+            var res = await _commentService.AddCommentAsync(addComment, userId);
             return new ResponseModel<CommentViewModel> { Data = res };
         }
-        [HttpGet("GetComments/{itemId}")]
+        [HttpGet("Comments/{itemId}")]
         public async Task<ResponseModel<List<CommentViewModel>>> GetComments([FromRoute] Guid itemId)
         {
-            await Task.CompletedTask;
-            return new() { };
+            var comments = await _commentService.GetAllCommnets(itemId);
+            return new()
+            {
+                Data = comments
+            };
         }
     }
 }

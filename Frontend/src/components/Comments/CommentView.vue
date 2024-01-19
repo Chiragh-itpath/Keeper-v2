@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import type { IComment } from '@/Models/CommentModel'
 import { dateDiffernce } from '@/Services/HelperFunction'
 import AllReplies from '@/components/Comments/AllReplies.vue'
-defineProps<{
+
+const props = defineProps<{
     comment: IComment,
     itemId: string
 }>()
+const comment = ref(props.comment)
+watch(props, () => {
+    comment.value = props.comment
+})
 </script>
 <template>
     <div class="mt-2 bg-white border rounded-lg">
@@ -22,7 +28,7 @@ defineProps<{
         </div>
         <div class="ms-15 my-2 ">{{ comment.content }}</div>
         <div class="mx-2 my-2">
-            <all-replies :comment="comment.comments" :item-id="itemId" :comment-id="comment.id"></all-replies>
+            <all-replies v-model:comments="comment.comments" :item-id="itemId" :comment-id="comment.id"></all-replies>
         </div>
     </div>
 </template>

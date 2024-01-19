@@ -43,4 +43,8 @@ export class ItemService {
             status
         })
     }
+    public getAllComments = async (itemid: string): Promise<IComment[] | null> => {
+        const response: IComment[] | null = await http.get(`${this.baseUrl}/Comments/${itemid}`)
+        return response
+    }
 }

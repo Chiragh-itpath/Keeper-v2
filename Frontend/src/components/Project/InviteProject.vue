@@ -67,7 +67,7 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700" close-on-back>
+    <v-dialog v-model="visible" max-width="700" close-on-back>
         <template v-slot:activator="{ props }">
             <v-list-item v-bind="props">
                 <v-icon>mdi-account-plus-outline</v-icon>

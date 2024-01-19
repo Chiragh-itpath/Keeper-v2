@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, type Ref, reactive, computed } from 'vue'
-import { TextField, TextEditor } from '@/components/Custom/'
+import { TextField, TextEditor, SearchableList } from '@/components/Custom/'
 import { ItemStore } from '@/stores'
 import type { IAddItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
@@ -60,10 +60,12 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true" class="float-end">
-        New Item
-    </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="850">
+    <v-dialog v-model="visible" close-on-back max-width="850">
+        <template v-slot:activator="{ props }">
+            <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" v-bind="props" class="float-end">
+                New Item
+            </v-btn>
+        </template>
         <v-card>
             <v-card-title class="bg-primary text-center position-sticky">
                 New Item
@@ -100,22 +102,8 @@ watch(visible, () => {
                                 <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to" />
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <v-select label="Discuss By" color="primary" :items="users" v-model="addItem.discussedBy"
-                                    clearable density="comfortable" hide-details>
-                                    <template v-slot:clear>
-                                        <v-icon @click="addItem.discussedBy = undefined" color="primary">
-                                            mdi-close-circle-outline
-                                        </v-icon>
-                                    </template>
-                                    <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props" :title="item.title" :subtitle="item.value"
-                                            :value="item.value">
-                                        </v-list-item>
-                                    </template>
-                                    <template v-slot:selection="{ item }">
-                                        {{ item.value }}
-                                    </template>
-                                </v-select>
+                                <searchable-list :search-items="users" label="Discuss By"
+                                    v-model="addItem.discussedBy"></searchable-list>
                             </v-col>
                         </v-row>
                         <v-row>

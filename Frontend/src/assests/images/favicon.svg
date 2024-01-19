@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="66" height="66"><svg id="SvgjsSvg1006" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 66 66">
+    <defs>
+        <style>
+            .cls-1{fill:#26A69A;}.cls-2{fill:#1cbbb4;}.cls-3{opacity:0.15;}.cls-4{fill:#fffcf2;}.cls-5{opacity:0.15;}.cls-6{fill:#344e5f;}</style>
+    </defs>
+    <title>sticky-note</title>
+    <g id="SvgjsG1005">
+        <g id="SvgjsG1004" data-name="Circle Shadow">
+            <circle class="cls-1" cx="33" cy="34" r="31"></circle>
+    </g>
+        <g id="SvgjsG1003">
+            <circle class="cls-2" cx="33" cy="32" r="31"></circle>
+        </g>
+        <path id="SvgjsPath1002" data-name="Long Shadow" class="cls-3" d="M18.59,48.41,33.17,63A31,31,0,0,0,64,32.17L49.4,17.57Z"></path>
+        <g id="SvgjsG1001" data-name="Note">
+            <path class="cls-4" d="M48,17H20a2,2,0,0,0-2,2V47a2,2,0,0,0,2,2H39L50,38V19A2,2,0,0,0,48,17Z"></path>
+        </g>
+        <g id="SvgjsG1000" class="cls-5">
+            <path class="cls-6" d="M39,38V49L50,38ZM24,42H35V40H24Zm19-8H24v2H43Zm0-6H24v2H43Zm-4-6H24v2H39Z"></path>
+        </g>
+    </g>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+</style></svg>

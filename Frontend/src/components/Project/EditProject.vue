@@ -39,7 +39,7 @@ const emits = defineEmits<{
 
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700" v-if="project">
+    <v-dialog v-model="visible" max-width="700" v-if="project">
         <template v-slot:activator="{ props }">
             <v-list-item v-bind="props">
                 <v-icon>mdi-folder-edit-outline</v-icon>

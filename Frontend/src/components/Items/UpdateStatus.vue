@@ -7,9 +7,10 @@ import { GlobalStore, ItemStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 const props = defineProps<{
-    item: IItem
+    item: IItem,
+    status: ItemStatus
 }>()
-const selected = ref([props.item.status])
+const selected = ref([props.status])
 const isUpdating = ref(false)
 const menu: Ref<boolean> = ref(false)
 const itemStore = ItemStore()

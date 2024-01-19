@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, type Ref, computed } from 'vue'
 import { ItemStore } from '@/stores'
-import { TextField, TextEditor } from '@/components/Custom/'
+import { TextField, TextEditor, SearchableList } from '@/components/Custom/'
 import type { IEditItem, IItem } from '@/Models/ItemModels'
 import type { IProject } from '@/Models/ProjectModels'
 import type { IKeep } from '@/Models/KeepModels'
@@ -35,7 +35,8 @@ const { EditItem } = ItemStore()
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
     if (!valid) return
-    await EditItem(editItem)
+    const item = await EditItem(editItem)
+    if (item) emits('update:item', item)
     visible.value = false
 }
 const users = computed(() => {
@@ -60,16 +61,16 @@ watch(visible, () => {
     }
 })
 const emits = defineEmits<{
-    (e: 'close'): void
+    (e: 'close'): void,
+    (e: 'update:modelValue', value: boolean): void,
+    (e: 'update:item', item: IItem): void
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" close-on-back max-width="850">
+    <v-dialog v-model="visible" close-on-back max-width="850"
+        @update:model-value="() => emits('update:modelValue', visible)">
         <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props">
-                <v-icon>mdi-folder-edit-outline</v-icon>
-                <span class="mx-3">Edit</span>
-            </v-list-item>
+            <slot :props="props"></slot>
         </template>
         <v-card class="position-relative">
             <v-card-title class="bg-primary text-center position-sticky">
@@ -104,22 +105,8 @@ const emits = defineEmits<{
                                 <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to" />
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <v-select label="Discuss By" color="primary" :items="users" v-model="editItem.discussedBy"
-                                    clearable density="comfortable">
-                                    <template v-slot:clear>
-                                        <v-icon @click="editItem.discussedBy = undefined" color="primary">
-                                            mdi-close-circle-outline
-                                        </v-icon>
-                                    </template>
-                                    <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props" :title="item.title" :subtitle="item.value"
-                                            :value="item.value">
-                                        </v-list-item>
-                                    </template>
-                                    <template v-slot:selection="{ item }">
-                                        {{ item.value }}
-                                    </template>
-                                </v-select>
+                                <searchable-list :search-items="users" label="Discuss By" v-model="editItem.discussedBy">
+                                </searchable-list>
                             </v-col>
                         </v-row>
                         <v-row>

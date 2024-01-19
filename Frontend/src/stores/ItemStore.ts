@@ -8,9 +8,8 @@ import type { ItemStatus } from '@/Models/enum'
 
 const ItemStore = defineStore('item', () => {
     const Items: Ref<IItem[]> = ref([])
-    const AllItems: Ref<IItem[]> = ref([])
+    const Comments: Ref<IComment[]> = ref([])
 
-    const KeepId: Ref<string> = ref('')
     const itemService = new ItemService()
     const getSingalItem = (id: string): IItem | undefined => {
         const item = Items.value.find((x) => x.id == id)
@@ -18,11 +17,9 @@ const ItemStore = defineStore('item', () => {
     }
 
     const GetAllItems = async (id: string): Promise<void> => {
-        KeepId.value = id
         const response = await itemService.GetAll(id)
         if (response) {
-            AllItems.value = response
-            fetchItems()
+            Items.value = response
         }
     }
 
@@ -52,20 +49,17 @@ const ItemStore = defineStore('item', () => {
     const AddItem = async (addItem: IAddItem): Promise<void> => {
         const response = await itemService.Add(CreateForm(addItem))
         if (response) {
-            AllItems.value.push(response)
-            fetchItems()
+            Items.value.unshift(response)
         }
     }
-    const EditItem = async (editItem: IEditItem): Promise<void> => {
+    const EditItem = async (editItem: IEditItem): Promise<IItem | undefined> => {
         const response = await itemService.Update(CreateForm(editItem))
         if (response) {
             const index = Items.value.findIndex((x) => x.id == editItem.id)
-            AllItems.value.splice(index, 1, response)
-            fetchItems()
+            Items.value.splice(index, 1, response)
+            return response
         }
-    }
-    const fetchItems = () => {
-        Items.value = AllItems.value
+        return undefined
     }
     const DeleteItem = async (id: string): Promise<void> => {
         const response = await itemService.Delete(id)
@@ -73,17 +67,15 @@ const ItemStore = defineStore('item', () => {
             useToster({ message: 'Item Deleted' })
             const index = Items.value.findIndex((x) => x.id == id)
             if (index != -1) {
-                AllItems.value.splice(index, 1)
-                fetchItems()
+                Items.value.splice(index, 1)
             }
         }
     }
-    const AddComment = async (addCommnet: IAddComment): Promise<IComment | null> => {
-        const comment = await itemService.PostComment(addCommnet)
+    const AddComment = async (addComment: IAddComment): Promise<IComment | null> => {
+        const comment = await itemService.PostComment(addComment)
         return comment
     }
     const updateStatus = async (itemId: string, status: ItemStatus): Promise<boolean> => {
-
         const res = await itemService.UpdateStatus(itemId, status)
         if (res) {
             const index = Items.value.findIndex(x => x.id == itemId)
@@ -94,9 +86,15 @@ const ItemStore = defineStore('item', () => {
         }
         return false
     }
+    const fetchComments = async (itemid: string) => {
+        const res = await itemService.getAllComments(itemid)
+        if (res) {
+            Comments.value = res
+        }
+    }
     return {
         Items,
-        KeepId,
+        Comments,
         AddItem,
         EditItem,
         DeleteItem,
@@ -104,7 +102,8 @@ const ItemStore = defineStore('item', () => {
         GetById,
         getSingalItem,
         AddComment,
-        updateStatus
+        updateStatus,
+        fetchComments
     }
 })
 export { ItemStore }

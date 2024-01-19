@@ -35,7 +35,7 @@ const clear = () => {
 }
 </script>
 <template>
-    <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition">
+    <v-menu v-model="menu" :close-on-content-click="false" :transition="false">
         <template v-slot:activator="{ isActive, props }">
             <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary" v-if="!date">
                 <template v-slot:append>

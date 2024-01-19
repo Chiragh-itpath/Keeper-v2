@@ -7,6 +7,7 @@ import OtpInput from './OtpInput.vue'
 import TagSelector from './TagSelector.vue'
 import TextEditor from './TextEditor.vue'
 import TextField from './TextField.vue'
+import SearchableList from './SearchableList.vue'
 
 export {
     DatePicker,
@@ -17,5 +18,6 @@ export {
     OtpInput,
     TagSelector,
     TextEditor,
-    TextField
+    TextField,
+    SearchableList
 }

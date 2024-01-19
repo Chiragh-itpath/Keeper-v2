@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, type Ref, reactive } from 'vue'
+import { computed, ref, onMounted, type Ref, reactive, watch } from 'vue'
+import { useDate } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'
-import { AddItem, AllItems, ItemFilter } from '@/components/Items'
-import { DatePicker, NoItem } from '@/components/Custom'
-import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { DatePicker, NoItem } from '@/components/Custom'
+import { AddItem, ItemFilter, ItemCard } from '@/components/Items'
+import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
+import type { IItem } from '@/Models/ItemModels'
 import { ItemStatus, ItemType, Permission } from '@/Models/enum'
 
 const route = useRoute()
-const { GetAllItems } = ItemStore()
-const { Items } = storeToRefs(ItemStore())
-const { User } = UserStore()
+const router = useRouter()
+const dateHelper = useDate()
 const loading: Ref<boolean> = ref(false)
 const project: Ref<IProject | undefined> = ref()
 const keep: Ref<IKeep | undefined> = ref()
-const router = useRouter()
+const { GetAllItems } = ItemStore()
+const { Items } = storeToRefs(ItemStore())
+const { User } = UserStore()
+const itemToDisplay: Ref<IItem[]> = ref([])
 const filters = reactive<{
     date?: Date,
     itemType?: ItemType,
@@ -91,6 +95,21 @@ const canCreate = (): boolean => {
         keepUser?.permission == Permission.ALL
     )
 }
+watch([filters, Items], () => {
+    itemToDisplay.value = Items.value.filter(itemFilterCallBack).sort((x, y) => x.status - y.status)
+})
+const itemFilterCallBack = (item: IItem): boolean => {
+    return (
+        (
+            !filters.date ||
+            dateHelper.format(item.createdOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate') ||
+            dateHelper.format(item.updatedOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate')
+        ) &&
+        (filters.itemType == undefined || item.type == filters.itemType) &&
+        (filters.itemStatus == undefined || item.status == filters.itemStatus) &&
+        (!filters.itemOwner || item.createdBy == filters.itemOwner || item.updatedBy == filters.itemOwner)
+    )
+}
 onMounted(async () => {
     loading.value = true
     await GetAllItems(keepId.value)
@@ -98,6 +117,7 @@ onMounted(async () => {
     keep.value = await KeepStore().getSingleKeep(keepId.value)
     if (!hasAccess.value) router.go(-1)
     else loading.value = false
+    itemToDisplay.value = Items.value.sort((x, y) => x.status - y.status)
 })
 </script>
 <template>
@@ -122,10 +142,14 @@ onMounted(async () => {
             </v-col>
         </v-row>
         <v-row v-if="!loading && project && keep">
-            <all-items :items="Items" :project="project" :keep="keep" :date="filters.date" :item-type="filters.itemType"
-                :item-status="filters.itemStatus" :item-owner="filters.itemOwner"></all-items>
+            <template v-for="(item, index) of itemToDisplay" :key="index">
+                <v-col cols="12" lg="4" md="6">
+                    <item-card :item="item" :project="project" :keep="keep" :can-edit="true" :can-delete="true">
+                    </item-card>
+                </v-col>
+            </template>
         </v-row>
-        <v-row v-if="!loading && (!project || !keep)">
+        <v-row v-if="!loading && (!project || !keep)" class="mt-10">
             <no-item :title="!project ? 'No Project found with this id' : 'No Keep found with this id'"></no-item>
         </v-row>
     </v-container>

@@ -1,20 +1,20 @@
 import AddItem from './AddItem.vue'
-import AllItems from './AllItems.vue'
 import EditItem from './EditItem.vue'
 import InfoItem from './InfoItem.vue'
 import DeleteItem from './DeleteItem.vue'
 import UpdateStatus from './UpdateStatus.vue'
 import ItemFilter from './ItemFilter.vue'
+import ItemCard from './ItemCard.vue'
 import { ItemStatus, ItemType } from '@/Models/enum'
 
 export {
     AddItem,
-    AllItems,
     EditItem,
     InfoItem,
     DeleteItem,
     UpdateStatus,
-    ItemFilter
+    ItemFilter,
+    ItemCard
 }
 
 export type ListItemsType = {
