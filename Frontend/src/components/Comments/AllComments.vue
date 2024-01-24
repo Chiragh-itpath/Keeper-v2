@@ -7,8 +7,9 @@ import { storeToRefs } from 'pinia'
 import type { IComment } from '@/Models/CommentModel'
 
 const props = defineProps<{
-    itemId: string,
+    itemId: string
 }>()
+
 const itemStore = ItemStore()
 const { Comments } = storeToRefs(ItemStore())
 const latestComments = (comment: IComment) => {

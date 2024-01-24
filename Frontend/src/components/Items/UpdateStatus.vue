@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { StatusList } from './'
+import { StatusList } from '@/components/Items'
 import type { IItem } from '@/Models/ItemModels'
 import { ItemStatus } from '@/Models/enum'
 import { GlobalStore, ItemStore } from '@/stores'
@@ -15,21 +15,17 @@ const isUpdating = ref(false)
 const menu: Ref<boolean> = ref(false)
 const itemStore = ItemStore()
 const { Loading } = storeToRefs(GlobalStore())
-const emit = defineEmits<{
-    (e: 'update:status', status: ItemStatus): void
-}>()
-watch(selected, async (newValue, oldValue) => {
+
+watch(props, () => {
+    selected.value = [props.status]
+})
+const UpdateStatusHandler = async (status: any) => {
     if (isUpdating.value) return
-    if (oldValue[0] == newValue[0]) return
     menu.value = false
     isUpdating.value = true
-    if (await itemStore.updateStatus(props.item.id, newValue[0])) {
-        emit('update:status', newValue[0])
-    } else {
-        selected.value = [props.item.status]
-    }
+    await itemStore.updateStatus(props.item.id, status[0])
     isUpdating.value = false
-})
+} 
 </script>
 <template>
     <v-menu location="right" :close-on-content-click="false" v-model="menu" :transition="false" :disabled="Loading">
@@ -37,7 +33,8 @@ watch(selected, async (newValue, oldValue) => {
             <slot :props="props" :is-active="isActive" v-if="!isUpdating"></slot>
             <v-progress-circular indeterminate v-if="isUpdating" color="primary"></v-progress-circular>
         </template>
-        <v-list density="compact" select-strategy="single-independent" v-model:selected="selected" mandatory>
+        <v-list density="compact" select-strategy="single-independent" :selected="selected" mandatory
+            @update:selected="UpdateStatusHandler">
             <template v-for="(item, index) in StatusList" :key="index">
                 <v-list-item :title="item.title" :value="item.value" color="primary" v-if="index != 0"></v-list-item>
             </template>

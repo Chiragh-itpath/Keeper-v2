@@ -2,13 +2,13 @@
 import { type Ref, ref, watch } from 'vue'
 import { DeletePropmt } from '@/components/Custom/'
 import { ItemStore } from '@/stores'
-const props = defineProps<{
+const { id } = defineProps<{
     id: string
 }>()
 const visible: Ref<boolean> = ref(false)
 const { DeleteItem } = ItemStore()
 const deleteHandler = async (): Promise<void> => {
-    await DeleteItem(props.id)
+    await DeleteItem(id)
     visible.value = false
 }
 watch(visible, () => {
@@ -21,9 +21,7 @@ const emits = defineEmits<{
 <template>
     <delete-propmt v-model="visible" @click:yes="deleteHandler" title="Delete Item">
         <template v-slot="{ props }">
-            <v-list-item role="button" v-bind="props">
-                <v-icon>mdi-delete-outline</v-icon>
-                <span class="mx-3">Delete</span>
-            </v-list-item></template>
+            <slot :activator="props"></slot>
+        </template>
     </delete-propmt>
 </template>

@@ -28,8 +28,8 @@ namespace Keeper.Services.Services
             foreach (var item in result)
             {
                 ProjectViewModel project = ProjectViewModelMapper(item, UserId);
-                project.Users = await AllInvitedUsers(item.Id);
                 UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy);
+                project.Users = new List<ProjectUsersViewModel>();
                 if (user != null)
                 {
                     project.Users.Add(new()
@@ -39,6 +39,7 @@ namespace Keeper.Services.Services
                         InvitedUser = user,
                     });
                 }
+                project.Users.AddRange(await AllInvitedUsers(item.Id));
                 projects.Add(project);
             }
             return projects;
@@ -47,8 +48,8 @@ namespace Keeper.Services.Services
         {
             ProjectModel project = await _projectRepo.GetByIdAsync(Id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             ProjectViewModel projectViewModel = ProjectViewModelMapper(project, userId);
-            projectViewModel.Users = await AllInvitedUsers(project.Id);
             UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy.Email);
+            projectViewModel.Users = new List<ProjectUsersViewModel>();
             if (user != null)
             {
                 projectViewModel.Users.Add(new()
@@ -58,6 +59,7 @@ namespace Keeper.Services.Services
                     InvitedUser = user,
                 });
             }
+            projectViewModel.Users.AddRange(await AllInvitedUsers(project.Id));
             return projectViewModel;
         }
         public async Task<ProjectViewModel> SaveAsync(AddProject addProject, Guid userId)
@@ -90,7 +92,7 @@ namespace Keeper.Services.Services
             {
                 TagModel? tag = await _tagService.AddAsync(editProject.Tag, project.CreatedById, TagType.PROJECT);
                 project.TagId = tag?.Id;
-            } 
+            }
             else
             {
                 project.TagId = null;

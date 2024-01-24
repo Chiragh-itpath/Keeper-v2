@@ -6,9 +6,9 @@ namespace Keeper.Services.Services.Interfaces
     {
         Task<List<ItemViewModel>> GetAllAsync(Guid Keepid);
         Task<ItemViewModel> GetAsync(Guid id);
-        Task<ItemViewModel> SaveAsync(AddItem addItem,Guid userId);
+        Task<ItemViewModel> SaveAsync(AddItem addItem, Guid userId);
         Task<ItemViewModel> UpdateAsync(EditItem editItem, Guid userId);
         Task<bool> DeleteAsync(Guid id);
-        Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails,Guid userId);
+        Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails, Guid userId);
     }
 }

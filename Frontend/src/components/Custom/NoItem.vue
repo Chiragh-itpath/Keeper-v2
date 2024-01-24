@@ -12,15 +12,19 @@ withDefaults(defineProps<{
 </script>
 <template>
     <v-col cols="12">
-        <div class="d-flex justify-center align-center flex-column pa-10">
+        <div class="d-flex justify-center align-center flex-column pa-5">
             <div class="bg-blue-grey-lighten-3 rounded-circle pa-10 mt-10">
                 <v-icon color="primary" size="150">mdi-notebook-remove</v-icon>
             </div>
             <p class="text-h5 mt-10 text-primary">
-                {{ title }}
+                <slot name="title">
+                    {{ title }}
+                </slot>
             </p>
             <p class="text-grey-darken-1 mt-2 text-center mb-10">
-                {{ subTitle }}
+                <slot name="subtitle">
+                    {{ subTitle }}
+                </slot>
             </p>
             <p v-if="backButton">
                 <router-link :to="{ name: RouterEnum.PROJECT }" class="text-black text-decoration-underline">

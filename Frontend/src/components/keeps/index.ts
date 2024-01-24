@@ -1,5 +1,5 @@
 import AddKeep from './AddKeep.vue'
-import AllKeeps from './AllKeeps.vue'
+import KeepCard from './KeepCard.vue'
 import EditKeep from './EditKeep.vue'
 import InfoKeep from './InfoKeep.vue'
 import InviteKeep from './InviteKeep.vue'
@@ -8,10 +8,10 @@ import ManageUser from './ManageUser.vue'
 
 export {
     AddKeep,
-    AllKeeps,
+    KeepCard,
     EditKeep,
     InfoKeep,
     InviteKeep,
-    DeleteKeep, 
+    DeleteKeep,
     ManageUser
 }

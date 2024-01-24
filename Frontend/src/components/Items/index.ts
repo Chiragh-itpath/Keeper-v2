@@ -5,6 +5,7 @@ import DeleteItem from './DeleteItem.vue'
 import UpdateStatus from './UpdateStatus.vue'
 import ItemFilter from './ItemFilter.vue'
 import ItemCard from './ItemCard.vue'
+import ItemGrid from './ItemGrid.vue'
 import { ItemStatus, ItemType } from '@/Models/enum'
 
 export {
@@ -14,7 +15,8 @@ export {
     DeleteItem,
     UpdateStatus,
     ItemFilter,
-    ItemCard
+    ItemCard,
+    ItemGrid
 }
 
 export type ListItemsType = {

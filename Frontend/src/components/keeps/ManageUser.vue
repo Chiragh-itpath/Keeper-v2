@@ -83,10 +83,7 @@ const emits = defineEmits<{
 <template>
     <v-dialog v-model="visible" max-width="700">
         <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props">
-                <v-icon>mdi-account-multiple-outline</v-icon>
-                <span class="mx-3">Manage</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
         </template>
         <v-card>
             <v-card-title class="bg-primary text-center">

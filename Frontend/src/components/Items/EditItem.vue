@@ -70,7 +70,7 @@ const emits = defineEmits<{
     <v-dialog v-model="visible" close-on-back max-width="850"
         @update:model-value="() => emits('update:modelValue', visible)">
         <template v-slot:activator="{ props }">
-            <slot :props="props"></slot>
+            <slot :activator="props"></slot>
         </template>
         <v-card class="position-relative">
             <v-card-title class="bg-primary text-center position-sticky">

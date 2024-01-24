@@ -22,17 +22,12 @@ import {
     ContactPage
 } from '@/pages'
 
-const IsLoggedIn = (): boolean => {
-    const token = getToken()
-    return token != ''
-}
-
 const requireLoggedIn = (
     to: RouteLocationNormalized,
     from: RouteLocationNormalized,
     next: NavigationGuardNext
 ) => {
-    if (IsLoggedIn()) {
+    if (getToken() != undefined) {
         next()
     } else {
         next({ name: RouterEnum.LOGIN })
@@ -43,7 +38,7 @@ const AlreadyLoggedIn = (
     from: RouteLocationNormalized,
     next: NavigationGuardNext
 ) => {
-    if (IsLoggedIn()) {
+    if (getToken() != undefined) {
         next({ name: RouterEnum.PROJECT })
     } else {
         next()

@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { storeToRefs } from 'pinia'
 import { GlobalStore, UserStore } from '@/stores'
 import { useToster } from '@/composable/useToaster'
@@ -19,9 +19,15 @@ const navigateTologin = async () => {
     logout()
 }
 
-http.interceptors.request.use((config) => {
+http.interceptors.request.use((config: InternalAxiosRequestConfig<any>) => {
     loadingEffect(true)
-    config.headers.Authorization = `Bearer ${getToken()}`
+    const token = getToken()
+    if (config.url?.toLowerCase() != 'account/login' && config.url?.toUpperCase() != 'account/signup') {
+        if (!token) {
+            navigateTologin()
+        }
+        config.headers.Authorization = `Bearer ${getToken()}`
+    }
     return config
 })
 http.interceptors.response.use(
@@ -47,7 +53,6 @@ http.interceptors.response.use(
             useToster({ message: 'Server unavailable', color: 'danger' })
         } else if (error.response?.status == 401) {
             navigateTologin()
-            useToster({ message: 'Your session is over Please login again', color: 'warning' })
         } else {
             useToster({ message: error.response?.data.message, color: 'danger' })
         }

@@ -3,11 +3,9 @@ import { ref, watch, type Ref } from 'vue'
 import type { IKeep } from '@/Models/KeepModels'
 import moment from 'moment'
 
-withDefaults(defineProps<{
+defineProps<{
     keep: IKeep
-}>(), {
-
-})
+}>()
 
 const visible: Ref<boolean> = ref(false)
 
@@ -24,10 +22,7 @@ const emits = defineEmits<{
 <template>
     <v-dialog v-model="visible" max-width="500" v-if="keep">
         <template v-slot:activator="{ props }">
-            <v-list-item role="button" v-bind="props">
-                <v-icon>mdi-information-outline</v-icon>
-                <span class="mx-3">Info</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
         </template>
         <v-card class="overflow-auto">
             <v-card-title class="text-center bg-primary">
