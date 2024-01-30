@@ -14,7 +14,8 @@ interface IInvitedKeep extends IInvitedProject {
 }
 interface IProjectInvite {
     projectId: string
-    users: IUser[]
+    user: IUser
+    permission: Permission
 }
 interface IKeepInvite extends IProjectInvite {
     keepId: string
@@ -24,9 +25,7 @@ interface InviteResponse {
     inviteId: string
     response: boolean
 }
-interface IInvitingUser extends IUser {
-    permission: Permission
-}
+
 interface IUpdatePermission {
     shareId: string
     permission: Permission
@@ -37,6 +36,5 @@ export type {
     IKeepInvite,
     IProjectInvite,
     InviteResponse,
-    IInvitingUser,
     IUpdatePermission
 }

@@ -2,14 +2,11 @@
 
 namespace Keeper.Common.ViewModels
 {
-    public class InvitingUser : UserViewModel
-    {
-        public Permission Permission { get; set; } = Permission.VIEW;
-    } 
-    public class ProjectInviteModel
+    public class ProjectInviteModel 
     {
         public Guid ProjectId { get; set; }
-        public List<InvitingUser> Users{ get; set; } = new (); 
+        public UserViewModel User { get; set; } = default!;
+        public Permission Permission { get; set; }
     }
     
     public class KeepInviteModel : ProjectInviteModel

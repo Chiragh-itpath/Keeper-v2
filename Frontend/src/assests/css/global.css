@@ -23,3 +23,6 @@
 .cursor-pointer {
     cursor: pointer !important;
 }
+.cursor-text {
+    cursor: text !important;
+}

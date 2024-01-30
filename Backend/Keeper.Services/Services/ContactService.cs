@@ -10,40 +10,51 @@ namespace Keeper.Services.Services
     {
         private readonly IContactRepo _contact;
         private readonly IUserService _userService;
-        public ContactService(IContactRepo contact, IUserService userService)
+        private readonly IInviteService _inviteService;
+        private readonly IProjectService _projectService;
+        private readonly IProjectShareRepo _projectShareRepo;
+        public ContactService(IContactRepo contact, IUserService userService, IInviteService inviteService, IProjectService projectService, IProjectShareRepo projectShareRepo)
         {
             _contact = contact;
             _userService = userService;
+            _inviteService = inviteService;
+            _projectService = projectService;
+            _projectShareRepo = projectShareRepo;
         }
-        public  ContactViewModel Mapper(ContactModel contact)
+        public ContactViewModel Mapper(ContactModel contact)
         {
             return new ContactViewModel
             {
                 Id = contact.Id,
                 AddedBy = _userService.MapToUserVM(contact.AddedBy),
-                AddedPerson= _userService.MapToUserVM(contact.AddedPerson)
+                AddedPerson = _userService.MapToUserVM(contact.AddedPerson)
             };
         }
-        public async Task<List<ContactViewModel>> AddAsync(AddContact contact, Guid userId)
+        public async Task<ContactViewModel> AddAsync(AddContact addContact, Guid userId)
         {
-            List<ContactViewModel> contacts = new();
-            foreach(var addedId in contact.UserIds)
+            var addedContact = await _contact.AddAsync(new ContactModel
             {
-                var addedContact = await _contact.AddAsync(new ContactModel
+                AddedById = userId,
+                AddedId = addContact.User.Id
+            });
+            if (addContact.ProjectId != null)
+            {
+                await _inviteService.InviteToProjectAsync(new ProjectInviteModel
                 {
-                    AddedById = userId,
-                    AddedId = addedId
-                });
-                var viewModel = await GetById(addedContact.Id);
-                contacts.Add(viewModel);
+                    User = addContact.User,
+                    ProjectId = (Guid)addContact.ProjectId,
+                    Permission = addContact.Permission
+                }, userId);
             }
-            return contacts;
+            return (await GetById(addedContact.Id));
         }
 
         public async Task<List<ContactViewModel>> GetAllContacts(Guid userId)
         {
-            var contacts = await _contact.GetAllAsync(userId);
-            return contacts.Select(contact => Mapper(contact)).ToList();
+            var contactList = await _contact.GetAllAsync(userId);
+            return contactList
+                .Select(contact => Mapper(contact))
+                .ToList();
         }
         public async Task<ContactViewModel> GetById(Guid id)
         {

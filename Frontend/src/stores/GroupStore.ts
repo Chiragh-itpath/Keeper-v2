@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { GroupService } from '@/Services/GroupService'
-import type { IAddContact, IAddGroup, IGroup } from '@/Models/GroupModels'
+import type { IAddContactToGroup, IAddGroup, IGroup } from '@/Models/GroupModels'
 import { ref, type Ref } from 'vue'
 
 export const GroupStore = defineStore('group', () => {
@@ -20,7 +20,7 @@ export const GroupStore = defineStore('group', () => {
             Groups.value = res
         }
     }
-    const AddContacts = async (contacts: IAddContact) => {
+    const AddContacts = async (contacts: IAddContactToGroup) => {
         const res = await groupService.AddContacts(contacts)
         if (res) {
             const index = Groups.value.findIndex((x) => x.id == res.id)

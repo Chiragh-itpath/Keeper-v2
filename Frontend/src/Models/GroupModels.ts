@@ -11,9 +11,9 @@ interface IAddGroup {
     contactId: string[]
 }
 
-interface IAddContact {
+interface IAddContactToGroup {
     groupId: string,
     contactIds: string[]
 }
 
-export type { IAddGroup, IGroup, IAddContact }
+export type { IAddGroup, IGroup, IAddContactToGroup }

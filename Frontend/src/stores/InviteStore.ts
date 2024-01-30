@@ -1,17 +1,15 @@
 import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IInvitedKeep, IInvitedProject } from '@/Models/InviteModels'
+import type { IInvitedKeep, IInvitedProject, IKeepInvite, IProjectInvite } from '@/Models/InviteModels'
 import { InviteService } from '@/Services/InviteService'
-import type { IUser } from '@/Models/UserModels'
 
 const InviteStore = defineStore('inviteStore', () => {
     const inviteService = new InviteService()
     const InvitedProjectList: Ref<IInvitedProject[]> = ref([])
     const InvitedKeepList: Ref<IInvitedKeep[]> = ref([])
-    const InviteUsersToProject = async (projectId: string, users: IUser[]) => {
-        await inviteService.InviteToProject({
-            projectId,
-            users
+    const InviteUsersToProject = async (projectInvites: IProjectInvite[]) => {
+        projectInvites.forEach(async (projectInvite) => {
+            await inviteService.InviteToProject(projectInvite)
         })
     }
     const FetchInvitedProjects = async () => {
@@ -32,11 +30,9 @@ const InviteStore = defineStore('inviteStore', () => {
             InvitedKeepList.value = response
         }
     }
-    const InviteUsersToKeep = async (keepId: string, projectId: string, users: IUser[]) => {
-        await inviteService.InviteToKeep({
-            keepId,
-            projectId,
-            users
+    const InviteUsersToKeep = async (keepInvites: IKeepInvite[]) => {
+        keepInvites.forEach(async (keepInvite) => {
+            await inviteService.InviteToKeep(keepInvite)
         })
     }
     const keepInviteResponse = async (inviteId: string, inviteResponse: boolean): Promise<boolean> => {

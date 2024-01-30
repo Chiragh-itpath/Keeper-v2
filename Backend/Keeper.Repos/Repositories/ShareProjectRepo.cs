@@ -32,6 +32,7 @@ namespace Keeper.Repos.Repositories
         public async Task<List<SharedProjectsModel>> GetAllInvited(Guid UserId)
         {
             return await _db.SharedProjects
+                .Include(x => x.Project)
                 .AsNoTracking()
                 .Where(x => x.UserId == UserId)
                 .ToListAsync();

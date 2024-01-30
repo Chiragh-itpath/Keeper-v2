@@ -170,7 +170,7 @@ onMounted(async () => {
                 </v-col>
             </template>
         </v-row>
-        <v-row v-if="!loading && project && keep && view == 'grid'" class="bg-white mt-5 mb-5">
+        <v-row v-if="!loading && project && keep && view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">
             <v-col cols="12">
                 <v-row class="border-b bg-primary">
                     <v-col cols="1">#</v-col>

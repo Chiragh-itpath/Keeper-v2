@@ -3,7 +3,7 @@ import type { IToken } from '@/Models/TokenModel'
 const setToken = (token: IToken): void => {
     const date = new Date()
     date.setHours(date.getHours() + 1)
-    document.cookie = `token=${JSON.stringify(token)};expires=${date} ; path=/;`
+    document.cookie = `token=${JSON.stringify(token)};expires=${date.toUTCString()} ; path=/;`
 }
 const removeToken = (): void => {
     document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`

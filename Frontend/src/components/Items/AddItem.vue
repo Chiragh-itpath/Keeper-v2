@@ -57,6 +57,7 @@ watch(visible, () => {
         addItem.keepId = props.keep.id
         addItem.type = ItemType.TICKET
     }
+    validateOn.value = 'submit'
 })
 </script>
 <template>

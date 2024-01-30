@@ -22,11 +22,6 @@ namespace Keeper.Common.ViewModels
         public bool IsShared { get; set; } = false;
         public List<ProjectUsersViewModel> Users { get; set; } = new();
     }
-    public class PartialProjectDetailsModel
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = default!;
-    }
     public class ProjectUsersViewModel
     {
         public Guid? ShareId { get; set; }
