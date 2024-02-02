@@ -1,18 +1,13 @@
-﻿using Keeper.Common.Enums;
-
-namespace Keeper.Common.ViewModels
+﻿namespace Keeper.Common.ViewModels
 {
-    public class ContactViewModel
+    public class ContactViewModel : AddContact
     {
         public Guid Id { get; set; }
-        public UserViewModel AddedBy { get; set; } = default!;
-        public UserViewModel AddedPerson { get; set; } = default!;
-        public List<ProjectViewModel> Projects { get; set; } = new();
     }
     public class AddContact
     {
-        public UserViewModel User { get; set; } = default!;
-        public Guid? ProjectId { get; set; }
-        public Permission Permission { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }

@@ -2,7 +2,7 @@
 import { ref, watch, type Ref } from 'vue'
 import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
 import { GlobalStore, ProjectStore, UserStore } from '@/stores'
-import { DeletePropmt } from '@/components/Custom'
+import { DeletePrompt } from '@/components/Custom'
 import { permissions } from '@/data/permission'
 import { storeToRefs } from 'pinia'
 
@@ -45,6 +45,7 @@ const handleRemove = async (id: string) => {
     if (res) {
         InvitedUsers.value.splice(InvitedUsers.value.findIndex(x => x.shareId == id), 1)
     }
+
 }
 const handleUpdate = async () => {
     const updatePermissionModel = updatingUsers.value.map(x => {
@@ -120,12 +121,12 @@ const emits = defineEmits<{
                                         </template>
                                     </v-select>
                                 </v-sheet>
-                                <delete-propmt title="Remove Member" subtitle="Are you sure you want to remove this user"
+                                <delete-prompt title="Remove Member" subtitle="Are you sure you want to remove this user"
                                     @click:yes="() => handleRemove(user.shareId)">
                                     <template v-slot:default="{ props }">
                                         <v-icon color="danger" v-bind="props">mdi-delete</v-icon>
                                     </template>
-                                </delete-propmt>
+                                </delete-prompt>
                             </template>
                         </v-list-item>
                     </template>

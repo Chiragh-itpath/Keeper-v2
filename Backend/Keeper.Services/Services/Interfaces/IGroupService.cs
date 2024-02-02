@@ -7,5 +7,6 @@ namespace Keeper.Services.Services.Interfaces
         Task<GroupViewModel> AddAsync(AddGroup addGroup, Guid userId);
         Task<List<GroupViewModel>> GetAllGroup(Guid userId);
         Task<GroupViewModel> AddContacts(AddContactsToGroup addContacts);
+        Task<bool> RemoveContact(Guid contactId, Guid groupId);
     }
 }

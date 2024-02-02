@@ -1,13 +1,9 @@
-import { type IUser } from '@/Models/UserModels'
-import type { Permission } from './enum'
-interface IContact {
-    id: string,
-    addedBy: IUser
-    addedPerson: IUser
+interface IContact extends IAddContact {
+    id: string,    
 }
 interface IAddContact {
-    user: IUser,
-    projectId?: string,
-    permission: Permission
+    firstName: string,
+    lastName: string,
+    email: string
 }
 export type { IContact, IAddContact }

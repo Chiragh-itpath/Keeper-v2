@@ -27,7 +27,7 @@ const validateForm = async () => {
 }
 const searchHandler = (searchVal: string | null) => {
     if (searchVal && searchVal != '') {
-        Contacts.value = props.contacts.filter(x => x.addedPerson.userName.startsWith(searchVal) || x.addedPerson.email.startsWith(searchVal))
+        Contacts.value = props.contacts.filter(x => x.firstName.startsWith(searchVal) || x.email.startsWith(searchVal))
     } else {
         Contacts.value = props.contacts
     }
@@ -85,18 +85,17 @@ watch(visible, () => {
                         <v-card max-height="500" elevation="0">
                             <v-list @update:selected="selectHandler">
                                 <template v-for="(contact, index) in Contacts" :key="index">
-                                    <v-list-item :title="contact.addedPerson.userName" :subtitle="contact.addedPerson.email"
-                                        :value="contact.id" class="border rounded-lg mb-3 py-1">
+                                    <v-list-item :title="`${contact.firstName} ${contact.lastName}`"
+                                        :subtitle="contact.email" :value="contact.id" class="border rounded-lg mb-3 py-1">
                                         <template v-slot:prepend="{ isSelected }">
                                             <v-checkbox density="compact" hide-details color="primary" class="me-2"
                                                 :model-value="isSelected" />
-                                            <v-avatar :text="contact.addedPerson.email.charAt(0).toUpperCase()"
-                                                color="primary" />
+                                            <v-avatar :text="contact.email.charAt(0).toUpperCase()" color="primary" />
                                         </template>
                                     </v-list-item>
                                 </template>
                                 <v-list-item v-if="Contacts.length == 0" title="No Contact found"
-                                    class="bg-grey-lighten-2 text-center rounded-lg" />
+                                    class="bg-grey-lighten-3 text-center text-grey rounded-lg" />
                             </v-list>
                         </v-card>
                     </v-window-item>

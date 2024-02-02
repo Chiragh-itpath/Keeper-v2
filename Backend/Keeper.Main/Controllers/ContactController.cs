@@ -16,7 +16,7 @@ namespace Keeper.Main.Controllers
         {
             _contact = contact;
         }
-        [HttpPost("")]
+        [HttpPost]
         public async Task<ResponseModel<ContactViewModel>> AddContact(AddContact contact)
         {
             var user = User.Identities.First();
@@ -28,7 +28,25 @@ namespace Keeper.Main.Controllers
                 Data = res
             };
         }
-        [HttpGet("")]
+        [HttpPut]
+        public async Task<ResponseModel<ContactViewModel>> UpdateContact(ContactViewModel contact)
+        {
+            var res = await _contact.UpdateAsync(contact);
+            return new()
+            {
+                Data = res
+            };
+        }
+        [HttpDelete("{id}")]
+        public async Task<ResponseModel<string>> DeleteContact([FromRoute] Guid id)
+        {
+            await _contact.DeleteAsync(id);
+            return new()
+            {
+                Data = "Deleted"
+            };
+        }
+        [HttpGet]
         public async Task<ResponseModel<List<ContactViewModel>>> GetContacts()
         {
             var user = User.Identities.First();

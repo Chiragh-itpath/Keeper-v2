@@ -1,5 +1,5 @@
 import DatePicker from './DatePicker.vue'
-import DeletePropmt from './DeletePropmt.vue'
+import DeletePrompt from './DeletePrompt.vue'
 import HoverEffect from './HoverEffect.vue'
 import LoaderComponent from './LoaderComponent.vue'
 import NoItem from './NoItem.vue'
@@ -11,7 +11,7 @@ import SearchableList from './SearchableList.vue'
 
 export {
     DatePicker,
-    DeletePropmt,
+    DeletePrompt,
     HoverEffect,
     LoaderComponent,
     NoItem,

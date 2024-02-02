@@ -1,4 +1,3 @@
-import type { IUser } from '@/Models/UserModels'
 import type { Permission } from '@/Models/enum'
 
 interface IInvited {
@@ -14,7 +13,7 @@ interface IInvitedKeep extends IInvitedProject {
 }
 interface IProjectInvite {
     projectId: string
-    user: IUser
+    email: string
     permission: Permission
 }
 interface IKeepInvite extends IProjectInvite {

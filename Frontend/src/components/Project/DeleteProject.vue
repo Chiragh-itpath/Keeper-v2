@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { DeletePropmt } from '@/components/Custom'
+import { DeletePrompt } from '@/components/Custom'
 import { ProjectStore } from '@/stores'
 
 const { id } = defineProps<{
@@ -21,9 +21,9 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <delete-propmt v-model="visible" @click:yes="deleteHandler" title="Delete Project">
+    <delete-prompt v-model="visible" @click:yes="deleteHandler" title="Delete Project">
         <template v-slot="{ props }">
             <slot :activator="props"></slot>
         </template>
-    </delete-propmt>
+    </delete-prompt>
 </template>

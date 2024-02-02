@@ -1,20 +1,30 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { AddContact, AllGroups, AddGroup } from '@/components/Contact'
+import { AddContact, AllGroups, AddGroup, AllContacts } from '@/components/Contact'
 import { ContactStore, GroupStore, ProjectStore } from '@/stores'
 import type { IContact } from '@/Models/ContactModels'
+import type { IGroup } from '@/Models/GroupModels'
 
 const tabs = ref()
-const contactSearch: Ref<string> = ref('')
-const groupSearch: Ref<string> = ref('')
 const contactsToDisplay: Ref<IContact[]> = ref([])
+const groupsToDisplay: Ref<IGroup[]> = ref([])
 const { GetContacts } = ContactStore()
 const { GetGroups } = GroupStore()
 const { Contacts } = storeToRefs(ContactStore())
+const { Groups } = storeToRefs(GroupStore())
 const { isProjectFetched, Projects } = storeToRefs(ProjectStore())
 
 const loading: Ref<boolean> = ref(false)
+
+const contactSearchHandler = (value: string | null) => {
+    contactsToDisplay.value = Contacts.value.filter(contact =>
+        !value || contact.firstName.startsWith(value) || contact.email.startsWith(value)
+    )
+}
+const groupSearchHandler = (value: string | null) => {
+    groupsToDisplay.value = Groups.value.filter(group => !value || group.name.startsWith(value))
+}
 onMounted(async () => {
     loading.value = true
     await GetContacts()
@@ -23,6 +33,7 @@ onMounted(async () => {
         await ProjectStore().GetProjects()
     }
     contactsToDisplay.value = Contacts.value
+    groupsToDisplay.value = Groups.value
     loading.value = false
 })
 </script>
@@ -51,66 +62,37 @@ onMounted(async () => {
                 <v-row class="mt-10 align-center">
                     <v-col>
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
-                            hide-details v-model="contactSearch" density="comfortable">
+                            hide-details density="comfortable" @update:model-value="contactSearchHandler"
+                            clear-icon="mdi-close-circle-outline">
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
                             </template>
-                            <template v-slot:clear>
-                                <v-icon @click="contactSearch = ''">mdi-close-circle-outline</v-icon>
-                            </template>
                         </v-text-field>
                     </v-col>
-                    <v-col cols="auto" class="text-end me-2">
-                        <add-contact :contacts="Contacts" :project="Projects" />
+                    <v-col cols="12" sm="auto" class="text-end me-2">
+                        <add-contact :contacts="Contacts" :projects="Projects" />
                     </v-col>
                 </v-row>
-                <v-card class="mt-10">
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="1">#</v-col>
-                            <v-col>name</v-col>
-                            <v-col>Email</v-col>
-                            <v-col>Projects</v-col>
-                        </v-row>
-                        <template v-for="(contact, index) in contactsToDisplay" :key="index">
-                            <v-row class="border-t mt-3">
-                                <v-col cols="1">
-                                    <v-avatar :text="contact.addedPerson.email[0].toUpperCase()" color="primary"></v-avatar>
-                                </v-col>
-                                <v-col>{{ contact.addedPerson.userName }}</v-col>
-                                <v-col>{{ contact.addedPerson.email }}</v-col>
-                                <v-col>
-                                    {{
-                                        Projects.filter(p => {
-                                            return p.users.some(x => x.invitedUser.id == contact.addedPerson.id)
-                                        }).length
-                                    }}
-                                </v-col>
-                            </v-row>
-                        </template>
-                    </v-card-text>
-                </v-card>
+                <all-contacts :contacts="contactsToDisplay"></all-contacts>
             </v-window-item>
             <v-window-item value="group">
                 <v-row class="mt-10 align-center">
                     <v-col>
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
-                            hide-details v-model="groupSearch" density="comfortable">
+                            hide-details density="comfortable" clear-icon="mdi-close-circle-outline"
+                            @update:model-value="groupSearchHandler">
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
                             </template>
-                            <template v-slot:clear>
-                                <v-icon @click="groupSearch = ''">mdi-close-circle-outline</v-icon>
-                            </template>
                         </v-text-field>
                     </v-col>
-                    <v-col cols="auto" class="text-center">
+                    <v-col cols="12" sm="auto" class="text-end me-2">
                         <add-group :contacts="Contacts"></add-group>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <all-groups :search="groupSearch"></all-groups>
+                        <all-groups :groups="groupsToDisplay"></all-groups>
                     </v-col>
                 </v-row>
             </v-window-item>

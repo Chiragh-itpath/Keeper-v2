@@ -3,12 +3,11 @@ import { type Ref, ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { InviteDropDown } from '@/components/Contact/'
 import { GlobalStore, InviteStore, KeepStore } from '@/stores'
-import type { IUser } from '@/Models/UserModels'
 import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
 import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
-import type { IInvitingUser } from '@/Models/InviteModels'
 import { Permission } from '@/Models/enum'
 import { permissions } from '@/data/permission'
+import type { IKeepInvite } from '@/Models/InviteModels'
 
 const props = defineProps<{
     keep: IKeep
@@ -18,16 +17,15 @@ const props = defineProps<{
 const permissionForAll = ref(0)
 const visible: Ref<boolean> = ref(false)
 const window: Ref<'next' | 'done'> = ref('next')
-const inviteUser: Ref<IInvitingUser[]> = ref([])
-const selectedUser: Ref<IUser[]> = ref([])
+const inviteUser: Ref<IKeepInvite[]> = ref([])
+const selectedUser: Ref<string[]> = ref([])
 const keepInvitedUsers: Ref<IKeepMembers[]> = ref([])
 const projectInvitedUsers: Ref<IProjectMembers[]> = ref([])
 const errorMessage: Ref<string> = ref('')
 const { Loading } = storeToRefs(GlobalStore())
-
 const handleInvite = async (): Promise<void> => {
     if (props.keep) {
-        await InviteStore().InviteUsersToKeep(props.keep.id, props.project.id, inviteUser.value)
+        await InviteStore().InviteUsersToKeep(inviteUser.value)
         await KeepStore().GetInvitedMembers(props.keep.id)
         visible.value = false
         inviteUser.value = []
@@ -47,11 +45,16 @@ watch(visible, () => {
 })
 watch(selectedUser, () => {
     inviteUser.value = selectedUser.value.filter(u =>
-        !keepInvitedUsers.value.some(s => s.invitedUser.id == u.id)
+        !keepInvitedUsers.value.some(s => s.invitedUser.email == u)
     ).filter(u =>
-        !projectInvitedUsers.value.some(s => s.invitedUser.id == u.id)
+        !projectInvitedUsers.value.some(s => s.invitedUser.email == u)
     ).map(x => {
-        return { ...x, permission: Permission.VIEW }
+        return {
+            email: x,
+            keepId: props.keep.id,
+            projectId: props.project.id,
+            permission: Permission.VIEW
+        }
     })
     errorMessage.value = inviteUser.value.length != selectedUser.value.length ?
         'Users already invited to this project or keep will not be included' : ''
@@ -122,7 +125,7 @@ onMounted(() => {
                         </v-list-item>
                         <v-list height="270" class="overflow-auto">
                             <template v-for="(share, index) in inviteUser" :key="index">
-                                <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.userName"
+                                <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.email"
                                     :subtitle="share.email">
                                     <template v-slot:prepend>
                                         <v-avatar color="primary">

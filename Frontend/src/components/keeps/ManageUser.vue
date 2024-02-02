@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
 import { GlobalStore, KeepStore } from '@/stores'
 import { permissions } from '@/data/permission'
-import { DeletePropmt } from '@/components/Custom'
+import { DeletePrompt } from '@/components/Custom'
 
 const props = defineProps<{
     keep: IKeep
@@ -121,12 +121,12 @@ const emits = defineEmits<{
                                         </template>
                                     </v-select>
                                 </v-sheet>
-                                <delete-propmt title="Remove user" subtitle="Are you sure you want to remove this user?"
+                                <delete-prompt title="Remove user" subtitle="Are you sure you want to remove this user?"
                                     @click:yes="() => handleRemove(user.shareId)">
                                     <template v-slot="{ props }">
                                         <v-icon color="danger" v-bind="props">mdi-delete</v-icon>
                                     </template>
-                                </delete-propmt>
+                                </delete-prompt>
                             </template>
                         </v-list-item>
                     </template>

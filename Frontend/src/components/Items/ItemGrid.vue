@@ -92,7 +92,7 @@ watch(props, () => {
                 </v-col>
                 <v-col cols="1">
                     <template v-if="item.discussedBy">
-                        <v-avatar color="primary" size="small">
+                        <v-avatar color="primary" size="small" class="cursor-pointer">
                             <v-tooltip activator="parent" location="top">
                                 {{ item.discussedBy }}
                             </v-tooltip>

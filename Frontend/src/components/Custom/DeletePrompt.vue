@@ -6,7 +6,8 @@ import { ref, watch, type Ref } from 'vue'
 const props = withDefaults(defineProps<{
     modelValue?: boolean,
     title?: string,
-    subtitle?: string
+    subtitle?: string,
+    width?: string
 }>(), {
     modelValue: false,
     subtitle: 'Are you sure want to delete this?'
@@ -27,7 +28,7 @@ const emits = defineEmits<{
 
 </script>
 <template>
-    <v-dialog v-model="visible" transition="scale-transition" max-width="400">
+    <v-dialog v-model="visible" :max-width="width ?? 400">
         <template v-slot:activator="{ props }">
             <slot v-bind="{ props }"></slot>
         </template>
@@ -37,13 +38,15 @@ const emits = defineEmits<{
                 <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text class="my-2">
-                {{ subtitle }}
+                <slot name="alert">
+                    {{ subtitle }}
+                </slot>
             </v-card-text>
             <v-card-actions class="my-2 d-flex justify-end">
-                <v-btn variant="outlined" color="success" class="rounded-xl mx-2" width="100"
-                    @click="visible = false">Cancel</v-btn>
-                <v-btn variant="elevated" color="danger" class="rounded-xl mx-2" width="100" @click="emits('click:yes')"
-                    :loading="Loading">Yes</v-btn>
+                <v-btn text="Cancel" variant="outlined" color="success" class="rounded-xl mx-2" width="100"
+                    @click="visible = false" />
+                <v-btn text="yes" variant="elevated" color="danger" class="rounded-xl mx-2" width="100"
+                    @click="emits('click:yes'); visible = !visible" :loading="Loading" />
             </v-card-actions>
         </v-card>
     </v-dialog>

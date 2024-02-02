@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch, type Ref } from 'vue'
-import { ContactStore, GlobalStore, GroupStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { ContactStore, GlobalStore, GroupStore } from '@/stores'
 import type { IGroup } from '@/Models/GroupModels'
+import { DeletePrompt } from '@/components/Custom'
 
 
-const { AddContacts } = GroupStore()
+const { AddContacts, RemoveContact } = GroupStore()
 const { Contacts } = storeToRefs(ContactStore())
 const { Loading } = storeToRefs(GlobalStore())
 const visible: Ref<boolean> = ref(false)
@@ -14,10 +15,6 @@ const error: Ref<string | undefined> = ref()
 const props = defineProps<{
     group: IGroup
 }>()
-
-const clickHandler = () => {
-    visible.value = true
-}
 
 const submitHandler = async () => {
     error.value = undefined
@@ -36,7 +33,7 @@ const items = computed(() => {
         return !props.group.contacts.find(c => c.id == x.id)
     }).map(c => {
         return {
-            title: c.addedPerson.email,
+            title: c.email,
             value: c.id
         }
     })
@@ -46,9 +43,11 @@ watch(visible, () => [
 ])
 </script>
 <template>
-    <slot :onclick="clickHandler"></slot>
     <v-dialog v-model="visible" max-width="700">
-        <v-card>
+        <template v-slot:activator="{ props }">
+            <slot :activator="props"></slot>
+        </template>
+        <v-card max-height="500">
             <v-card-title class="bg-primary text-center">
                 <span>Group Contacts</span>
                 <span class="float-end">
@@ -67,7 +66,7 @@ watch(visible, () => [
                             </template>
                             <template v-slot:no-data>
                                 <v-list-item class="text-center text-grey">
-                                    No more data
+                                    No data
                                 </v-list-item>
                             </template>
                         </v-select>
@@ -82,22 +81,29 @@ watch(visible, () => [
                         </v-btn>
                     </v-col>
                     <v-col cols="12">
-                        <v-card max-height="500" elevation="0">
-                            <v-list>
-                                <template v-for="(contact, index) in group.contacts" :key="index">
-                                    <v-list-item :title="contact.addedPerson.userName" :subtitle="contact.addedPerson.email"
-                                        class="border rounded-lg py-2">
-                                        <template v-slot:prepend>
-                                            <v-avatar :text="contact.addedPerson.email.charAt(0)"
-                                                class="bg-primary text-capitalize" />
-                                        </template>
-                                    </v-list-item>
-                                </template>
-                            </v-list>
-                        </v-card>
+                        <v-list max-height="300">
+                            <v-list-item class="text-grey text-center bg-grey-lighten-2 rounded-lg"
+                                v-if="group.contacts.length == 0">
+                                No Contacts
+                            </v-list-item>
+                            <template v-for="(contact, index) in group.contacts" :key="index">
+                                <v-list-item :title="`${contact.firstName} ${contact.lastName}`" :subtitle="contact.email"
+                                    class="border rounded-lg py-2 mb-2">
+                                    <template v-slot:prepend>
+                                        <v-avatar :text="contact.email.charAt(0)" class="bg-primary text-capitalize" />
+                                    </template>
+                                    <template v-slot:append>
+                                        <delete-prompt v-slot="{ props }" width="500" title="Remove Contact"
+                                            subtitle="Are you sure you want to remove contact from group?"
+                                            @click:yes="RemoveContact(group.id, contact.id)">
+                                            <v-icon icon="mdi-delete" color="danger" v-bind="props" />
+                                        </delete-prompt>
+                                    </template>
+                                </v-list-item>
+                            </template>
+                        </v-list>
                     </v-col>
                 </v-row>
-
             </v-card-text>
             <v-card-actions></v-card-actions>
         </v-card>

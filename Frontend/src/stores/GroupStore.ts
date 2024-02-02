@@ -27,11 +27,20 @@ export const GroupStore = defineStore('group', () => {
             Groups.value.splice(index, 1, res)
         }
     }
+    const RemoveContact = async (groupId: string, contactId: string) => {
+        const res = await groupService.RemoveContact(groupId, contactId)
+        if (res) {
+            const groupIndex = Groups.value.findIndex(g => g.id == groupId)
+            const contactIndex = Groups.value[groupIndex].contacts.findIndex(c => c.id == contactId)
+            Groups.value[groupIndex].contacts.splice(contactIndex, 1)
+        }
+    }
     return {
         Groups,
         isGroupFetched,
         AddGroup,
         GetGroups,
-        AddContacts
+        AddContacts,
+        RemoveContact
     }
 })

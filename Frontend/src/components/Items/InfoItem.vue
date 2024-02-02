@@ -126,7 +126,7 @@ const emit = defineEmits<{
                                 <v-col cols="6">modified on:</v-col>
                                 <v-col cols="6">
                                     <span v-if="item.updatedOn">
-                                        {{ moment(item.createdOn).format('DD/MM/YYYY, hh:mm a') }}
+                                        {{ moment(item.updatedOn).format('DD/MM/YYYY, hh:mm a') }}
                                     </span>
                                     <span v-else>-</span>
                                 </v-col>

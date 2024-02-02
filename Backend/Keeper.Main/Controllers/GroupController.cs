@@ -42,5 +42,14 @@ namespace Keeper.Main.Controllers
             var res = await _group.AddContacts(addContacts);
             return new ResponseModel<GroupViewModel> { Data = res };
         }
+        [HttpDelete("RemoveContact/{groupId}/{contactId}")]
+        public async Task<ResponseModel<string>> RemoveContact(Guid groupId, Guid contactId)
+        {
+            await _group.RemoveContact(contactId, groupId);
+            return new()
+            {
+                Data = "Success"
+            };
+        }
     }
 }

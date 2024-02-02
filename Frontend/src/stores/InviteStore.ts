@@ -8,9 +8,11 @@ const InviteStore = defineStore('inviteStore', () => {
     const InvitedProjectList: Ref<IInvitedProject[]> = ref([])
     const InvitedKeepList: Ref<IInvitedKeep[]> = ref([])
     const InviteUsersToProject = async (projectInvites: IProjectInvite[]) => {
-        projectInvites.forEach(async (projectInvite) => {
-            await inviteService.InviteToProject(projectInvite)
-        })
+        const invitePromises = projectInvites.map(async (projectInvite) => {
+            await inviteService.InviteToProject(projectInvite);
+        });
+
+        await Promise.all(invitePromises);
     }
     const FetchInvitedProjects = async () => {
         const response = await inviteService.GetAllInvitedProject()
@@ -31,9 +33,10 @@ const InviteStore = defineStore('inviteStore', () => {
         }
     }
     const InviteUsersToKeep = async (keepInvites: IKeepInvite[]) => {
-        keepInvites.forEach(async (keepInvite) => {
+        const invitePromises = keepInvites.map(async (keepInvite) => {
             await inviteService.InviteToKeep(keepInvite)
         })
+        await Promise.all(invitePromises)
     }
     const keepInviteResponse = async (inviteId: string, inviteResponse: boolean): Promise<boolean> => {
         return (await inviteService.ResponseToKeepInvite({
