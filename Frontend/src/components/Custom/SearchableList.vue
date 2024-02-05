@@ -14,7 +14,10 @@ const inputHandler = () => {
     if (search.value == '') {
         displayList.value = props.searchItems
     } else {
-        displayList.value = displayList.value.filter(x => x.value.startsWith(search.value) || x.title.startsWith(search.value))
+        displayList.value = displayList.value.filter(x =>
+            x.value.toLowerCase().startsWith(search.value.toLowerCase()) ||
+            x.title.toLowerCase().startsWith(search.value.toLowerCase())
+        )
     }
     emit('update:modelValue', search.value != '' ? search.value : undefined)
 }
