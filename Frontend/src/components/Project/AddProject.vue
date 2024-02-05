@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref, type Ref } from 'vue'
+import { reactive, ref, watch, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { GlobalStore, ProjectStore } from '@/stores'
 import { TextField } from '@/components/Custom'
 import type { IAddProject } from '@/Models/ProjectModels'
-import { watch } from 'vue'
+
 
 const visible: Ref<boolean> = ref(false)
 const form = ref()
@@ -18,10 +18,9 @@ const addProject: IAddProject = reactive({
 
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
-    if (valid) {
-        await AddProject(addProject)
-        close()
-    }
+    if (!valid) return
+    await AddProject(addProject)
+    visible.value = false
 }
 watch(visible, (newVal) => {
     if (!newVal) {
