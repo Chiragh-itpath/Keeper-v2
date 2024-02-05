@@ -18,6 +18,9 @@ const { groups } = defineProps<{
             </v-row>
         </v-card-title>
         <v-card-text class="pt-3">
+            <v-row v-if="groups.length == 0" class="pa-1">
+                <v-col cols="12" class="text-center text-grey">No Groups</v-col>
+            </v-row>
             <template v-for="(group, index) in groups" :key="index">
                 <group-details :group="group" v-slot="{ activator }">
                     <v-row v-bind="activator" class="cursor-pointer">
