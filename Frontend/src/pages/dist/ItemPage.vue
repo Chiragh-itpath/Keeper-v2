@@ -48,7 +48,7 @@ const users = computed(() => {
     const _users: { title: string, value: string }[] = []
     if (project.value) {
         _users.push(
-            ...project.value.users.map(x => {
+            ...project.value.users.filter(x => x.isAccepted).map(x => {
                 return {
                     title: x.invitedUser.userName,
                     value: x.invitedUser.email
@@ -58,7 +58,7 @@ const users = computed(() => {
     }
     if (keep.value) {
         _users.push(
-            ...keep.value.users.map(x => {
+            ...keep.value.users.filter(x => x.isAccepted).map(x => {
                 return {
                     title: x.invitedUser.userName,
                     value: x.invitedUser.email
