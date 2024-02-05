@@ -18,8 +18,8 @@ watch(searchText, () => {
     displayUser.value = props.users.filter(x => {
         return (
             !searchText.value ||
-            x.title.startsWith(searchText.value) ||
-            x.value.startsWith(searchText.value)
+            x.title.toLowerCase().startsWith(searchText.value.toLowerCase()) ||
+            x.value.toLowerCase().startsWith(searchText.value.toLowerCase())
         )
     })
 })
@@ -107,7 +107,7 @@ const emits = defineEmits<{
                         </template>
                     </v-list-item>
                 </template>
-                <v-list-item v-if="displayUser.length == 0" title="No user found"></v-list-item>
+                <v-list-item v-if="displayUser.length == 0" title="No user found" class="text-grey"></v-list-item>
             </v-list>
         </v-menu>
     </v-col>

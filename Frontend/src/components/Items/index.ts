@@ -6,6 +6,7 @@ import UpdateStatus from './UpdateStatus.vue'
 import ItemFilter from './ItemFilter.vue'
 import ItemCard from './ItemCard.vue'
 import ItemGrid from './ItemGrid.vue'
+import ImagePreview from './ImagePreview.vue'
 import { ItemStatus, ItemType } from '@/Models/enum'
 
 export {
@@ -16,7 +17,8 @@ export {
     UpdateStatus,
     ItemFilter,
     ItemCard,
-    ItemGrid
+    ItemGrid,
+    ImagePreview
 }
 
 export type ListItemsType = {
