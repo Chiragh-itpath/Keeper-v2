@@ -18,7 +18,9 @@ namespace Keeper.Repos.Repositories
             return await _db.Items
                 .Include(i => i.CreatedBy)
                 .Include(i => i.UpdatedBy)
-                .Where(x => x.KeepId == KeepId && !x.IsDeleted).ToListAsync();
+                .Where(x => x.KeepId == KeepId && !x.IsDeleted)
+                .OrderBy(x => x.CreatedOn)
+                .ToListAsync();
         }
 
         public async Task<ItemModel?> GetAsync(Guid ItemId)
@@ -26,7 +28,8 @@ namespace Keeper.Repos.Repositories
             return await _db.Items
                 .Include(i => i.CreatedBy)
                 .Include(i => i.UpdatedBy)
-                .Where(i => !i.IsDeleted).FirstOrDefaultAsync(x => x.Id == ItemId);
+                .Where(i => !i.IsDeleted)
+                .FirstOrDefaultAsync(x => x.Id == ItemId);
         }
 
         public async Task<Guid> SaveAsync(ItemModel item)

@@ -18,22 +18,32 @@ namespace Keeper.Repos.Repositories
             await _db.SaveChangesAsync();
             return contact;
         }
+        public async Task<ContactModel> UpdateAsync(ContactModel contact)
+        {
+            _db.Entry(contact).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
+            return contact;
+        }
+        public async Task DeleteAsync(ContactModel contact)
+        {
+            _db.Remove(contact);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<List<ContactModel>> GetAllAsync(Guid userId)
         {
             return await _db.Contact
-                .Include(x => x.AddedPerson)
-                .Include(x => x.AddedBy)
                 .AsNoTracking()
-                .Where(x => x.AddedById == userId)
+                .Where(x => x.UserId == userId)
                 .ToListAsync();
         }
         public async Task<ContactModel> GetByIdAsync(Guid id)
         {
             return await _db.Contact
-                .Include(x => x.AddedBy)
-                .Include(x => x.AddedPerson)
                 .AsNoTracking()
                 .FirstAsync(x => x.Id == id);
         }
+
+
     }
 }

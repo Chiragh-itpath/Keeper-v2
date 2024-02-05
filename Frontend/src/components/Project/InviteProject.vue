@@ -3,11 +3,10 @@ import { ref, watch, type Ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { InviteStore, GlobalStore, ProjectStore, UserStore } from '@/stores'
 import { InviteDropDown } from '@/components/Contact'
-import type { IUser } from '@/Models/UserModels'
 import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
-import type { IInvitingUser } from '@/Models/InviteModels'
 import { Permission } from '@/Models/enum'
 import { permissions } from '@/data/permission'
+import type { IProjectInvite } from '@/Models/InviteModels'
 
 const props = defineProps<{
     project: IProject,
@@ -16,8 +15,8 @@ const props = defineProps<{
 const permissionForAll = ref(0)
 const visible: Ref<boolean> = ref(false)
 const window: Ref<'next' | 'done'> = ref('next')
-const inviteUser: Ref<IInvitingUser[]> = ref([])
-const selectedUsers: Ref<IUser[]> = ref([])
+const inviteUser: Ref<IProjectInvite[]> = ref([])
+const selectedUsers: Ref<string[]> = ref([])
 const InvitedUsers: Ref<IProjectMembers[]> = ref([])
 const errorMessage: Ref<string> = ref('')
 const { InviteUsersToProject } = InviteStore()
@@ -26,7 +25,7 @@ const projectStore = ProjectStore()
 
 const handleInvite = async (): Promise<void> => {
     if (props.project) {
-        await InviteUsersToProject(props.project.id, inviteUser.value)
+        await InviteUsersToProject(inviteUser.value)
         await projectStore.GetInvitedMembers(props.project.id)
         inviteUser.value = []
         visible.value = false
@@ -46,9 +45,13 @@ watch(visible, () => {
 })
 watch(selectedUsers, () => {
     inviteUser.value = selectedUsers.value.filter(x =>
-        !InvitedUsers.value.some(i => i.invitedUser.id == x.id)
+        !InvitedUsers.value.some(i => i.invitedUser.email == x)
     ).map(x => {
-        return { ...x, permission: Permission.VIEW }
+        return {
+            projectId: props.project.id,
+            email: x,
+            permission: Permission.VIEW
+        }
     });
     errorMessage.value = selectedUsers.value.length != inviteUser.value.length ?
         'Users already invited to this project will not be included' : '';
@@ -67,12 +70,9 @@ const emits = defineEmits<{
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700" close-on-back>
+    <v-dialog v-model="visible" max-width="700" close-on-back>
         <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props">
-                <v-icon>mdi-account-plus-outline</v-icon>
-                <span class="mx-3">Invite</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
         </template>
         <v-card>
             <v-card-title class="text-center bg-primary">
@@ -82,7 +82,7 @@ const emits = defineEmits<{
             <v-card-text>
                 <v-window v-model="window" :touch="false">
                     <v-window-item value="next">
-                        <invite-drop-down v-model:users="selectedUsers" :error-message="errorMessage"></invite-drop-down>
+                        <invite-drop-down v-model:emails="selectedUsers" :error-message="errorMessage"></invite-drop-down>
                         <v-list-item v-if="InvitedUsers.length == 0" height="250"
                             class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
                             No Data
@@ -123,7 +123,7 @@ const emits = defineEmits<{
                         </v-list-item>
                         <v-list height="270" class="overflow-auto">
                             <template v-for="( share, index ) in  inviteUser " :key="index">
-                                <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.userName"
+                                <v-list-item class="py-2 mb-1 rounded-lg border" :title="share.email"
                                     :subtitle="share.email">
                                     <template v-slot:prepend>
                                         <v-avatar color="primary">

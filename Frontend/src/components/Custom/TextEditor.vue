@@ -31,7 +31,7 @@ const toolbar = [
 
 <template>
     <div class="container">
-        <quill-editor :toolbar="toolbar" style="height: 200px;" v-model:content="text" content-type="html" > </quill-editor>
+        <quill-editor :toolbar="toolbar" style="height: 150px;" v-model:content="text" content-type="html" > </quill-editor>
     </div>
 </template>
 <style>

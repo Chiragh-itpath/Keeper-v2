@@ -1,6 +1,7 @@
 ﻿using Keeper.Context;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Keeper.Repos.Repositories
 {
@@ -18,5 +19,22 @@ namespace Keeper.Repos.Repositories
             await _db.SaveChangesAsync();
             return item;
         }
+        public async Task<ContactGroupLinkerModel?> GetAsync(Guid contactId, Guid groupId)
+        {
+            return await _db.ContactGroupLinkers
+                .FirstOrDefaultAsync(x => x.ContactId == contactId && x.GroupId == groupId);
+        }
+        public async Task<List<ContactGroupLinkerModel>> GetListByContactId(Guid contactId)
+        {
+            return await _db.ContactGroupLinkers
+                .Where(x => x.ContactId == contactId)
+                .ToListAsync();
+        }
+        public async Task<int> RemoveAsync(ContactGroupLinkerModel linkerModel)
+        {
+            _db.Remove(linkerModel);
+            return await _db.SaveChangesAsync();
+        }
+
     }
 }

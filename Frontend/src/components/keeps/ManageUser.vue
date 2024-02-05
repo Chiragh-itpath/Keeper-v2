@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
 import { GlobalStore, KeepStore } from '@/stores'
 import { permissions } from '@/data/permission'
-import { DeletePropmt } from '@/components/Custom'
+import { DeletePrompt } from '@/components/Custom'
 
 const props = defineProps<{
     keep: IKeep
@@ -83,10 +83,7 @@ const emits = defineEmits<{
 <template>
     <v-dialog v-model="visible" max-width="700">
         <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props">
-                <v-icon>mdi-account-multiple-outline</v-icon>
-                <span class="mx-3">Manage</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
         </template>
         <v-card>
             <v-card-title class="bg-primary text-center">
@@ -99,7 +96,11 @@ const emits = defineEmits<{
                         <template v-slot:append>
                             <v-sheet width="120">
                                 <v-select density="compact" color="primary" hide-details :items="permissions"
-                                    v-model="permissionForAll"></v-select>
+                                    v-model="permissionForAll">
+                                    <template v-slot:item="{ props }">
+                                        <v-list-item v-bind="props" density="compact"></v-list-item>
+                                    </template>
+                                </v-select>
                             </v-sheet>
                         </template>
                     </v-list-item>
@@ -115,14 +116,17 @@ const emits = defineEmits<{
                                 <v-sheet width="120" class="mx-2">
                                     <v-select density="compact" color="primary" hide-details :items="permissions"
                                         v-model="user.permission" @update:model-value="() => handleValueChanges(index)">
+                                        <template v-slot:item="{ props }">
+                                            <v-list-item v-bind="props" density="compact"></v-list-item>
+                                        </template>
                                     </v-select>
                                 </v-sheet>
-                                <delete-propmt title="Remove user" subtitle="Are you sure you want to remove this user?"
+                                <delete-prompt title="Remove user" subtitle="Are you sure you want to remove this user?"
                                     @click:yes="() => handleRemove(user.shareId)">
                                     <template v-slot="{ props }">
                                         <v-icon color="danger" v-bind="props">mdi-delete</v-icon>
                                     </template>
-                                </delete-propmt>
+                                </delete-prompt>
                             </template>
                         </v-list-item>
                     </template>

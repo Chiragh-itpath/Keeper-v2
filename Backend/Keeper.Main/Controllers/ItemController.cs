@@ -12,11 +12,11 @@ namespace Keeper.Main.Controllers
     public class ItemController : ControllerBase
     {
         private readonly IItemService _itemService;
-        private readonly ICommentService _comment;
+        private readonly ICommentService _commentService;
         public ItemController(IItemService itemService, ICommentService comment)
         {
             _itemService = itemService;
-            _comment = comment;
+            _commentService = comment;
         }
         [HttpGet("{id}")]
         public async Task<ResponseModel<ItemViewModel>> GetById([FromRoute] Guid id)
@@ -50,6 +50,15 @@ namespace Keeper.Main.Controllers
             var res = await _itemService.UpdateAsync(editItem, userId);
             return new ResponseModel<ItemViewModel> { Data = res };
         }
+        [HttpPut("UpdateStatus")]
+        public async Task<ResponseModel<ItemViewModel>> UpdateStatus(UpdateItemStatus newStatusDetails)
+        {
+            var user = User.Identities.First();
+            var claims = user.Claims.ToList();
+            var userId = Guid.Parse(claims.ElementAt(3).Value);
+            var response = await _itemService.UpdateStatus(newStatusDetails, userId);
+            return new() { Data = response };
+        }
         [HttpDelete("{Id}")]
         public async Task<ResponseModel<string>> Delete(Guid id)
         {
@@ -62,8 +71,17 @@ namespace Keeper.Main.Controllers
             var user = User.Identities.First();
             var claims = user.Claims.ToList();
             var userId = Guid.Parse(claims.ElementAt(3).Value);
-            var res = await _comment.AddCommentAsync(addComment, userId);
+            var res = await _commentService.AddCommentAsync(addComment, userId);
             return new ResponseModel<CommentViewModel> { Data = res };
+        }
+        [HttpGet("Comments/{itemId}")]
+        public async Task<ResponseModel<List<CommentViewModel>>> GetComments([FromRoute] Guid itemId)
+        {
+            var comments = await _commentService.GetAllCommnets(itemId);
+            return new()
+            {
+                Data = comments
+            };
         }
     }
 }

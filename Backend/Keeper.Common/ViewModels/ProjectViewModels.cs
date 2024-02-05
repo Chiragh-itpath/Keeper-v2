@@ -2,7 +2,7 @@
 
 namespace Keeper.Common.ViewModels
 {
-    public class AddProject 
+    public class AddProject
     {
         public string Title { get; set; } = default!;
         public string? Description { get; set; }
@@ -12,7 +12,7 @@ namespace Keeper.Common.ViewModels
     {
         public Guid Id { get; set; }
     }
-    public class ProjectViewModel: AddProject
+    public class ProjectViewModel : AddProject
     {
         public Guid Id { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -24,7 +24,7 @@ namespace Keeper.Common.ViewModels
     }
     public class ProjectUsersViewModel
     {
-        public Guid? ShareId{ get; set; }
+        public Guid? ShareId { get; set; }
         public bool IsAccepted { get; set; }
         public Permission Permission { get; set; }
         public UserViewModel InvitedUser { get; set; } = new();

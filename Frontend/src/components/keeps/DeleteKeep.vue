@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue'
 import { KeepStore } from '@/stores'
-import { DeletePropmt } from '@/components/Custom'
+import { DeletePrompt } from '@/components/Custom'
 
 const props = defineProps<{
     id: string
@@ -22,12 +22,9 @@ const emits = defineEmits<{
 
 </script>
 <template>
-    <delete-propmt v-model="visible" @click:yes="deleteHandler" title="Delete Keep">
+    <delete-prompt v-model="visible" @click:yes="deleteHandler" title="Delete Keep">
         <template v-slot="{ props }">
-            <v-list-item role="button" v-bind="props">
-                <v-icon>mdi-delete-outline</v-icon>
-                <span class="mx-3">Delete</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
         </template>
-    </delete-propmt>
+    </delete-prompt>
 </template>

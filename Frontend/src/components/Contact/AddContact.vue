@@ -1,123 +1,152 @@
 <script setup lang="ts">
-import { ref, watch, type Ref } from 'vue'
-import { ContactStore, GlobalStore, UserStore } from '@/stores'
-import { debounce } from 'lodash'
+import { ref, watch, type Ref, reactive, computed } from 'vue'
+import { ContactStore, GlobalStore, InviteStore } from '@/stores'
 import { storeToRefs } from 'pinia'
-import type { IUser } from '@/Models/UserModels'
+import { TextField } from '@/components/Custom'
+import type { IAddContact, IContact } from '@/Models/ContactModels'
+import type { IProject } from '@/Models/ProjectModels'
+import type { IProjectInvite } from '@/Models/InviteModels'
+import { permissions } from '@/data/permission'
+import { Permission } from '@/Models/enum'
+
+const { contacts, projects } = defineProps<{
+    contacts: IContact[],
+    projects: IProject[]
+}>()
+const contactStore = ContactStore()
+const { Loading, errors } = storeToRefs(GlobalStore())
+const window: Ref<'form' | 'project'> = ref('project')
 
 const visible: Ref<boolean> = ref(false)
-const email: Ref<string> = ref('')
-const items: Ref<any[]> = ref([])
-const selected = ref()
-const selectedUsers: Ref<IUser[]> = ref([])
-const menu: Ref<boolean> = ref(false)
-const { SearchEmail } = UserStore()
-const { AddContact } = ContactStore()
-const { Contacts } = storeToRefs(ContactStore())
-const isLoading: Ref<boolean> = ref(false)
-const { Loading } = storeToRefs(GlobalStore())
-const inputHandler = debounce(async (): Promise<void> => {
-    isLoading.value = true
-    menu.value = false
-    if (email.value.trim() == '') {
-        items.value = []
-        isLoading.value = false
+watch(visible, async () => {
+    if (form.value) {
+        form.value.reset()
+    }
+    window.value = 'form'
+    errors.value = {}
+    validate.value = false
+    invite.value = false
+})
+const validate: Ref<boolean> = ref(false)
+const form = ref()
+const addContact = reactive<IAddContact>({
+    firstName: '',
+    lastName: '',
+    email: ''
+})
+const submitHandler = async () => {
+    validate.value = true
+    const { valid } = await form.value.validate()
+    if (!valid) return
+    if (contacts.some(x => x.email == addContact.email)) {
+        errors.value.email = 'Contact already exist'
         return
     }
-    const res = await SearchEmail(email.value)
-    items.value = res.filter(x =>
-        !selectedUsers.value.some(user => user.id === x.id)
-    ).filter(x =>
-        !Contacts.value.some(user => user.addedPerson.id === x.id)
-    ).map(x => {
-        return {
-            title: x.userName,
-            subtitle: x.email,
-            value: x
-        }
-    })
-    isLoading.value = false
-    menu.value = true
-}, 500)
-const submitHandler = async () => {
-    await AddContact(selectedUsers.value.map(x => x.id))
+    if (await contactStore.AddContact(addContact)) {
+        if (invite.value)
+            window.value = 'project'
+        else
+            visible.value = false
+    }
+}
+const invite: Ref<boolean> = ref(false)
+const items = computed((): { title: string, value: IProjectInvite }[] => {
+    return projects
+        .filter(p => !p.isShared)
+        .map(p => {
+            return {
+                title: p.title,
+                value: {
+                    email: addContact.email,
+                    projectId: p.id,
+                    permission: Permission.VIEW
+                }
+            }
+        })
+})
+const selected: Ref<IProjectInvite[]> = ref([])
+const inviteStore = InviteStore()
+const inviteHandler = async () => {
+    await inviteStore
+        .InviteUsersToProject(selected.value);
     visible.value = false
 }
-const removeSelection = (id: string) => {
-    selectedUsers.value.splice(selectedUsers.value.findIndex(x => x.id == id), 1)
-}
-watch(visible, () => {
-    if (visible.value) {
-        email.value = ''
-        items.value = []
-        selected.value = undefined
-        selectedUsers.value = []
-    }
-})
-watch(email, inputHandler);
-watch(selected, () => {
-    if (selected.value == undefined) return
-    selectedUsers.value.push(selected.value)
-    items.value = []
-    selected.value = undefined
-    email.value = ''
-})
 </script>
 <template>
-    <v-btn color="primary" prepend-icon="mdi-plus" @click="visible = !visible">New Contact</v-btn>
-    <v-dialog v-model="visible" max-width="700">
+    <v-dialog v-model="visible" max-width="700" :close-on-back="!Loading">
+        <template v-slot:activator="{ props }">
+            <v-btn color="primary" class="cursor-pointer" prepend-icon="mdi-plus" v-bind="props">New Contact</v-btn>
+        </template>
         <v-card class="rounded-lg">
             <v-card-title class="bg-primary text-center">
-                <span>New Contact</span>
+                <span>{{ window == 'form' ? 'New Contact' : 'Select Projects' }}</span>
                 <span class="float-right">
-                    <v-icon @click="visible = !visible">mdi-close</v-icon>
+                    <v-btn @click="visible = !visible" icon="mdi-close" variant="flat" color="primary" :disabled="Loading"
+                        density="compact" />
                 </span>
             </v-card-title>
-            <v-card-text>
-                <v-autocomplete :items="items" v-model:search="email" :active="false" v-model:menu="menu"
-                    v-model:model-value="selected" placeholder="Enter email address" color="primary" :loading="isLoading"
-                    label="Email" :hide-no-data="isLoading || email == ''" :menu-props="{ closeOnBack: true }">
-                    <template v-slot:item="{ props, item }">
-                        <v-list-item v-bind="props" :title="item.title" :subtitle="item.raw.subtitle" :value="item.value">
-                        </v-list-item>
-                    </template>
-                    <template v-slot:chip="{ item, props }">
-                        <v-chip v-bind="props" color="primary">
-                            <template v-slot:prepend>
-                                <v-avatar color="red" class="me-2">{{ item.raw.subtitle?.slice(0, 1) }}</v-avatar>
+            <v-card-text class="py-5">
+                <v-window v-model="window" :touch="false">
+                    <v-window-item value="form">
+                        <v-form ref="form" :validate-on="validate ? 'input' : 'submit'" @submit.prevent="submitHandler">
+                            <v-row>
+                                <v-col cols="12" sm="6">
+                                    <text-field label="First name" is-required v-model="addContact.firstName"></text-field>
+                                </v-col>
+                                <v-col cols="12" sm="6">
+                                    <text-field label="Last name" is-required v-model="addContact.lastName"></text-field>
+                                </v-col>
+                                <v-col cols="12">
+                                    <text-field label="Email" is-required is-email v-model="addContact.email"
+                                        :error-messages="errors.email"> </text-field>
+                                </v-col>
+                            </v-row>
+                        </v-form>
+                    </v-window-item>
+                    <v-window-item value="project">
+                        <v-select multiple :items="items" density="comfortable" color="primary" v-model="selected"
+                            label="Select Projects" chips>
+                            <template v-slot:chip>
+                                <v-chip color="primary"></v-chip>
                             </template>
-                            {{ item.raw.subtitle }}
-                        </v-chip>
-                    </template>
-                    <template v-slot:no-data>
-                        <v-list-item>No User found with this Email</v-list-item>
-                    </template>
-                </v-autocomplete>
-                <v-list max-height="200" class="overflow-y-auto px-5">
-                    <v-list-item v-for="(user, index) in selectedUsers" :key="index" class="border mb-3 px-2 py-3">
-                        <template v-slot:prepend>
-                            <v-avatar color="primary">
-                                {{ user.email.slice(0, 1) }}
-                            </v-avatar>
-                        </template>
-                        <template v-slot:title>
-                            {{ user.userName }}
-                        </template>
-                        <template v-slot:subtitle>
-                            {{ user.email }}
-                        </template>
-                        <template v-slot:append>
-                            <v-icon color="danger" @click="() => removeSelection(user.id)">mdi-delete</v-icon>
-                        </template>
-                    </v-list-item>
-                </v-list>
+                        </v-select>
+                        <v-list height="200">
+                            <template v-for="(item, index) in selected" :key="index">
+                                <v-list-item class="border mb-2 rounded-lg">
+                                    {{ projects.find(x => x.id == item.projectId)?.title }}
+                                    <template v-slot:append>
+                                        <v-menu>
+                                            <template v-slot:activator="{ props, isActive }">
+                                                <v-chip color="primary" v-bind="props">
+                                                    {{ permissions[item.permission].title }}
+                                                    <template v-slot:append>
+                                                        <v-icon :icon="`mdi-menu-${isActive ? 'up' : 'down'}`" />
+                                                    </template>
+                                                </v-chip>
+                                            </template>
+                                            <v-list>
+                                                <template v-for="(permission, index) in permissions" :key="index">
+                                                    <v-list-item :title="permission.title" :value="permission.value"
+                                                        density="compact" @click="item.permission = permission.value">
+                                                    </v-list-item>
+                                                </template>
+                                            </v-list>
+                                        </v-menu>
+                                    </template>
+                                </v-list-item>
+                            </template>
+                        </v-list>
+                    </v-window-item>
+                </v-window>
             </v-card-text>
-            <v-card-actions class="justify-end px-4 pb-4">
-                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" @click="submitHandler"
-                    :loading="Loading" :disabled="Loading || selectedUsers.length == 0">
-                    Add
-                    <span v-if="selectedUsers.length > 0">({{ selectedUsers.length }})</span>
-                </v-btn>
+            <v-card-actions class="px-5 pb-4">
+                <v-checkbox label="Invite to project" density="compact" hide-details color="primary" v-model="invite"
+                    v-if="window === 'form'" />
+                <v-spacer></v-spacer>
+                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" text="add" :loading="Loading"
+                    :disabled="Loading" @click="submitHandler" v-if="window === 'form'" />
+                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" text="invite" :loading="Loading"
+                    :disabled="Loading || selected.length == 0" @click="inviteHandler" v-else />
             </v-card-actions>
         </v-card>
     </v-dialog>

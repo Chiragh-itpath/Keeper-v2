@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import homeimg from '@/assests/images/Home.jpg'
+import SiteIcon from '@/assests/images/favicon.svg'
 import { RouterEnum } from '@/Models/enum'
 import { useDisplay } from 'vuetify'
 const { smAndDown, xxl } = useDisplay()
@@ -9,6 +10,9 @@ const { smAndDown, xxl } = useDisplay()
         <v-col cols="12" md="6" class="pa-0">
             <v-sheet :height="smAndDown ? '400' : '100%'" class="w-100 d-flex align-center">
                 <v-row justify="center">
+                    <v-col cols="12" class="d-flex justify-center">
+                        <v-img :src="SiteIcon" width="100" height="100"></v-img>
+                    </v-col>
                     <v-col cols="12" class="text-center text-xl-h1 text-sm-h3 text-h4" :class="xxl ? 'my-2' : ''">
                         <span class="text-primary">Create. </span>
                         <span class="">Organize.</span>

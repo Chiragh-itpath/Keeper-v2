@@ -1,4 +1,6 @@
-﻿using Keeper.Common.ViewModels;
+﻿using Keeper.Common.Enums;
+using Keeper.Common.InnerException;
+using Keeper.Common.ViewModels;
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
 using Keeper.Services.Services.Interfaces;
@@ -52,7 +54,7 @@ namespace Keeper.Services.Services
                 UserEmail = group.User.Email,
                 Contacts = new()
             };
-            foreach(var linker in group.Linkers)
+            foreach (var linker in group.Linkers)
             {
                 groupViewModel.Contacts.Add(await _contact.GetById(linker.ContactId));
             }
@@ -60,7 +62,7 @@ namespace Keeper.Services.Services
         }
         public async Task<GroupViewModel> AddContacts(AddContactsToGroup addContacts)
         {
-            foreach(var contactId in addContacts.ContactIds)
+            foreach (var contactId in addContacts.ContactIds)
             {
                 await _linker.AddAsync(new ContactGroupLinkerModel
                 {
@@ -72,6 +74,10 @@ namespace Keeper.Services.Services
             var viewModel = await FillContacts(group!);
             return viewModel;
         }
-
+        public async Task<bool> RemoveContact(Guid contactId, Guid groupId)
+        {
+            var linkerModel = await _linker.GetAsync(contactId, groupId) ?? throw new InnerException("No Contact Found", StatusType.NOT_FOUND);
+            return await _linker.RemoveAsync(linkerModel) == 1;
+        }
     }
 }

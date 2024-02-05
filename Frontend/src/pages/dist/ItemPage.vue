@@ -1,23 +1,34 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, type Ref } from 'vue'
+import { computed, ref, onMounted, type Ref, reactive, watch } from 'vue'
+import { useDate, useDisplay } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'
-import { AddItem, AllItems } from '@/components/Items'
-import { DatePicker, NoItem } from '@/components/Custom'
-import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { DatePicker, NoItem } from '@/components/Custom'
+import { AddItem, ItemFilter, ItemCard, ItemGrid } from '@/components/Items'
+import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
-import { Permission } from '@/Models/enum'
+import type { IItem } from '@/Models/ItemModels'
+import { ItemStatus, ItemType, Permission } from '@/Models/enum'
 
 const route = useRoute()
+const router = useRouter()
+const dateHelper = useDate()
+const { mdAndDown } = useDisplay()
+const loading: Ref<boolean> = ref(false)
+const view: Ref<'card' | 'grid'> = ref('card')
+const project: Ref<IProject | undefined> = ref()
+const keep: Ref<IKeep | undefined> = ref()
 const { GetAllItems } = ItemStore()
 const { Items } = storeToRefs(ItemStore())
 const { User } = UserStore()
-const loading: Ref<boolean> = ref(false)
-const date = ref(null)
-const project: Ref<IProject | undefined> = ref()
-const keep: Ref<IKeep | undefined> = ref()
-const router = useRouter()
+const itemToDisplay: Ref<IItem[]> = ref([])
+const filters = reactive<{
+    date?: Date,
+    itemType?: ItemType,
+    itemStatus?: ItemStatus,
+    itemOwner?: string
+}>({})
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
@@ -26,13 +37,36 @@ const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
 })
-const filter = ref([])
 const hasAccess = computed((): boolean => {
     return (
         (project.value?.createdBy == User.email) ||
         (project.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false) ||
         (keep.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false)
     )
+})
+const users = computed(() => {
+    const _users: { title: string, value: string }[] = []
+    if (project.value) {
+        _users.push(
+            ...project.value.users.filter(x => x.isAccepted).map(x => {
+                return {
+                    title: x.invitedUser.userName,
+                    value: x.invitedUser.email
+                }
+            })
+        )
+    }
+    if (keep.value) {
+        _users.push(
+            ...keep.value.users.filter(x => x.isAccepted).map(x => {
+                return {
+                    title: x.invitedUser.userName,
+                    value: x.invitedUser.email
+                }
+            })
+        )
+    }
+    return _users
 })
 const breadcrumbsItems = [
     {
@@ -63,6 +97,26 @@ const canCreate = (): boolean => {
         keepUser?.permission == Permission.ALL
     )
 }
+watch([filters, Items], () => {
+    itemToDisplay.value = Items.value.filter(itemFilterCallBack).sort((x, y) => x.status - y.status)
+}, {
+    deep: true
+})
+watch(mdAndDown, () => {
+    view.value = mdAndDown.value ? 'card' : view.value
+})
+const itemFilterCallBack = (item: IItem): boolean => {
+    return (
+        (
+            !filters.date ||
+            dateHelper.format(item.createdOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate') ||
+            dateHelper.format(item.updatedOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate')
+        ) &&
+        (filters.itemType == undefined || item.type == filters.itemType) &&
+        (filters.itemStatus == undefined || item.status == filters.itemStatus) &&
+        (!filters.itemOwner || item.createdBy == filters.itemOwner)
+    )
+}
 onMounted(async () => {
     loading.value = true
     await GetAllItems(keepId.value)
@@ -70,8 +124,8 @@ onMounted(async () => {
     keep.value = await KeepStore().getSingleKeep(keepId.value)
     if (!hasAccess.value) router.go(-1)
     else loading.value = false
+    itemToDisplay.value = Items.value.sort((x, y) => x.status - y.status)
 })
-
 </script>
 <template>
     <v-container class="px-10 pt-5" fluid>
@@ -80,41 +134,72 @@ onMounted(async () => {
                 <v-skeleton-loader type="text,image,actions"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading && project && keep" class="align-center">
+        <v-row v-if="!loading && project && keep" class="align-center flex-wrap">
             <v-col cols="12">
                 <v-breadcrumbs divider="/" :items="breadcrumbsItems"></v-breadcrumbs>
             </v-col>
-            <v-col cols="auto">
-                <date-picker label="Select a date" v-model="date"></date-picker>
+            <v-col cols="auto" v-if="!mdAndDown">
+                <v-btn-toggle v-model="view" mandatory color="primary" class="rounded-pill" density="compact">
+                    <v-btn value="card" text="card" width="90">
+                        <template v-slot:prepend>
+                            <v-icon>mdi-card-text-outline</v-icon>
+                        </template>
+                    </v-btn>
+                    <v-btn value="grid" text="grid" width="90">
+                        <template v-slot:prepend>
+                            <v-icon>mdi-table</v-icon>
+                        </template>
+                    </v-btn>
+                </v-btn-toggle>
             </v-col>
+            <v-col cols="auto">
+                <date-picker label="Select a date" v-model="filters.date"></date-picker>
+            </v-col>
+            <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus" :users="users"
+                v-model:item-owner="filters.itemOwner">
+            </item-filter>
             <v-col>
-                <v-menu :transition="false">
-                    <template v-slot:activator="{ props }">
-                        <v-btn v-bind="props" color="primary" variant="outlined" class="rounded-lg" width="120"
-                            append-icon="mdi-menu-down" v-if="filter.length == 0">
-                            Item Type
-                        </v-btn>
-                        <v-btn color="primary" variant="outlined" class="rounded-lg" width="120" v-else>
-                            <template v-slot:append>
-                                <v-icon @click="filter = []" class="ms-end">mdi-close</v-icon>
-                            </template>
-                            {{ filter[0] == 0 ? 'Ticket' : 'PR' }}
-                        </v-btn>
-                    </template>
-                    <v-list v-model:selected="filter" select-strategy="single-independent"
-                        :items="[{ title: 'Ticket', value: 0 }, { title: 'PR', value: 1 }]">
-                    </v-list>
-                </v-menu>
-            </v-col>
-            <v-col cols="auto">
                 <add-item :keep="keep" :project="project" v-if="canCreate()"></add-item>
             </v-col>
         </v-row>
-        <v-row v-if="!loading && project && keep">
-            <all-items :items="Items" :date="date" :project="project" :keep="keep" :filter="filter[0]"></all-items>
+        <v-row v-if="!loading && project && keep && view == 'card'">
+            <template v-for="(item, index) of itemToDisplay" :key="index">
+                <v-col cols="12" lg="4" md="6">
+                    <item-card :item="item" :project="project" :keep="keep">
+                    </item-card>
+                </v-col>
+            </template>
         </v-row>
-        <v-row v-if="!loading && (!project || !keep)">
-            <no-item :title="!project ? 'No Project found with this id' : 'No Keep found with this id'"></no-item>
+        <v-row v-if="!loading && project && keep && view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">
+            <v-col cols="12">
+                <v-row class="border-b bg-primary">
+                    <v-col cols="1">#</v-col>
+                    <v-col>Description</v-col>
+                    <v-col cols="1"> With</v-col>
+                    <v-col cols="1"> By</v-col>
+                    <v-col cols="2">Status</v-col>
+                </v-row>
+                <template v-for="(item, index) of itemToDisplay" :key="index">
+                    <item-grid :item="item" :project="project" :keep="keep"></item-grid>
+                </template>
+            </v-col>
+        </v-row>
+        <v-row v-if="!loading && (!project || !keep || itemToDisplay.length == 0)" class="mt-10">
+            <no-item>
+                <template v-slot:title>
+                    <span v-if="!project">No Project found with this id</span>
+                    <span v-else-if="!keep">No Keep found with this id</span>
+                    <span v-else>No Item found</span>
+                </template>
+                <template v-slot:subtitle v-if="!(!project || !keep)">
+                    <span v-if="filters.date || filters.itemOwner || filters.itemStatus || filters.itemType">
+                        No item found with specified filters
+                    </span>
+                    <span v-else>
+                        Please click on add button to insert new record
+                    </span>
+                </template>
+            </no-item>
         </v-row>
     </v-container>
 </template>

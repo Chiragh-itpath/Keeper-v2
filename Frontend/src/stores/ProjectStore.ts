@@ -18,11 +18,11 @@ const ProjectStore = defineStore('ProjectStore', () => {
 
     const GetSingalProject = async (id: string): Promise<IProject | undefined> => {
         const projectOnLocal = Projects.value.find(x => x.id == id)
-        if(projectOnLocal) {
+        if (projectOnLocal) {
             return projectOnLocal
         } else {
             const projectOnServer = await projectService.GetById(id)
-            if(projectOnServer){
+            if (projectOnServer) {
                 Projects.value.push(projectOnServer)
                 return projectOnServer
             }
@@ -96,6 +96,7 @@ const ProjectStore = defineStore('ProjectStore', () => {
     return {
         Projects,
         ProjectTags,
+        isProjectFetched,
         AddProject,
         GetSingalProject,
         UpdateProject,

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, type Ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { GlobalStore, ProjectStore } from '@/stores'
 import { TextField } from '@/components/Custom'
 import type { IAddProject } from '@/Models/ProjectModels'
-import { storeToRefs } from 'pinia';
+import { watch } from 'vue'
 
 const visible: Ref<boolean> = ref(false)
 const form = ref()
@@ -22,20 +23,23 @@ const submitHandler = async (): Promise<void> => {
         close()
     }
 }
-const close = () => {
-    form.value.reset()
-    visible.value = false
-}
+watch(visible, (newVal) => {
+    if (!newVal) {
+        form.value.reset()
+    }
+})
 </script>
 <template>
-    <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="visible = true" class="w-sm-100"> 
-        New Project
-    </v-btn>
-    <v-dialog transition="scale-transition" v-model="visible" width="700" @update:model-value="close">
+    <v-dialog v-model="visible" width="700">
+        <template v-slot:activator="{ props }">
+            <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" class="w-sm-100" v-bind="props">
+                New Project
+            </v-btn>
+        </template>
         <v-card>
             <v-card-title class="text-center bg-primary">
                 New Project
-                <v-icon class="float-end" @click="close">mdi-close</v-icon>
+                <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
             </v-card-title>
             <v-card-text>
                 <v-form @submit.prevent="submitHandler" ref="form" validate-on="submit">

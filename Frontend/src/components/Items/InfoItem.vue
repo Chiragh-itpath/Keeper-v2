@@ -1,64 +1,61 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { useDate } from 'vuetify'
-import { ItemStore } from '@/stores'
-import type { IItem } from '@/Models/ItemModels'
-import { AllComments } from '@/components/Comments/'
+import moment from 'moment'
 
-const { GetById } = ItemStore()
+import { AllComments } from '@/components/Comments/'
+import { TypeList } from '@/components/Items'
+import type { IItem } from '@/Models/ItemModels'
+import { ItemType } from '@/Models/enum'
+
 const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
-const Item: Ref<IItem | null> = ref(null)
-const dateHelper = useDate()
-
-const props = withDefaults(defineProps<{
-    modelValue: boolean,
-    id: string
-}>(), {
-    modelValue: false
-})
-
+defineProps<{
+    item: IItem,
+    modelValue?: boolean
+}>()
 const downloadFile = (path: string) => {
     window.open(path, '_blank')
 }
-
-watch(props, () => {
-    visible.value = props.modelValue
-    tab.value = 'info'
-})
-
-watch(visible, async () => {
-    Item.value = await GetById(props.id)
-    if (!visible.value) {
-        emits('update:modelValue', visible.value)
+watch(visible, () => {
+    if (visible.value) {
+        tab.value = 'info'
     }
 })
-
-const emits = defineEmits<{
-    (e: 'update:modelValue', modelValue: boolean): void
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: boolean): void
 }>()
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="800">
-        <v-card v-if="Item">
-            <v-card-title class="bg-primary d-flex">
-                <span>
-                    <a :href="Item.url" class="text-decoration-none text-white" target="_blank">
-                        <v-tooltip>
-                            <template v-slot:activator="{ props }">
-                                <v-chip class="cursor-pointer" v-bind="props">
-                                    {{ Item.type == 0 ? '#' : '!' }}
-                                    {{ Item.number }}
-                                </v-chip>
-                            </template>
-                            {{ Item.type == 0 ? 'Ticket' : 'PR' }}
-                        </v-tooltip>
-                    </a>
-                </span>
+    <v-dialog v-model="visible" max-width="800" @update:model-value="(value) => emit('update:modelValue', value)">
+        <template v-slot:activator="{ props }">
+            <slot :activator="props" :visible="visible"></slot>
+        </template>
+        <v-card>
+            <v-card-title class="bg-primary d-flex align-center">
+                <a :href="item.url" class="text-decoration-none text-white" target="_blank">
+                    <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                            <v-chip class="me-1" v-bind="props"
+                                v-if="item.type == ItemType.TICKET || item.type == ItemType.PR">
+                                {{ item.type == 0 ? '#' : '!' }} {{ item.number }}
+                            </v-chip>
+                            <v-icon size="small" v-bind="props"
+                                v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
+                                :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file'"></v-icon>
+                        </template>
+                        {{ TypeList[item.type].title }}
+                    </v-tooltip>
+                </a>
                 <v-spacer></v-spacer>
-                <span class="text-truncate">{{ Item.title }}</span>
+                <span class="text-truncate">{{ item.title }}</span>
                 <v-spacer></v-spacer>
-                <v-icon color="white" @click="(visible = false)">mdi-close</v-icon>
+                <slot name="edit"></slot>
+                <v-tooltip location="top">
+                    <template v-slot:activator="{ props: tooltip }">
+                        <v-icon color="white" v-bind="tooltip" class="ms-2" @click="(visible = false)">mdi-close</v-icon>
+                    </template>
+                    Close
+                </v-tooltip>
             </v-card-title>
             <v-card-text class="pa-0 pb-5">
                 <div class="d-flex flex-row-reverse mx-5">
@@ -72,24 +69,30 @@ const emits = defineEmits<{
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
                             <div>
-                                <div class="mb-3">Discussed with:
-                                    <v-chip v-if="Item.to" color="primary">{{ Item.to }}</v-chip>
+                                <div class="mb-3">Discuss with:
+                                    <span v-if="item.to">
+                                        <template v-for="(client, index) in item.to.split(/,/)" :key="index">
+                                            <v-chip color="primary" class="mx-1" v-if="client.trim()">
+                                                {{ client.trim() }}
+                                            </v-chip>
+                                        </template>
+                                    </span>
                                     <span class="text-grey text-h5" v-else>-</span>
                                 </div>
-                                <div class="mb-3">Discussed by:
-                                    <v-chip color="primary" v-if="Item.discussedBy">
-                                        {{ Item.discussedBy }}
+                                <div class="mb-3">Discuss by:
+                                    <v-chip color="primary" v-if="item.discussedBy">
+                                        {{ item.discussedBy }}
                                     </v-chip>
                                     <span v-else class="text-grey text-h5">-</span>
                                 </div>
                             </div>
                             <div class="description rounded-lg pa-3 mt-2 ">
-                                <div v-if="Item.description" v-html="Item.description"></div>
+                                <div v-if="item.description" v-html="item.description"></div>
                                 <div v-else class="text-grey">No description provided</div>
                             </div>
-                            <div v-if="Item.files.length > 0" class="mt-3">Files:</div>
+                            <div v-if="item.files.length > 0" class="mt-3">Files:</div>
                             <v-row class="mt-2">
-                                <v-col v-for="(file, index) in Item.files" :key="index" cols="auto">
+                                <v-col v-for="(file, index) in item.files" :key="index" cols="auto">
                                     <v-card max-width="200" color="primary" variant="tonal"
                                         class="d-flex justify-center align-center pa-3">
                                         <v-tooltip location="top">
@@ -106,24 +109,24 @@ const emits = defineEmits<{
                             </v-row>
                         </v-window-item>
                         <v-window-item value="comments">
-                            <all-comments :item-id="Item.id" :comments="Item.comments"></all-comments>
+                            <all-comments :item-id="item.id" :comments="item.comments"></all-comments>
                         </v-window-item>
                         <v-window-item value="logs">
                             <v-row>
                                 <v-col cols="6">created by:</v-col>
-                                <v-col cols="6">{{ Item.createdBy }}</v-col>
+                                <v-col cols="6">{{ item.createdBy }}</v-col>
                                 <v-col cols="6">created on:</v-col>
                                 <v-col cols="6">
-                                    {{ dateHelper.format(Item.createdOn, 'keyboardDate') }}
+                                    {{ moment(item.createdOn).format('DD/MM/YYYY, hh:mm a') }}
                                 </v-col>
                                 <v-col cols="6">modified by:</v-col>
                                 <v-col cols="6">
-                                    {{ Item.updatedBy ?? '-' }}
+                                    {{ item.updatedBy ?? '-' }}
                                 </v-col>
                                 <v-col cols="6">modified on:</v-col>
                                 <v-col cols="6">
-                                    <span v-if="Item.updatedOn">
-                                        {{ dateHelper.format(Item.updatedOn, 'keyboardDate') }}
+                                    <span v-if="item.updatedOn">
+                                        {{ moment(item.updatedOn).format('DD/MM/YYYY, hh:mm a') }}
                                     </span>
                                     <span v-else>-</span>
                                 </v-col>
@@ -135,12 +138,7 @@ const emits = defineEmits<{
         </v-card>
     </v-dialog>
 </template>
-<style scoped>
-.v-col-4,
-.v-col-8 {
-    padding: 8px 12px;
-}
-
+<style>
 .description {
     min-height: 150px;
     max-height: 300px;
@@ -149,7 +147,8 @@ const emits = defineEmits<{
     overflow-x: auto;
 }
 
-.scroll-y-reverse-transition {
-    transition-duration: 1s !important;
+.description>div>ol,
+.description>div>ul {
+    margin: 0 15px;
 }
 </style>

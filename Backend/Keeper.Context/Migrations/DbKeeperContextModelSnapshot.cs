@@ -85,17 +85,24 @@ namespace Keeper.Context.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AddedById")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("AddedId")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddedById");
-
-                    b.HasIndex("AddedId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Contact");
                 });
@@ -185,8 +192,10 @@ namespace Keeper.Context.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -469,21 +478,13 @@ namespace Keeper.Context.Migrations
 
             modelBuilder.Entity("Keeper.Context.Model.ContactModel", b =>
                 {
-                    b.HasOne("Keeper.Context.Model.UserModel", "AddedBy")
+                    b.HasOne("Keeper.Context.Model.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("AddedById")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Keeper.Context.Model.UserModel", "AddedPerson")
-                        .WithMany()
-                        .HasForeignKey("AddedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AddedBy");
-
-                    b.Navigation("AddedPerson");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.GroupModel", b =>

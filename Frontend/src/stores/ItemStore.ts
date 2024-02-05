@@ -4,12 +4,12 @@ import type { IItem, IAddItem, IEditItem } from '@/Models/ItemModels'
 import { ItemService } from '@/Services/ItemService'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
 import { useToster } from '@/composable/useToaster'
+import type { ItemStatus } from '@/Models/enum'
 
 const ItemStore = defineStore('item', () => {
     const Items: Ref<IItem[]> = ref([])
-    const AllItems: Ref<IItem[]> = ref([])
+    const Comments: Ref<IComment[]> = ref([])
 
-    const KeepId: Ref<string> = ref('')
     const itemService = new ItemService()
     const getSingalItem = (id: string): IItem | undefined => {
         const item = Items.value.find((x) => x.id == id)
@@ -17,11 +17,9 @@ const ItemStore = defineStore('item', () => {
     }
 
     const GetAllItems = async (id: string): Promise<void> => {
-        KeepId.value = id
         const response = await itemService.GetAll(id)
         if (response) {
-            AllItems.value = response
-            fetchItems()
+            Items.value = response
         }
     }
 
@@ -32,54 +30,36 @@ const ItemStore = defineStore('item', () => {
         }
         return null
     }
+    const CreateForm = (item: IAddItem | IEditItem): FormData => {
+        const formData = new FormData();
+        formData.append('type', String(item.type));
+        for (const [key, value] of Object.entries(item)) {
+            if (value !== null && value !== undefined && key !== 'files') {
+                formData.append(key, String(value));
+            }
+        }
+        if (item.files) {
+            item.files.forEach((file) => {
+                formData.append('files', file);
+            });
+        }
+        return formData;
+    };
 
     const AddItem = async (addItem: IAddItem): Promise<void> => {
-        const formData = new FormData()
-        formData.append('title', addItem.title)
-        formData.append('type', addItem.type == 'Ticket' ? '0' : '1')
-        formData.append('number', addItem.number.toString())
-        formData.append('url', addItem.url ?? '')
-        formData.append('description', addItem.description ?? '')
-        formData.append('keepId', addItem.keepId)
-        formData.append('to', addItem.to ?? '')
-        formData.append('discussedBy', addItem.discussedBy ?? '')
-        if (addItem.files != null) {
-            for (const file of addItem.files) {
-                formData.append('files', file)
-            }
-        }
-
-        const response = await itemService.Add(formData)
+        const response = await itemService.Add(CreateForm(addItem))
         if (response) {
-            AllItems.value.push(response)
-            fetchItems()
+            Items.value.unshift(response)
         }
     }
-    const EditItem = async (editItem: IEditItem): Promise<void> => {
-        const formData = new FormData()
-        formData.append('id', editItem.id)
-        formData.append('title', editItem.title)
-        formData.append('type', editItem.type == 'Ticket' ? '0' : '1')
-        formData.append('number', editItem.number.toString())
-        formData.append('url', editItem.url ?? '')
-        formData.append('description', editItem.description ?? '')
-        formData.append('keepId', editItem.keepId)
-        formData.append('to', editItem.to ?? '')
-        formData.append('discussedBy', editItem.discussedBy ?? '')
-        if (editItem.files != null) {
-            for (const file of editItem.files) {
-                formData.append('files', file)
-            }
-        }
-        const response = await itemService.Update(formData)
+    const EditItem = async (editItem: IEditItem): Promise<IItem | undefined> => {
+        const response = await itemService.Update(CreateForm(editItem))
         if (response) {
             const index = Items.value.findIndex((x) => x.id == editItem.id)
-            AllItems.value.splice(index, 1, response)
-            fetchItems()
+            Items.value.splice(index, 1, response)
+            return response
         }
-    }
-    const fetchItems = () => {
-        Items.value = AllItems.value
+        return undefined
     }
     const DeleteItem = async (id: string): Promise<void> => {
         const response = await itemService.Delete(id)
@@ -87,25 +67,43 @@ const ItemStore = defineStore('item', () => {
             useToster({ message: 'Item Deleted' })
             const index = Items.value.findIndex((x) => x.id == id)
             if (index != -1) {
-                AllItems.value.splice(index, 1)
-                fetchItems()
+                Items.value.splice(index, 1)
             }
         }
     }
-    const AddComment = async (addCommnet: IAddComment): Promise<IComment | null> => {
-        const comment = await itemService.PostComment(addCommnet)
+    const AddComment = async (addComment: IAddComment): Promise<IComment | null> => {
+        const comment = await itemService.PostComment(addComment)
         return comment
+    }
+    const updateStatus = async (itemId: string, status: ItemStatus): Promise<boolean> => {
+        const res = await itemService.UpdateStatus(itemId, status)
+        if (res) {
+            const index = Items.value.findIndex(x => x.id == itemId)
+            if (index != -1) {
+                Items.value[index] = res
+            }
+            return true
+        }
+        return false
+    }
+    const fetchComments = async (itemid: string) => {
+        const res = await itemService.getAllComments(itemid)
+        if (res) {
+            Comments.value = res
+        }
     }
     return {
         Items,
-        KeepId,
+        Comments,
         AddItem,
         EditItem,
         DeleteItem,
         GetAllItems,
         GetById,
         getSingalItem,
-        AddComment
+        AddComment,
+        updateStatus,
+        fetchComments
     }
 })
 export { ItemStore }

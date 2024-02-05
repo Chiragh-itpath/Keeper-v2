@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import type { IKeep } from '@/Models/KeepModels'
-import { useDate } from 'vuetify'
+import moment from 'moment'
 
-const dateHelper = useDate()
-withDefaults(defineProps<{
+defineProps<{
     keep: IKeep
-}>(), {
-
-})
+}>()
 
 const visible: Ref<boolean> = ref(false)
 
@@ -23,12 +20,9 @@ const emits = defineEmits<{
 
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="500" v-if="keep">
+    <v-dialog v-model="visible" max-width="500" v-if="keep">
         <template v-slot:activator="{ props }">
-            <v-list-item role="button" v-bind="props">
-                <v-icon>mdi-information-outline</v-icon>
-                <span class="mx-3">Info</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
         </template>
         <v-card class="overflow-auto">
             <v-card-title class="text-center bg-primary">
@@ -58,7 +52,7 @@ const emits = defineEmits<{
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Created On:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
-                        {{ dateHelper.format(keep.createdOn, 'keyboardDate') }}
+                        {{ moment(keep.createdOn).format('DD/MM/YYYY, hh:mm a') }}
                     </v-col>
 
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified By:</v-col>
@@ -70,7 +64,7 @@ const emits = defineEmits<{
                     <v-col cols="6" class="text-grey pb-0 pb-sm-3">Last Modified:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
                         <span v-if="keep.updatedOn">
-                            {{ dateHelper.format(keep.updatedOn, 'keyboardDate') }}
+                            {{ moment(keep.updatedOn).format('DD/MM/YYYY, hh:mm a') }}
                         </span>
                         <span v-else class="text-grey">-</span>
                     </v-col>

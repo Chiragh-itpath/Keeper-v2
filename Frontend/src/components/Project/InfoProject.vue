@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import type { IProject } from '@/Models/ProjectModels'
-import { useDate } from 'vuetify'
+import moment from 'moment'
 
 defineProps<{
     project: IProject
 }>()
 
 const visible: Ref<boolean> = ref(false)
-const dateHelper = useDate()
 const emit = defineEmits<{
     (e: 'close'): void
 }>()
@@ -17,12 +16,10 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-dialog transition="scale-transition" v-model="visible" max-width="700" v-if="project">
+    <v-dialog v-model="visible" max-width="700" v-if="project">
         <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props">
-                <v-icon>mdi-information-outline</v-icon>
-                <span class="mx-3">Info</span>
-            </v-list-item>
+            <slot :activator="props"></slot>
+            
         </template>
         <v-card class="overflow-auto">
             <v-card-title class="text-center bg-primary">
@@ -55,7 +52,7 @@ watch(visible, () => {
 
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Created On:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
-                        {{ dateHelper.format(project.createdOn, 'keyboardDate') }}
+                        {{ moment(project.createdOn).format("DD/MM/YYYY, hh:mm a") }}
                     </v-col>
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">
                         Last Modified By:
@@ -66,7 +63,7 @@ watch(visible, () => {
                     <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Last Modified:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
                         <span v-if="project.updatedOn">
-                            {{ dateHelper.format(project.updatedOn, 'keyboardDate') }}
+                            {{ moment(project.updatedOn).format("DD/MM/YYYY, hh:mm a") }}
                         </span>
                         <span v-else>-</span>
                     </v-col>
