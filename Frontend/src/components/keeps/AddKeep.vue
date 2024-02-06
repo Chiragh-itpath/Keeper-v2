@@ -22,9 +22,9 @@ const addKeep = reactive<IAddKeep>({
 
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
-    if (valid) {
-        await AddKeep(addKeep)
-    }
+    if (!valid) return
+    await AddKeep(addKeep)
+    visible.value = false
 }
 watch(visible, () => {
     if (visible.value) {

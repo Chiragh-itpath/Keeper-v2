@@ -56,6 +56,7 @@ watch(visible, () => {
         form.value.reset()
         addItem.keepId = props.keep.id
         addItem.type = ItemType.TICKET
+        addItem.discussedBy = ''
     }
     validateOn.value = 'submit'
 })
@@ -103,8 +104,8 @@ watch(visible, () => {
                                 <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to" />
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <searchable-list :search-items="users" label="Discuss By"
-                                    v-model="addItem.discussedBy"></searchable-list>
+                                <searchable-list :search-items="users" label="Discuss By" v-model="addItem.discussedBy">
+                                </searchable-list>
                             </v-col>
                         </v-row>
                         <v-row>

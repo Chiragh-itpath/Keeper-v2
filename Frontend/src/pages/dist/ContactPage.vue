@@ -19,11 +19,17 @@ const loading: Ref<boolean> = ref(false)
 
 const contactSearchHandler = (value: string | null) => {
     contactsToDisplay.value = Contacts.value.filter(contact =>
-        !value || contact.firstName.startsWith(value) || contact.email.startsWith(value)
+        !value ||
+        contact.firstName.toLowerCase().startsWith(value.toLowerCase()) ||
+        contact.lastName.toLowerCase().startsWith(value.toLowerCase()) ||
+        contact.email.toLowerCase().startsWith(value.toLowerCase())
     )
 }
 const groupSearchHandler = (value: string | null) => {
-    groupsToDisplay.value = Groups.value.filter(group => !value || group.name.startsWith(value))
+    groupsToDisplay.value = Groups.value.filter(group =>
+        !value ||
+        group.name.toLowerCase().startsWith(value.toLowerCase())
+    )
 }
 onMounted(async () => {
     loading.value = true

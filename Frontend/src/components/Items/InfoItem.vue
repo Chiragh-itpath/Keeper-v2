@@ -3,7 +3,7 @@ import { ref, watch, type Ref } from 'vue'
 import moment from 'moment'
 
 import { AllComments } from '@/components/Comments/'
-import { TypeList } from '@/components/Items'
+import { TypeList, ImagePreview } from '@/components/Items'
 import type { IItem } from '@/Models/ItemModels'
 import { ItemType } from '@/Models/enum'
 
@@ -90,7 +90,7 @@ const emit = defineEmits<{
                                 <div v-if="item.description" v-html="item.description"></div>
                                 <div v-else class="text-grey">No description provided</div>
                             </div>
-                            <div v-if="item.files.length > 0" class="mt-3">Files:</div>
+                            <div v-if="item.files && item.files.length > 0" class="mt-3">Files:</div>
                             <v-row class="mt-2">
                                 <v-col v-for="(file, index) in item.files" :key="index" cols="auto">
                                     <v-card max-width="200" color="primary" variant="tonal"
@@ -103,7 +103,12 @@ const emit = defineEmits<{
                                             </template>
                                             {{ file.fileName }}
                                         </v-tooltip>
-                                        <v-icon @click="() => downloadFile(file.fileUrl)">mdi-download</v-icon>
+                                        <image-preview v-if="file.isImage" v-slot="{ activator }" :image-url="file.fileUrl">
+                                            <v-btn icon="mdi-eye" class="text-primary ms-2" density="compact" variant="flat"
+                                                v-bind="activator" />
+                                        </image-preview>
+                                        <v-btn icon="mdi-download" class="text-primary" density="compact" variant="flat"
+                                            @click="() => downloadFile(file.fileUrl)" />
                                     </v-card>
                                 </v-col>
                             </v-row>

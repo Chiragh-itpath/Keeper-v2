@@ -22,7 +22,10 @@ const navigateTologin = async () => {
 http.interceptors.request.use((config: InternalAxiosRequestConfig<any>) => {
     loadingEffect(true)
     const token = getToken()
-    if (config.url?.toLowerCase() != 'account/login' && config.url?.toLowerCase() != 'account/register') {
+    if (
+        !config.url?.toLowerCase().startsWith('account') &&
+        !config.url?.toLowerCase().startsWith('user/checkmail')
+    ) {
         if (!token) {
             navigateTologin()
         }

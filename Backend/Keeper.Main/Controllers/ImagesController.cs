@@ -26,7 +26,6 @@ namespace Keeper.Main.Controllers
                 return File(fileByte, "application/octet-stream",filedetails.OriginalName);
             }
             return NotFound();
-            _ = 1;
         }
     }
 }

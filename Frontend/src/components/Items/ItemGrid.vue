@@ -5,6 +5,7 @@ import type { IItem } from '@/Models/ItemModels'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
 import { ItemType, Permission } from '@/Models/enum'
+
 import { StatusList, TypeList, UpdateStatus, InfoItem, EditItem } from '@/components/Items'
 const props = defineProps<{
     item: IItem,
@@ -53,9 +54,9 @@ watch(props, () => {
                                 </a>
                             </v-chip>
                         </template>
-                        <template v-else-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
+                        <template v-else-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL || item.type == ItemType.CUSTOM"
                             v-slot:activator="{ props }">
-                            <v-icon color="primary" v-bind="props"
+                            <v-icon color="primary" v-bind="props" v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
                                 :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file-outline'">
                             </v-icon>
                             {{ item.title }}
