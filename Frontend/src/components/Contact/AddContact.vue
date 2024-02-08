@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, type Ref, reactive, computed } from 'vue'
-import { ContactStore, GlobalStore, InviteStore } from '@/stores'
+import { ContactStore, GlobalStore, InviteStore, UserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { TextField } from '@/components/Custom'
 import type { IAddContact, IContact } from '@/Models/ContactModels'
@@ -14,6 +14,7 @@ const { contacts, projects } = defineProps<{
     projects: IProject[]
 }>()
 const contactStore = ContactStore()
+const { User } = storeToRefs(UserStore())
 const { Loading, errors } = storeToRefs(GlobalStore())
 const window: Ref<'form' | 'project'> = ref('project')
 
@@ -38,6 +39,10 @@ const submitHandler = async () => {
     validate.value = true
     const { valid } = await form.value.validate()
     if (!valid) return
+    if (User.value.email.toLowerCase() == addContact.email.toLowerCase()) {
+        errors.value.email = 'Cannot add your own email.'
+        return
+    }
     if (contacts.some(x => x.email == addContact.email)) {
         errors.value.email = 'Contact already exist'
         return

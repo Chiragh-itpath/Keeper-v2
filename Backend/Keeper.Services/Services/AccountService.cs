@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Crypto = BCrypt.Net.BCrypt;
 
 namespace Keeper.Services.Services
 {
@@ -43,15 +44,16 @@ namespace Keeper.Services.Services
             {
                 throw new InnerException("Email already exists", StatusType.EMAIL_EXISTS);
             }
-            userModel.Password = BCrypt.Net.BCrypt.HashPassword(register.Password);
+            userModel.Password = Crypto.HashPassword(register.Password);
             await _accountRepo.RegisterAsync(userModel);
             return true;
         }
         public async Task<TokenModel> LoginAsync(LoginModel login)
         {
-            var user = await _userRepo.GetByEmailAsync(login.Email);
-            if (user == null) throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
-            if (!BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
+            UserModel user = await _userRepo.GetByEmailAsync(login.Email) ??
+            throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
+            
+            if (!Crypto.Verify(login.Password, user.Password))
                 throw new InnerException("Password does not match", StatusType.PASSWORD_NOT_MATCHED);
             return new TokenModel()
             {
@@ -73,9 +75,8 @@ namespace Keeper.Services.Services
         }
         public async Task<bool> UpdatePasswordAsync(PasswordResetModel resetModel)
         {
-            var user = await _userRepo.GetByEmailAsync(resetModel.Email);
-            if (user == null) throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
-            user.Password = BCrypt.Net.BCrypt.HashPassword(resetModel.Password);
+            UserModel user = await _userRepo.GetByEmailAsync(resetModel.Email) ?? throw new InnerException("Email is not registered", StatusType.EMAIL_NOT_FOUND);
+            user.Password = Crypto.HashPassword(resetModel.Password);
             await _accountRepo.UpdatePasswordAsync(user);
             return true;
         }
@@ -95,7 +96,7 @@ namespace Keeper.Services.Services
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddHours(8),
                 signingCredentials: signIn);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
