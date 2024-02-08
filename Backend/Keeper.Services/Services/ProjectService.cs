@@ -79,6 +79,17 @@ namespace Keeper.Services.Services
             Guid ProjectId = await _projectRepo.SaveAsync(project);
             ProjectModel savedProject = await _projectRepo.GetByIdAsync(ProjectId) ?? throw new InnerException("", StatusType.NOT_FOUND);
             ProjectViewModel projectView = ProjectViewModelMapper(savedProject);
+            UserViewModel? user = await _userService.GetByEmailAsync(project.CreatedBy.Email);
+            projectView.Users = new List<ProjectUsersViewModel>();
+            if (user != null)
+            {
+                projectView.Users.Add(new()
+                {
+                    ShareId = null,
+                    IsAccepted = true,
+                    InvitedUser = user,
+                });
+            }
             return projectView;
         }
         public async Task<ProjectViewModel> UpdateAsync(EditProject editProject, Guid userId)

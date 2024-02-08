@@ -25,7 +25,7 @@ const areAllPermissionsSame = () => {
 }
 const handleValueChanges = (index: number) => {
     const updatingValue = InvitedUsers.value[index]
-    const oldValue = props.project.users[index]
+    const oldValue = props.project.users.filter(u => u.invitedUser.id != UserStore().User.id)[index]
     if (updatingUsers.value.some(x => x.shareId == updatingValue.shareId)) {
         if (updatingValue.permission == oldValue.permission) {
             updatingUsers.value.splice(updatingUsers.value.findIndex(x => x.shareId == updatingValue.shareId), 1)

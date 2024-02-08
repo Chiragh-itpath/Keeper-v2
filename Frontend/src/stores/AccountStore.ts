@@ -20,7 +20,7 @@ const AccountStore = defineStore('AccountStore', () => {
     const loginUser = async (user: ILogin): Promise<void> => {
         const response = await accountService.SignIn(user)
         if (response) {
-            setToken(response)
+            setToken(response.token)
             router.push({ name: RouterEnum.PROJECT })
         }
     }
