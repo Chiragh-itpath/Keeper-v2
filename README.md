@@ -14,11 +14,16 @@
   - Status List
   - Client List (Either firstname & lastname OR Fullname)
   - Permission Management
-  - Rule Books
+  - Rule Books (Process flow, if any)
   - Reminder for particular status in days (i.e, If any item has "pending" status, then it should remind the user after 2 days if the status is still "Pending")
 - Scheduler
   - Google Calander Migration
   - Microsoft Calender Migration
 - Organization
   - Can create a new organization and invite it's user
-  - Individual user of that org can create there own project and keep and they can share those with team-member which are limited to that organization 
+  - Individual user of that org can create there own project and keep and they can share those with team-member which are limited to that organization
+- Notification
+  - Project/Keep invitation
+  - Status reminder
+  - User mentioned in any comment
+  - User added in any contact group
