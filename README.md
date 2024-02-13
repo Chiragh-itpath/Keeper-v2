@@ -2,6 +2,8 @@
 
 # Featuers
 - User Profile
+  - Update the Firstname, Lastname, Email Id, Mobile Number
+  - Cards (Total Project Coumt, Shared Project Count, Owned Project Count)
 - Project based keep and each keep will have it's own item which will act as task for that keep. ✔
 - Contact List and Grouping ✔
 - Share ✔
@@ -10,7 +12,7 @@
 - Roles and Permissions ✔
 - Project Level Settings (14th-Feb-2024)
   - Status List
-  - Client List (Only firstname & lastname)
+  - Client List (Either firstname & lastname OR Fullname)
   - Permission Management
   - Rule Books
   - Reminder for particular status in days (i.e, If any item has "pending" status, then it should remind the user after 2 days if the status is still "Pending")
