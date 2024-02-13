@@ -54,7 +54,7 @@ watch(props, () => {
                     <v-tooltip location="top">
                         <template v-slot:activator="{ props: tooltip }">
                             <v-icon v-bind="mergeProps(editActivator, tooltip)"
-                                size="small">mdi-folder-edit-outline</v-icon>
+                                size="small">mdi-note-edit-outline</v-icon>
                         </template>
                         Edit
                     </v-tooltip>
@@ -92,7 +92,7 @@ watch(props, () => {
                                             <edit-item :item="item" :keep="keep" :project="project" v-if="canEdit"
                                                 @close="isActive.value = false" v-slot="{ activator: editeditActivator }">
                                                 <v-list-item v-bind="editeditActivator">
-                                                    <v-icon>mdi-folder-edit-outline</v-icon>
+                                                    <v-icon>mdi-note-edit-outline</v-icon>
                                                     <span class="mx-3">Edit</span>
                                                 </v-list-item>
                                             </edit-item>

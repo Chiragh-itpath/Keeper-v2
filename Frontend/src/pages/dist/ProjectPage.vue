@@ -59,7 +59,7 @@ onMounted(async () => {
         </v-row>
         <v-row v-if="!loading" class="mt-10">
             <template v-for="( project, index ) in  ProjectsToDisplay " :key="index">
-                <v-col cols="12" lg="3" md="4" sm="6" xl="2">
+                <v-col cols="12" lg="3" md="4" sm="6">
                     <project-card :project="project"></project-card>
                 </v-col>
             </template>

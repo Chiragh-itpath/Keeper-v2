@@ -94,7 +94,7 @@ onMounted(async () => {
             </v-col>
         </v-row>
         <v-row v-if="!loading && project" class="mt-10">
-            <v-col cols="12" lg="3" md="4" sm="6" xl="2" v-for="(keep, index) in KeepsToDisplay" :key="index">
+            <v-col cols="12" lg="3" md="4" sm="6" v-for="(keep, index) in KeepsToDisplay" :key="index">
                 <keep-card :keep="keep" :project="project"></keep-card>
             </v-col>
         </v-row>
