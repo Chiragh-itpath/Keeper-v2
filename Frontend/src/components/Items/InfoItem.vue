@@ -118,17 +118,17 @@ const emit = defineEmits<{
                         </v-window-item>
                         <v-window-item value="logs">
                             <v-row>
-                                <v-col cols="6">created by:</v-col>
+                                <v-col cols="6">Created By:</v-col>
                                 <v-col cols="6">{{ item.createdBy }}</v-col>
-                                <v-col cols="6">created on:</v-col>
+                                <v-col cols="6">Created By:</v-col>
                                 <v-col cols="6">
                                     {{ moment(item.createdOn).format('DD/MM/YYYY, hh:mm a') }}
                                 </v-col>
-                                <v-col cols="6">modified by:</v-col>
+                                <v-col cols="6">Modified By:</v-col>
                                 <v-col cols="6">
                                     {{ item.updatedBy ?? '-' }}
                                 </v-col>
-                                <v-col cols="6">modified on:</v-col>
+                                <v-col cols="6">Modified On:</v-col>
                                 <v-col cols="6">
                                     <span v-if="item.updatedOn">
                                         {{ moment(item.updatedOn).format('DD/MM/YYYY, hh:mm a') }}
