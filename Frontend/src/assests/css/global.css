@@ -26,3 +26,6 @@
 .cursor-text {
     cursor: text !important;
 }
+.invisible {
+    visibility: hidden;
+}

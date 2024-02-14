@@ -31,6 +31,7 @@ const enum Permission {
 
 const enum ItemStatus {
     NEW,
+    WAITING,
     PENDING,
     FOLLOW_UP,
     COMPLETED,

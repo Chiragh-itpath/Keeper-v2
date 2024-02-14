@@ -36,7 +36,7 @@ const UpdateStatusHandler = async (status: any) => {
         <v-list density="compact" select-strategy="single-independent" :selected="selected" mandatory
             @update:selected="UpdateStatusHandler">
             <template v-for="(item, index) in StatusList" :key="index">
-                <v-list-item :title="item.title" :value="item.value" color="primary" v-if="index != 0"></v-list-item>
+                <v-list-item :title="item.title" :value="item.value" color="primary"></v-list-item>
             </template>
         </v-list>
     </v-menu>

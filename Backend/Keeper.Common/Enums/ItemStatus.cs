@@ -6,9 +6,10 @@ namespace Keeper.Common.Enums
     {
         NEW,
         [Description("Waitng from client")]
-        PEDNING,
-        COMPLETED,
+        WAITING,
+        PENDING,
         FOLLOW_UP,
+        COMPLETED,
         RE_OPEN
     }
 }
