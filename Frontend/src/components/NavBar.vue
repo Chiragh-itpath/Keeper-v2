@@ -23,15 +23,40 @@ onMounted(async () => {
             <invite-notification />
             <v-menu :close-on-content-click="false" transition="scale-transition" location="bottom">
                 <template v-slot:activator="{ props }">
-                    <v-avatar color="primary" v-bind="props" role="button">{{ User.email[0]?.toUpperCase() }}</v-avatar>
+                    <v-avatar color="primary" v-bind="props" role="button">
+                        {{
+                            User.userName
+                                .split(' ')
+                                .splice(0, 2)
+                                .map(x => x.charAt(0).toUpperCase())
+                                .join('')
+                        }}
+                    </v-avatar>
                 </template>
                 <v-card width="400" class="">
                     <v-card-title>
                         <div class="text-center">
                             <div class="my-3">
-                                <v-avatar color="primary">{{ User.email[0]?.toUpperCase() }}</v-avatar>
+                                <v-avatar color="primary" size="large">
+                                    {{
+                                        User.userName
+                                            .split(' ')
+                                            .splice(0, 2)
+                                            .map(x => x.charAt(0).toUpperCase())
+                                            .join('')
+                                    }}
+                                </v-avatar>
                             </div>
-                            <div>Hi, {{ User.userName }}</div>
+                            <div>
+                                Hi,
+                                {{
+                                    User.userName
+                                        .split(' ')
+                                        .splice(0, 2)
+                                        .map(x => `${x.charAt(0).toUpperCase()}${x.slice(1)}`)
+                                        .join(' ')
+                                }}
+                            </div>
                             <div class="text-grey-darken-1 my-3"> {{ User.email }}</div>
                         </div>
                     </v-card-title>

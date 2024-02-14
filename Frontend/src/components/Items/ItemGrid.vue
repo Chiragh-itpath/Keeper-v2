@@ -36,7 +36,7 @@ watch(props, () => {
         <template v-slot:edit>
             <edit-item v-model:item="item" :keep="keep" :project="project" v-if="canEdit">
                 <template v-slot="{ activator }">
-                    <v-icon v-bind="activator">mdi-folder-edit-outline</v-icon>
+                    <v-icon v-bind="activator">mdi-note-edit-outline</v-icon>
                 </template>
             </edit-item>
         </template>
@@ -54,9 +54,11 @@ watch(props, () => {
                                 </a>
                             </v-chip>
                         </template>
-                        <template v-else-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL || item.type == ItemType.CUSTOM"
+                        <template
+                            v-else-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL || item.type == ItemType.CUSTOM"
                             v-slot:activator="{ props }">
-                            <v-icon color="primary" v-bind="props" v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
+                            <v-icon color="primary" v-bind="props"
+                                v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
                                 :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file-outline'">
                             </v-icon>
                             {{ item.title }}
@@ -64,7 +66,7 @@ watch(props, () => {
                         {{ TypeList[item.type].title }}
                     </v-tooltip>
                 </v-col>
-                <v-col cols="7" class="py-1">
+                <v-col class="py-1">
                     <v-sheet max-height="110" class="ellipsis" @click.stop>
                         <span v-html="item.description" class="description"></span>
                     </v-sheet>
@@ -81,7 +83,13 @@ watch(props, () => {
                                         </v-tooltip>
                                     </span>
                                     <span v-else>
-                                        {{ client.trim().charAt(0).toUpperCase() }}
+                                        {{
+                                            client
+                                                .split(' ')
+                                                .splice(0, 2)
+                                                .map(x => x.charAt(0).toUpperCase())
+                                                .join('')
+                                        }}
                                         <v-tooltip activator="parent" location="top">
                                             {{ client.trim() }}
                                         </v-tooltip>
@@ -101,11 +109,11 @@ watch(props, () => {
                         </v-avatar>
                     </template>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="1" class="d-flex justify-end">
                     <update-status :item="item" :status="item.status" v-if="canEdit">
                         <template v-slot="{ props, isActive }">
                             <v-chip color="primary" variant="flat" v-bind="props">
-                                {{ StatusList[item.status].title }}
+                                {{ StatusList[item.status].subtitle ?? StatusList[item.status].title }}
                                 <template v-slot:append>
                                     <v-icon>{{ (isActive ? 'mdi-menu-up' : 'mdi-menu-down') }}</v-icon>
                                 </template>
