@@ -2,11 +2,12 @@
 import { ref, watch, type Ref } from 'vue'
 import { StatusList, TypeList } from '@/components/Items'
 import { ItemStatus, ItemType } from '@/Models/enum'
+
 const props = defineProps<{
     users: { title: string, value: string }[],
-    itemType?: ItemType,
-    itemStatus?: ItemStatus,
-    itemOwner?: string
+    itemType?: ItemType[],
+    itemStatus?: ItemStatus[],
+    itemOwner?: string[]
 }>()
 const selectedType = ref([])
 const selectedStatus = ref([])
@@ -24,51 +25,65 @@ watch(searchText, () => {
     })
 })
 const emits = defineEmits<{
-    (e: 'update:itemType', type: ItemType | undefined): void,
-    (e: 'update:itemStatus', type: ItemStatus | undefined): void,
-    (e: 'update:itemOwner', owner: string | undefined): void,
+    (e: 'update:itemType', type?: ItemType[]): void,
+    (e: 'update:itemStatus', type?: ItemStatus[]): void,
+    (e: 'update:itemOwner', owner?: string[]): void,
 }>()
 </script>
 <template>
     <v-col cols="auto" class="px-2">
-        <v-menu :transition="false" width="150">
-            <template v-slot:activator="{ props, isActive }">
-                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary"
-                    :append-icon="isActive ? 'mdi-menu-up' : 'mdi-menu-down'" v-if="selectedType.length == 0">
-                    Type
-                </v-btn>
-                <v-btn class="rounded-lg" variant="flat" color="primary" v-else>
+        <v-menu :transition="false" width="150" :close-on-content-click="false">
+            <template v-slot:activator="{ props: menu, isActive }">
+                <v-btn v-bind="menu" class="rounded-lg" variant="outlined" color="primary">
+                    {{ (selectedType.length == 0) ?
+                        'Type' :
+                        (selectedType.length == 1) ?
+                            `${TypeList[selectedType[0]].title}` :
+                            `Selected (${selectedType.length})`
+                    }}
+                    <v-tooltip activator="parent" v-if="selectedType.length != 0" location="top">
+                        {{ selectedType.map(x => TypeList[x].title).join(', ') }}
+                    </v-tooltip>
                     <template v-slot:append>
-                        <v-icon class="ms-end" icon="mdi-close"
-                            @click="selectedType = []; emits('update:itemType', undefined)">
-                        </v-icon>
+                        <v-icon icon="mdi-close" v-if="selectedType.length != 0"
+                            @click.stop="selectedType = []; emits('update:itemType')" />
+                        <v-icon>{{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
                     </template>
-                    {{ TypeList[selectedType[0]].title }}
                 </v-btn>
             </template>
-            <v-list density="compact" v-model:selected="selectedType" select-strategy="single-independent" :items="TypeList"
-                @update:selected="() => emits('update:itemType', selectedType[0])">
+            <v-list density="compact" v-model:selected="selectedType" select-strategy="classic" :items="TypeList"
+                color="primary"
+                @update:selected="() => emits('update:itemType', selectedType.length == 0 ? undefined : selectedType)">
+                <template v-slot:item="{ props }">
+                    <v-list-item v-bind="props">
+                    </v-list-item>
+                </template>
             </v-list>
         </v-menu>
     </v-col>
     <v-col cols="auto" class="px-2">
-        <v-menu :transition="false">
+        <v-menu :transition="false" :close-on-content-click="false">
             <template v-slot:activator="{ props, isActive }">
-                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary"
-                    :append-icon="isActive ? 'mdi-menu-up' : 'mdi-menu-down'" v-if="selectedStatus.length == 0">
-                    Status
-                </v-btn>
-                <v-btn class="rounded-lg" variant="flat" color="primary" v-else>
+                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary">
+                    {{
+                        (selectedStatus.length == 0) ?
+                        'Status' :
+                        (selectedStatus.length == 1) ?
+                            `${StatusList[selectedStatus[0]].title}` :
+                            `Selected (${selectedStatus.length})`
+                    }}
+                    <v-tooltip v-if="selectedStatus.length != 0" activator="parent" location="top">
+                        {{ selectedStatus.map(x => StatusList[x].title).join(', ') }}
+                    </v-tooltip>
                     <template v-slot:append>
-                        <v-icon class="ms-end" icon="mdi-close"
-                            @click="selectedStatus = []; emits('update:itemStatus', undefined)">
-                        </v-icon>
+                        <v-icon icon="mdi-close" v-if="selectedStatus.length != 0"
+                            @click.stop="selectedStatus = []; emits('update:itemStatus')" />
+                        <v-icon>{{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
                     </template>
-                    {{ StatusList[selectedStatus[0]].title }}
                 </v-btn>
             </template>
-            <v-list density="compact" v-model:selected="selectedStatus"
-                @update:selected="emits('update:itemStatus', selectedStatus[0])">
+            <v-list density="compact" v-model:selected="selectedStatus" select-strategy="classic" color="primary"
+                @update:selected="emits('update:itemStatus', selectedStatus.length == 0 ? undefined : selectedStatus)">
                 <template v-for="(item, index) in StatusList" :key="index">
                     <v-list-item :title="item.title" :value="item.value">
                     </v-list-item>
@@ -80,14 +95,21 @@ const emits = defineEmits<{
         <v-menu width="300" :transition="false" :close-on-content-click="false" v-model="userMenu"
             @update:model-value="searchText = undefined">
             <template v-slot:activator="{ props, isActive }">
-                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary"
-                    :append-icon="isActive ? 'mdi-menu-up' : 'mdi-menu-down'" v-if="selectedUser.length == 0">
-                    Owner
-                </v-btn>
-                <v-btn class="rounded-lg text-lowercase" variant="flat" color="primary" v-else>
-                    {{ selectedUser[0] }}
+                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary">
+                    {{
+                        (selectedUser.length == 0) ?
+                        'Owner' :
+                        (selectedUser.length == 1) ?
+                            `${selectedUser[0]}` :
+                            `Selected (${selectedUser.length})`
+                    }}
+                    <v-tooltip activator="parent" location="top" v-if="selectedUser.length != 0">
+                        {{ selectedUser.join(', ') }}
+                    </v-tooltip>
                     <template v-slot:append>
-                        <v-icon icon="mdi-close" @click="selectedUser = []; emits('update:itemOwner', undefined)"></v-icon>
+                        <v-icon icon="mdi-close" v-if="selectedUser.length != 0"
+                            @click.stop="selectedUser = []; emits('update:itemOwner')" />
+                        <v-icon>{{ isActive ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
                     </template>
                 </v-btn>
             </template>
@@ -96,8 +118,8 @@ const emits = defineEmits<{
                     prepend-inner-icon="mdi-magnify" v-model="searchText">
                 </v-text-field>
             </v-sheet>
-            <v-list max-height="200" v-model:selected="selectedUser"
-                @update:selected="userMenu = false; emits('update:itemOwner', selectedUser[0])">
+            <v-list max-height="200" v-model:selected="selectedUser" select-strategy="classic"
+                @update:selected="emits('update:itemOwner', selectedUser.length == 0 ? undefined : selectedUser)">
                 <template v-for="(user, index) in displayUser" :key="index">
                     <v-list-item :title="user.title" :subtitle="user.value" :value="user.value">
                         <template v-slot:prepend>
