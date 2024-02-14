@@ -37,8 +37,10 @@ const emits = defineEmits<{
 </script>
 <template>
     <v-form ref="form" validate-on="submit" class="d-flex mt-5" @submit.prevent="submitHandler">
-        <text-field v-model="comment" is-required label="Add your comment" :max-limit="300"></text-field>
+        <text-field v-model="comment" is-required label="Comment" placeholder="Add Your Comment"
+            :max-limit="300"></text-field>
         <v-btn icon="mdi-arrow-up" class="ms-4 mt-1" color="primary" @click="submitHandler" :loading="Loading"
-            :disabled="Loading"></v-btn>
+            :disabled="Loading">
+        </v-btn>
     </v-form>
 </template>

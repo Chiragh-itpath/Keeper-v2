@@ -16,8 +16,8 @@ const { DeleteContact } = ContactStore()
             <v-card-title class="text-body-1 bg-primary">
                 <v-row>
                     <v-col cols="1"></v-col>
-                    <v-col cols="2">First name</v-col>
-                    <v-col cols="2">Last name</v-col>
+                    <v-col cols="2">First Name</v-col>
+                    <v-col cols="2">Last Name</v-col>
                     <v-col>Email</v-col>
                     <v-col cols="2" class="text-end">Actions</v-col>
                 </v-row>
