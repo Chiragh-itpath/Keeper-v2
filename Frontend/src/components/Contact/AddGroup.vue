@@ -83,7 +83,7 @@ watch(visible, () => {
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
                             @update:model-value="searchHandler" />
                         <v-card max-height="500" elevation="0">
-                            <v-list @update:selected="selectHandler">
+                            <v-list @update:selected="selectHandler" select-strategy="classic">
                                 <template v-for="(contact, index) in Contacts" :key="index">
                                     <v-list-item :title="`${contact.firstName} ${contact.lastName}`"
                                         :subtitle="contact.email" :value="contact.id" class="border rounded-lg mb-3 py-1">

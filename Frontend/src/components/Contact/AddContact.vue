@@ -16,7 +16,7 @@ const { contacts, projects } = defineProps<{
 const contactStore = ContactStore()
 const { User } = storeToRefs(UserStore())
 const { Loading, errors } = storeToRefs(GlobalStore())
-const window: Ref<'form' | 'project'> = ref('project')
+const window: Ref<'form' | 'project'> = ref('form')
 
 const visible: Ref<boolean> = ref(false)
 watch(visible, async () => {
@@ -25,6 +25,7 @@ watch(visible, async () => {
     }
     window.value = 'form'
     errors.value = {}
+    selected.value = []
     validate.value = false
     invite.value = false
 })
@@ -37,6 +38,7 @@ const addContact = reactive<IAddContact>({
 })
 const submitHandler = async () => {
     validate.value = true
+    errors.value = {}
     const { valid } = await form.value.validate()
     if (!valid) return
     if (User.value.email.toLowerCase() == addContact.email.toLowerCase()) {
@@ -145,11 +147,20 @@ const inviteHandler = async () => {
                 </v-window>
             </v-card-text>
             <v-card-actions class="px-5 pb-4">
-                <v-checkbox label="Invite to project" density="compact" hide-details color="primary" v-model="invite"
-                    v-if="window === 'form'" />
+                <div v-if="window === 'form'" class="d-flex align-center">
+                    <v-checkbox label="Invite to project" density="compact" hide-details color="primary" v-model="invite" />
+                    <v-tooltip width="200">
+                        <template v-slot:activator="{ props }">
+                            <v-icon v-bind="props" class="ms-2 cursor-pointer" size="small">mdi-help-circle-outline</v-icon>
+                        </template>
+                        When checkbox is selected and you add contact pop up will be not closed and will allow you to
+                        invited user directly from here
+                    </v-tooltip>
+                </div>
                 <v-spacer></v-spacer>
-                <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" text="add" :loading="Loading"
-                    :disabled="Loading" @click="submitHandler" v-if="window === 'form'" />
+                <v-btn class="rounded-xl" color="primary" :width="!invite ? 120 : 150" variant="elevated"
+                    :text="!invite ? 'add' : 'add & invite'" :loading="Loading" :disabled="Loading" @click="submitHandler"
+                    v-if="window === 'form'" />
                 <v-btn class="rounded-xl" color="primary" width="120" variant="elevated" text="invite" :loading="Loading"
                     :disabled="Loading || selected.length == 0" @click="inviteHandler" v-else />
             </v-card-actions>
