@@ -41,9 +41,6 @@ const emits = defineEmits<{
                             `${TypeList[selectedType[0]].title}` :
                             `Selected (${selectedType.length})`
                     }}
-                    <v-tooltip activator="parent" v-if="selectedType.length != 0" location="top">
-                        {{ selectedType.map(x => TypeList[x].title).join(', ') }}
-                    </v-tooltip>
                     <template v-slot:append>
                         <v-icon icon="mdi-close" v-if="selectedType.length != 0"
                             @click.stop="selectedType = []; emits('update:itemType')" />
@@ -72,9 +69,6 @@ const emits = defineEmits<{
                             `${StatusList[selectedStatus[0]].title}` :
                             `Selected (${selectedStatus.length})`
                     }}
-                    <v-tooltip v-if="selectedStatus.length != 0" activator="parent" location="top">
-                        {{ selectedStatus.map(x => StatusList[x].title).join(', ') }}
-                    </v-tooltip>
                     <template v-slot:append>
                         <v-icon icon="mdi-close" v-if="selectedStatus.length != 0"
                             @click.stop="selectedStatus = []; emits('update:itemStatus')" />
@@ -104,9 +98,6 @@ const emits = defineEmits<{
                             `${displayUser.find(x => x.value == selectedUser[0])?.title}` :
                             `Selected (${selectedUser.length})`
                     }}
-                    <v-tooltip activator="parent" location="top" v-if="selectedUser.length != 0">
-                        {{ selectedUser.join(', ') }}
-                    </v-tooltip>
                     <template v-slot:append>
                         <v-icon icon="mdi-close" v-if="selectedUser.length != 0"
                             @click.stop="selectedUser = []; emits('update:itemOwner')" />
