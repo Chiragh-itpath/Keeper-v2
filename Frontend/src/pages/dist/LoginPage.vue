@@ -10,8 +10,8 @@ const { Loading, errors } = storeToRefs(GlobalStore())
 const loginClicked: Ref<boolean> = ref(false)
 const form = ref()
 const loginForm = reactive<ILogin>({
-    email: 'keeper@yopmail.com',
-    password: 'admin123'
+    email: '',
+    password: ''
 })
 
 const login = async (): Promise<void> => {

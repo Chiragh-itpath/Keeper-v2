@@ -7,16 +7,18 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace Keeper.Services.Services
 {
     public class MailService : IMailService
     {
         private readonly MailSettings _mailSettings;
-        private readonly static string _siteUrl = "http://ipskeeper.project-demo.info:8073/";
-        public MailService(IOptions<MailSettings> mailSettings)
+        private static string _siteUrl = "http://ipskeeper.project-demo.info:8073/";
+        public MailService(IOptions<MailSettings> mailSettings,IConfiguration configuration)
         {
             _mailSettings = mailSettings.Value;
+            _siteUrl = configuration["SiteUrl"];
         }
         public async Task SendEmailAsync(MailModel mail)
         {
