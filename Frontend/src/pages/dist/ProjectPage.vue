@@ -10,7 +10,7 @@ import type { IProject } from '@/Models/ProjectModels'
 const dateHelper = useDate()
 
 const { Projects, ProjectTags } = storeToRefs(ProjectStore())
-const date = ref(undefined);
+const date: Ref<undefined | Date | Date[]> = ref(undefined);
 const loading: Ref<boolean> = ref(false)
 const selectedTags: Ref<string[]> = ref([])
 const filter = ref(0)
@@ -18,9 +18,15 @@ const ProjectsToDisplay: Ref<IProject[]> = ref([])
 const filterFunction = (project: IProject) => {
     return (
         !date.value ||
-        dateHelper.format(project.createdOn, 'keyboardDate') == dateHelper.format(date.value, 'keyboardDate')) &&
+        (Array.isArray(date.value) && date.value.length === 0) || isSameDate(new Date(project.createdOn), date.value)) &&
         (selectedTags.value.length === 0 || selectedTags.value.includes(project.tag)) &&
         (filter.value == 0 || project.isShared)
+}
+const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
+    return Array.isArray(date2) ?
+        date2.map(d => dateHelper.format(d, 'keyboardDate'))
+            .includes(dateHelper.format(date1, 'keyboardDate')) :
+        dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
 }
 watch([selectedTags, date, filter], () => {
     ProjectsToDisplay.value = Projects.value.filter(filterFunction)
@@ -51,7 +57,7 @@ onMounted(async () => {
             <v-col cols="auto" class="d-flex">
                 <tag-selector :items="ProjectTags" v-model:selected="selectedTags"></tag-selector>
                 <span class="mx-2"></span>
-                <date-picker label="Select a Date" v-model="date"></date-picker>
+                <date-picker v-model="date"></date-picker>
             </v-col>
             <v-col class="d-flex justify-end">
                 <add-project></add-project>

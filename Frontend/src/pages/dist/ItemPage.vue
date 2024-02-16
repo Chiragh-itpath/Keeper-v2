@@ -24,7 +24,7 @@ const { Items } = storeToRefs(ItemStore())
 const { User } = UserStore()
 const itemToDisplay: Ref<IItem[]> = ref([])
 const filters = reactive<{
-    date?: Date,
+    date?: Date | Date[],
     itemType?: ItemType[],
     itemStatus?: ItemStatus[],
     itemOwner?: string[]
@@ -104,17 +104,21 @@ watch([filters, Items], () => {
 watch(mdAndDown, () => {
     view.value = mdAndDown.value ? 'card' : view.value
 })
+const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
+    return Array.isArray(date2) ?
+        date2.map(d => dateHelper.format(d, 'keyboardDate'))
+            .includes(dateHelper.format(date1, 'keyboardDate')) :
+        dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
+}
 const itemFilterCallBack = (item: IItem): boolean => {
     return (
-        (
-            !filters.date ||
-            dateHelper.format(item.createdOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate') ||
-            dateHelper.format(item.updatedOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate')
-        ) &&
+        !filters.date ||
+        (Array.isArray(filters.date) && filters.date.length === 0) || isSameDate(new Date(item.createdOn), filters.date)
+    ) &&
         (filters.itemType == undefined || filters.itemType.includes(item.type)) &&
         (filters.itemStatus == undefined || filters.itemStatus.includes(item.status)) &&
         (!filters.itemOwner || filters.itemOwner.includes(item.createdBy))
-    )
+
 }
 onMounted(async () => {
     loading.value = true
@@ -152,7 +156,7 @@ onMounted(async () => {
                 </v-btn-toggle>
             </v-col>
             <v-col cols="auto">
-                <date-picker label="Select a date" v-model="filters.date"></date-picker>
+                <date-picker v-model="filters.date"></date-picker>
             </v-col>
             <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus" :users="users"
                 v-model:item-owner="filters.itemOwner">
@@ -173,6 +177,7 @@ onMounted(async () => {
             <v-col cols="12">
                 <v-row class="border-b bg-primary">
                     <v-col cols="1">Task</v-col>
+                    <v-col cols="1">Title</v-col>
                     <v-col>Description</v-col>
                     <v-col cols="1">Discussed With</v-col>
                     <v-col cols="1">Discussed By</v-col>

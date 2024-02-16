@@ -95,12 +95,13 @@ const emits = defineEmits<{
         <v-menu width="300" :transition="false" :close-on-content-click="false" v-model="userMenu"
             @update:model-value="searchText = undefined">
             <template v-slot:activator="{ props, isActive }">
-                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary">
+                <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary"
+                    :class="[{ 'text-lowercase': selectedUser.length }]">
                     {{
                         (selectedUser.length == 0) ?
                         'Owner' :
                         (selectedUser.length == 1) ?
-                            `${selectedUser[0]}` :
+                            `${displayUser.find(x => x.value == selectedUser[0])?.title}` :
                             `Selected (${selectedUser.length})`
                     }}
                     <v-tooltip activator="parent" location="top" v-if="selectedUser.length != 0">
@@ -118,7 +119,7 @@ const emits = defineEmits<{
                     prepend-inner-icon="mdi-magnify" v-model="searchText">
                 </v-text-field>
             </v-sheet>
-            <v-list max-height="200" v-model:selected="selectedUser" select-strategy="classic"
+            <v-list max-height="200" v-model:selected="selectedUser" select-strategy="classic" color="primary"
                 @update:selected="emits('update:itemOwner', selectedUser.length == 0 ? undefined : selectedUser)">
                 <template v-for="(user, index) in displayUser" :key="index">
                     <v-list-item :title="user.title" :subtitle="user.value" :value="user.value">

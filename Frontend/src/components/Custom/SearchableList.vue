@@ -5,7 +5,7 @@ const props = defineProps<{
     modelValue?: string,
     label?: string,
     placeholder?: string,
-    searchItems: { title: string, value: string }[]
+    searchItems: { title: string, subtitle?: string, value: string }[]
 }>();
 const search: Ref<string> = ref(props.modelValue ?? '')
 const menu: Ref<boolean> = ref(false)
@@ -14,12 +14,13 @@ const inputHandler = () => {
     if (search.value == '') {
         displayList.value = props.searchItems
     } else {
-        displayList.value = displayList.value.filter(x =>
-            x.value.toLowerCase().startsWith(search.value.toLowerCase()) ||
-            x.title.toLowerCase().startsWith(search.value.toLowerCase())
+        menu.value = true
+        displayList.value = props.searchItems.filter(x =>
+            x.title.toLowerCase().startsWith(search.value.toLowerCase()) ||
+            x.subtitle?.toLowerCase().startsWith(search.value.toLowerCase()) ||
+            x.value.toLowerCase().startsWith(search.value.toLowerCase())
         )
     }
-    emit('update:modelValue', search.value != '' ? search.value : undefined)
 }
 const itemClickHandler = (item: { title: string, value: string }) => {
     search.value = item.value
@@ -43,7 +44,7 @@ const emit = defineEmits<{
         </template>
         <v-list>
             <v-list-item v-for="(item, index) in displayList" :key="index" density="compact" :title="item.title"
-                :subtitle="item.value" :value="item.value" @click="() => itemClickHandler(item)">
+                :subtitle="item.subtitle" :value="item.value" @click="() => itemClickHandler(item)">
             </v-list-item>
             <v-list-item v-if="displayList.length == 0" title="No data" density="compact" disabled></v-list-item>
         </v-list>
