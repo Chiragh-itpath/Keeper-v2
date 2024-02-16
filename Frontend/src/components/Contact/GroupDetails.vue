@@ -82,8 +82,7 @@ watch(visible, () => [
                     </v-col>
                     <v-col cols="12">
                         <v-list max-height="300">
-                            <v-list-item class="text-grey text-center bg-grey-lighten-2 rounded-lg"
-                                v-if="group.contacts.length == 0">
+                            <v-list-item class="text-grey text-center border rounded-lg" v-if="group.contacts.length == 0">
                                 No Contacts
                             </v-list-item>
                             <template v-for="(contact, index) in group.contacts" :key="index">

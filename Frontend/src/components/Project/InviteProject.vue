@@ -84,7 +84,7 @@ const emits = defineEmits<{
                     <v-window-item value="next">
                         <invite-drop-down v-model:emails="selectedUsers" :error-message="errorMessage"></invite-drop-down>
                         <v-list-item v-if="InvitedUsers.length == 0" height="250"
-                            class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
+                            class="border rounded-lg text-grey text-center">
                             No Data
                         </v-list-item>
                         <v-list v-else height="250" class="overflow-y-auto">

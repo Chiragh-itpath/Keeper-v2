@@ -131,8 +131,8 @@ const emits = defineEmits<{
                         </v-list-item>
                     </template>
                 </v-list>
-                <v-card v-else height="100" elevation="0"
-                    class="d-flex justify-center align-center bg-grey-lighten-3 text-grey">
+                <v-card class="d-flex justify-center align-center text-grey border rounded-lg" height="250" elevation="0"
+                    v-else>
                     No invited users
                 </v-card>
             </v-card-text>

@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { UserStore, GlobalStore } from '@/stores'
 import InviteNotification from '@/components/InviteNotification.vue'
+import { ThemeChanger } from '@/components/Custom'
 import { RouterEnum } from '@/Models/enum'
 
 let { logout, User, myProfile } = UserStore()
@@ -19,7 +20,8 @@ onMounted(async () => {
         </v-btn>
         <router-link :to="{ name: RouterEnum.PROJECT }" class="text-primary text-h5 ms-0">Keeper</router-link>
         <v-spacer></v-spacer>
-        <div class="d-flex align-center me-10">
+        <div class="d-flex align-center me-10 ga-5">
+            <theme-changer></theme-changer>
             <invite-notification />
             <v-menu :close-on-content-click="false" transition="scale-transition" location="bottom">
                 <template v-slot:activator="{ props }">

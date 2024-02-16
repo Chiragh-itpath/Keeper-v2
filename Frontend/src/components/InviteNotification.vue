@@ -51,15 +51,12 @@ onMounted(async (): Promise<void> => {
 })
 </script>
 <template>
-    <v-btn disabled></v-btn>
     <v-menu location="bottom" transition="scale-transition" v-model="menu" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
-            <span class="me-10">
-                <v-badge :content="NotificationCount" color="red" v-if="NotificationCount > 0">
-                    <v-icon size="30" color="primary" v-bind="props">mdi-bell</v-icon>
-                </v-badge>
-                <v-icon size="30" color="primary" v-bind="props" v-else>mdi-bell</v-icon>
-            </span>
+            <v-badge :content="NotificationCount" color="red" v-if="NotificationCount > 0">
+                <v-icon size="30" color="primary" v-bind="props">mdi-bell</v-icon>
+            </v-badge>
+            <v-icon size="30" color="primary" v-bind="props" v-else>mdi-bell</v-icon>
         </template>
         <v-card max-width="450">
             <v-card-text class="ma-0 pa-0 px-3">
