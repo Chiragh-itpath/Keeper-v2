@@ -32,13 +32,15 @@ const users = computed(() => {
         ...props.project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         }),
         ...props.keep.users.filter(u => u.isAccepted).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         })
     ]
@@ -54,6 +56,7 @@ const submitHandler = async (): Promise<void> => {
 watch(visible, () => {
     if (!visible.value) {
         form.value.reset()
+        addItem.description = ''
         addItem.keepId = props.keep.id
         addItem.type = ItemType.TICKET
         addItem.discussedBy = ''
@@ -113,7 +116,7 @@ watch(visible, () => {
                                 <text-editor v-model="addItem.description"></text-editor>
                             </v-col>
                             <v-col cols="12">
-                                <v-file-input color="primary" v-model="addItem.files" label="Select Files"
+                                <v-file-input color="primary" v-model="addItem.files" label="Select Files" multiple
                                     prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips :rules="[fileRule]">
                                 </v-file-input>
                             </v-col>

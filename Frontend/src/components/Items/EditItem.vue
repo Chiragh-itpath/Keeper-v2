@@ -44,13 +44,15 @@ const users = computed(() => {
         ...props.project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         }),
         ...props.keep.users.filter(u => u.isAccepted).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         })
     ]
@@ -115,7 +117,7 @@ const emits = defineEmits<{
                             </v-col>
                             <v-col cols="12">
                                 <v-file-input color="primary" v-model="editItem.files" label="Select Files"
-                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
+                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips multiple
                                     :rules="[fileRule]" />
                             </v-col>
                         </v-row>

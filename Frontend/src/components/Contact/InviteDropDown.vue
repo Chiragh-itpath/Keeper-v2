@@ -2,6 +2,8 @@
 import { computed, ref, type Ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ContactStore, GroupStore } from '@/stores'
+import type { IGroup } from '@/Models/GroupModels'
+import type { IContact } from '@/Models/ContactModels'
 
 defineProps<{
     errorMessage?: string
@@ -11,25 +13,25 @@ const { Groups, isGroupFetched } = storeToRefs(GroupStore())
 const menu: Ref<boolean> = ref(false)
 type itemType = { title: string, subtitle?: string, value: string | string[], isDisabled?: boolean }
 const items = computed((): itemType[] => {
+    const mapGroup = (group: IGroup) => ({
+        title: group.name,
+        value: group.contacts.map(contact => contact.email),
+    })
+    const mapContact = (contact: IContact) => ({
+        title: `${contact.firstName} ${contact.lastName}`,
+        subtitle: contact.email,
+        value: contact.email,
+    })
+
     return [
-        { title: 'Groups', value: '', isDisabled: true },
-        ...Groups.value
-            .filter(x => x.contacts.length)
-            .map(x => {
-                return {
-                    title: x.name,
-                    value: x.contacts.map(x => x.email),
-                }
-            }),
-        { title: 'Contacts', value: '', isDisabled: true },
-        ...Contacts.value
-            .map(x => {
-                return {
-                    title: `${x.firstName} ${x.lastName}`,
-                    subtitle: x.email,
-                    value: x.email
-                }
-            })
+        ...(Groups.value.filter(x => x.contacts.length).map(mapGroup).length
+            ? [{ title: 'Groups', value: '', isDisabled: true }, ...Groups.value.filter(x => x.contacts.length).map(mapGroup)]
+            : []
+        ),
+        ...(Contacts.value.map(mapContact).length
+            ? [{ title: 'Contacts', value: '', isDisabled: true }, ...Contacts.value.map(mapContact)]
+            : []
+        ),
     ]
 })
 const selectHandler = (selected: readonly any[]) => {
