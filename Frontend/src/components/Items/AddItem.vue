@@ -94,8 +94,8 @@ watch(visible, () => {
                                     v-model="addItem.number" :max-limit="10" />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <text-field label="Item Name*" placeholder="Item title" is-required
-                                    v-model="addItem.title" />
+                                <text-field label="Item Name*" placeholder="Item title" is-required v-model="addItem.title"
+                                    :max-limit="100" />
                             </v-col>
                             <v-col cols="12" v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
@@ -104,7 +104,8 @@ watch(visible, () => {
                         </v-row>
                         <v-row>
                             <v-col cols="12" sm="6">
-                                <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to" />
+                                <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to"
+                                    :max-limit="100" />
                             </v-col>
                             <v-col cols="12" sm="6">
                                 <searchable-list :search-items="users" label="Discuss By" v-model="addItem.discussedBy">
