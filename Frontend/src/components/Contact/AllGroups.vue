@@ -17,7 +17,7 @@ const { groups } = defineProps<{
                 <v-col>Contacts</v-col>
             </v-row>
         </v-card-title>
-        <v-card-text class="pt-3">
+        <v-card-text class="pt-3 border border-t-0">
             <v-row v-if="groups.length == 0" class="pa-1">
                 <v-col cols="12" class="text-center text-grey">No Groups</v-col>
             </v-row>

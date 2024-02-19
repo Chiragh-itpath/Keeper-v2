@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterEnum } from '@/Models/enum'
+import { useTheme } from '@/composable/useTheme'
 
 withDefaults(defineProps<{
     title?: string,
@@ -8,12 +9,12 @@ withDefaults(defineProps<{
 }>(), {
     backButton: false
 })
-
+const { dark } = useTheme()
 </script>
 <template>
     <v-col cols="12">
         <div class="d-flex justify-center align-center flex-column pa-5">
-            <div class="bg-blue-grey-lighten-3 rounded-circle pa-10 mt-10">
+            <div class="rounded-circle pa-10 mt-10" :class="`bg-blue-grey-lighten-${dark ? '1' : '3'}`">
                 <v-icon color="primary" size="150">mdi-notebook-remove</v-icon>
             </div>
             <p class="text-h5 mt-10 text-primary">

@@ -7,16 +7,18 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace Keeper.Services.Services
 {
     public class MailService : IMailService
     {
         private readonly MailSettings _mailSettings;
-        private readonly static string _siteUrl = "http://ipskeeper.project-demo.info:8073/";
-        public MailService(IOptions<MailSettings> mailSettings)
+        private static string _siteUrl = "http://ipskeeper.project-demo.info:8073/";
+        public MailService(IOptions<MailSettings> mailSettings,IConfiguration configuration)
         {
             _mailSettings = mailSettings.Value;
+            _siteUrl = configuration["SiteUrl"];
         }
         public async Task SendEmailAsync(MailModel mail)
         {
@@ -24,7 +26,7 @@ namespace Keeper.Services.Services
             {
                 Sender = MailboxAddress.Parse(_mailSettings.Mail),
                 Subject = mail.Subject,
-                Body = MessageBodyHelper(mail.Category,mail.Subject,mail.From,mail.Message)
+                Body = MessageBodyHelper(mail.Category, mail.Subject, mail.From, mail.Message)
             };
             email.From.Add(MailboxAddress.Parse(_mailSettings.Mail));
             email.To.Add(MailboxAddress.Parse(mail.To));
@@ -34,7 +36,7 @@ namespace Keeper.Services.Services
             await client.SendAsync(email);
             client.Disconnect(true);
         }
-        private static MimeEntity MessageBodyHelper(MailCategory category,string subject = "", string from = "keeper@yopmail.com", string extra = "")
+        private static MimeEntity MessageBodyHelper(MailCategory category, string subject = "", string from = "keeper@yopmail.com", string extra = "")
         {
             StringBuilder messageBody = new();
             messageBody.Append("<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 1000px;overflow: auto;line-height: 2;\">");
@@ -47,21 +49,21 @@ namespace Keeper.Services.Services
             if (category == MailCategory.SendInvitation)
             {
 
-                messageBody.Append($"<p> <a style=\"color: #4db6ac;\" href=\"mailto:{from}\">{from} &nbsp</a>");
-                messageBody.Append("has invited you to collaborate on");
+                messageBody.Append($"<p> <a style=\"color: #4db6ac;text-decoration: underline;\" href=\"mailto:{from}\">{from} </a>");
+                messageBody.Append("has invited you to collaborate on ");
                 messageBody.Append($"<span style=\"color: #4db6ac\"> {extra} </span> </p> ");
-                messageBody.Append("<p>Please Check your notification on &nbsp");
-                messageBody.Append($"<a href=\"{_siteUrl}\" target=\"_blank\" style=\"color: #4db6ac;\" >Keeper</a></p>");
+                messageBody.Append("<p>Please Check your notification on ");
+                messageBody.Append($"<a href=\"{_siteUrl}\" target=\"_blank\" style=\"color: #4db6ac; text-decoration: underline;\" > Keeper</a></p>");
             }
             if (category == MailCategory.AcceptInvitation)
             {
-                messageBody.Append($"<p> <a style=\"color: #4db6ac;\" href=\"mailto:{from}\">{from}</a>&nbsp;has Accepted your Invitation </p>");
+                messageBody.Append($"<p> <a style=\"color: #4db6ac;text-decoration: underline;\" href=\"mailto:{from}\">{from}</a> has Accepted your Invitation </p>");
             }
-            if(category == MailCategory.RejectInvitation)
+            if (category == MailCategory.RejectInvitation)
             {
-                messageBody.Append($"<p> <a style=\"color: #4db6ac;\" href=\"mailto:{from}\">{from}</a>has Rejected your Invitation </p>");
+                messageBody.Append($"<p> <a style=\"color: #4db6ac;text-decoration: underline;\" href=\"mailto:{from}\">{from}</a> has Rejected your Invitation </p>");
             }
-            if(category == MailCategory.OTP)
+            if (category == MailCategory.OTP)
             {
                 messageBody.Append("<p>Here is you verification code please copy it and verify your Email</p>");
                 messageBody.Append("<p style=\"background:#5ddbcd;text-align:center;min-height:50px;");

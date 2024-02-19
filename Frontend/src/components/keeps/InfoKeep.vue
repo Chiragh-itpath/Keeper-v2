@@ -45,7 +45,7 @@ const emits = defineEmits<{
                     <v-col cols="6" class="pb-0 pb-sm-3">
                         {{ keep.users.length }}
                     </v-col>
-                    <v-col cols="6" class="text-grey pb-0 pb-sm-3">Owner:</v-col>
+                    <v-col cols="6" class="text-grey pb-0 pb-sm-3">Created By:</v-col>
                     <v-col cols="6" class="pb-0 pb-sm-3">
                         {{ keep.createdBy }}
                     </v-col>

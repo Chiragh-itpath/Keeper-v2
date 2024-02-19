@@ -6,12 +6,14 @@ import type { IItem } from '@/Models/ItemModels'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
 import { UserStore } from '@/stores'
+import { useMenu } from '@/composable/useMenu'
 
 const props = defineProps<{
     project: IProject,
     keep: IKeep,
     item: IItem,
 }>()
+const { menu, menuHide, close } = useMenu()
 const { User } = UserStore()
 const item = ref(props.item)
 const canEdit = computed((): boolean => {
@@ -53,8 +55,7 @@ watch(props, () => {
                     v-slot="{ activator: editActivator }">
                     <v-tooltip location="top">
                         <template v-slot:activator="{ props: tooltip }">
-                            <v-icon v-bind="mergeProps(editActivator, tooltip)"
-                                size="small">mdi-note-edit-outline</v-icon>
+                            <v-icon v-bind="mergeProps(editActivator, tooltip)" size="small">mdi-note-edit-outline</v-icon>
                         </template>
                         Edit
                     </v-tooltip>
@@ -86,25 +87,24 @@ watch(props, () => {
                                 {{ item.title }}
                             </v-col>
                             <v-col v-if="canEdit || canDelete" cols="auto" class="px-1">
-                                <v-menu location="bottom" width="250">
-                                    <template v-slot="{ isActive }">
-                                        <v-list>
-                                            <edit-item :item="item" :keep="keep" :project="project" v-if="canEdit"
-                                                @close="isActive.value = false" v-slot="{ activator: editeditActivator }">
-                                                <v-list-item v-bind="editeditActivator">
-                                                    <v-icon>mdi-note-edit-outline</v-icon>
-                                                    <span class="mx-3">Edit</span>
-                                                </v-list-item>
-                                            </edit-item>
-                                            <delete-item :id="item.id" v-if="canDelete" @close="isActive.value = false"
-                                                v-slot="{ activator: deleteeditActivator }">
-                                                <v-list-item role="button" v-bind="deleteeditActivator">
-                                                    <v-icon>mdi-delete-outline</v-icon>
-                                                    <span class="mx-3">Delete</span>
-                                                </v-list-item>
-                                            </delete-item>
-                                        </v-list>
-                                    </template>
+                                <v-menu location="bottom" width="250" v-model="menu" :class="[{ 'invisible': menuHide }]">
+                                    <v-list>
+                                        <edit-item :item="item" :keep="keep" :project="project" v-if="canEdit"
+                                            @close="close" v-slot="{ activator: editeditActivator }">
+                                            <v-list-item v-bind="editeditActivator" @click="menuHide = true">
+                                                <v-icon>mdi-note-edit-outline</v-icon>
+                                                <span class="mx-3">Edit</span>
+                                            </v-list-item>
+                                        </edit-item>
+                                        <delete-item :id="item.id" v-if="canDelete" @close="close"
+                                            v-slot="{ activator: deleteeditActivator }">
+                                            <v-list-item role="button" v-bind="deleteeditActivator"
+                                                @click="menuHide = true">
+                                                <v-icon>mdi-delete-outline</v-icon>
+                                                <span class="mx-3">Delete</span>
+                                            </v-list-item>
+                                        </delete-item>
+                                    </v-list>
                                     <template v-slot:activator="{ props }">
                                         <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
                                     </template>
@@ -112,7 +112,7 @@ watch(props, () => {
                             </v-col>
                         </v-row>
                     </v-card-title>
-                    <v-card-text class="pa-2">
+                    <v-card-text class="pa-2" @click.stop>
                         <v-sheet height="100" class="pa-4 ellipsis">
                             <span v-html="item.description"></span>
                         </v-sheet>
@@ -121,7 +121,7 @@ watch(props, () => {
                         <update-status :item="item" :status="item.status" v-if="canEdit">
                             <template v-slot="{ props, isActive }">
                                 <v-chip color="primary" variant="flat" v-bind="props">
-                                    {{ StatusList[item.status].title }}
+                                    {{ StatusList[item.status].subtitle ?? StatusList[item.status].title }}
                                     <template v-slot:append>
                                         <v-icon>{{ (isActive ? 'mdi-menu-up' : 'mdi-menu-down') }}</v-icon>
                                     </template>
@@ -144,7 +144,13 @@ watch(props, () => {
                                                 </v-tooltip>
                                             </span>
                                             <span v-else>
-                                                {{ client.trim().charAt(0).toUpperCase() }}
+                                                {{
+                                                    client
+                                                        .split(' ')
+                                                        .splice(0, 2)
+                                                        .map(x => x.charAt(0).toUpperCase())
+                                                        .join('')
+                                                }}
                                                 <v-tooltip activator="parent" location="top">
                                                     {{ client.trim() }}
                                                 </v-tooltip>

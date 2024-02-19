@@ -32,13 +32,15 @@ const users = computed(() => {
         ...props.project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         }),
         ...props.keep.users.filter(u => u.isAccepted).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         })
     ]
@@ -54,6 +56,7 @@ const submitHandler = async (): Promise<void> => {
 watch(visible, () => {
     if (!visible.value) {
         form.value.reset()
+        addItem.description = ''
         addItem.keepId = props.keep.id
         addItem.type = ItemType.TICKET
         addItem.discussedBy = ''
@@ -91,8 +94,8 @@ watch(visible, () => {
                                     v-model="addItem.number" :max-limit="10" />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <text-field label="Item Name*" placeholder="Item title" is-required
-                                    v-model="addItem.title" />
+                                <text-field label="Item Name*" placeholder="Item title" is-required v-model="addItem.title"
+                                    :max-limit="100" />
                             </v-col>
                             <v-col cols="12" v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
@@ -101,7 +104,8 @@ watch(visible, () => {
                         </v-row>
                         <v-row>
                             <v-col cols="12" sm="6">
-                                <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to" />
+                                <text-field label="Discuss With" placeholder="Client name" v-model="addItem.to"
+                                    :max-limit="100" />
                             </v-col>
                             <v-col cols="12" sm="6">
                                 <searchable-list :search-items="users" label="Discuss By" v-model="addItem.discussedBy">
@@ -113,7 +117,7 @@ watch(visible, () => {
                                 <text-editor v-model="addItem.description"></text-editor>
                             </v-col>
                             <v-col cols="12">
-                                <v-file-input color="primary" v-model="addItem.files" label="Select Files"
+                                <v-file-input color="primary" v-model="addItem.files" label="Select Files" multiple
                                     prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips :rules="[fileRule]">
                                 </v-file-input>
                             </v-col>

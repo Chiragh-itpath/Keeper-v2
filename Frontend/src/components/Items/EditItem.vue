@@ -44,13 +44,15 @@ const users = computed(() => {
         ...props.project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         }),
         ...props.keep.users.filter(u => u.isAccepted).map(u => {
             return {
                 title: u.invitedUser.userName,
-                value: u.invitedUser.email
+                subtitle: u.invitedUser.email,
+                value: u.invitedUser.userName
             }
         })
     ]
@@ -94,15 +96,16 @@ const emits = defineEmits<{
                                     v-model="editItem.number" />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <text-field label="Item Name*" placeholder="Item title" is-required
-                                    v-model="editItem.title" />
+                                <text-field label="Item Name*" placeholder="Item title" is-required v-model="editItem.title"
+                                    :max-limit="100" />
                             </v-col>
                             <v-col cols="12" v-if="editItem.type == ItemType.TICKET || editItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url"
                                     :max-limit="200" icon="mdi-link-box-variant-outline" />
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to" />
+                                <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to"
+                                    :max-limit="100" />
                             </v-col>
                             <v-col cols="12" sm="6">
                                 <searchable-list :search-items="users" label="Discuss By" v-model="editItem.discussedBy">
@@ -115,7 +118,7 @@ const emits = defineEmits<{
                             </v-col>
                             <v-col cols="12">
                                 <v-file-input color="primary" v-model="editItem.files" label="Select Files"
-                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
+                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips multiple
                                     :rules="[fileRule]" />
                             </v-col>
                         </v-row>

@@ -18,7 +18,7 @@ const getOtp = async () => {
 }
 </script>
 <template>
-    <v-container fill-height fluid class="bg-blue-grey-lighten-5">
+    <v-container fill-height fluid>
         <v-row justify="center" align-content="center" class="h-screen">
             <v-col cols="12" xl="3" lg="4" md="6" sm="9">
                 <v-card elevation="10" class="rounded-xl">

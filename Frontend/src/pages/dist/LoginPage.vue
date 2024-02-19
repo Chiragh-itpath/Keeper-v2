@@ -10,8 +10,8 @@ const { Loading, errors } = storeToRefs(GlobalStore())
 const loginClicked: Ref<boolean> = ref(false)
 const form = ref()
 const loginForm = reactive<ILogin>({
-    email: 'keeper@yopmail.com',
-    password: 'admin123'
+    email: '',
+    password: ''
 })
 
 const login = async (): Promise<void> => {
@@ -26,7 +26,7 @@ onMounted(() => {
 })
 </script>
 <template>
-    <v-container fluid class="h-screen bg-blue-grey-lighten-5">
+    <v-container fluid class="h-screen">
         <v-row justify="center" align-content="center" class="h-100">
             <v-col cols="12" lg="4" md="6" sm="8">
                 <v-card elevation="10" class="rounded-xl">

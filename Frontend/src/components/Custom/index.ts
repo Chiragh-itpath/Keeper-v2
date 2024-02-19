@@ -8,6 +8,7 @@ import TagSelector from './TagSelector.vue'
 import TextEditor from './TextEditor.vue'
 import TextField from './TextField.vue'
 import SearchableList from './SearchableList.vue'
+import ThemeChanger from './ThemeChanger.vue'
 
 export {
     DatePicker,
@@ -19,5 +20,6 @@ export {
     TagSelector,
     TextEditor,
     TextField,
-    SearchableList
+    SearchableList,
+    ThemeChanger
 }

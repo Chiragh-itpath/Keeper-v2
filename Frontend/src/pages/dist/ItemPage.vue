@@ -24,10 +24,10 @@ const { Items } = storeToRefs(ItemStore())
 const { User } = UserStore()
 const itemToDisplay: Ref<IItem[]> = ref([])
 const filters = reactive<{
-    date?: Date,
-    itemType?: ItemType,
-    itemStatus?: ItemStatus,
-    itemOwner?: string
+    date?: Date | Date[],
+    itemType?: ItemType[],
+    itemStatus?: ItemStatus[],
+    itemOwner?: string[]
 }>({})
 const projectId = computed(() => {
     const id = route.params.id
@@ -85,8 +85,7 @@ const breadcrumbsItems = [
     }
 ]
 const canCreate = (): boolean => {
-    if (!project.value) return false
-    if (!keep.value) return false
+    if (!project.value || !keep.value) return false
     if (project.value.createdBy == User.email) return true
     const projectUser = project.value.users.find(u => u.invitedUser.id == User.id)
     const keepUser = keep.value.users.find(u => u.invitedUser.id == User.id)
@@ -105,17 +104,21 @@ watch([filters, Items], () => {
 watch(mdAndDown, () => {
     view.value = mdAndDown.value ? 'card' : view.value
 })
+const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
+    return Array.isArray(date2) ?
+        date2.map(d => dateHelper.format(d, 'keyboardDate'))
+            .includes(dateHelper.format(date1, 'keyboardDate')) :
+        dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
+}
 const itemFilterCallBack = (item: IItem): boolean => {
     return (
-        (
-            !filters.date ||
-            dateHelper.format(item.createdOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate') ||
-            dateHelper.format(item.updatedOn, 'keyboardDate') == dateHelper.format(filters.date, 'keyboardDate')
-        ) &&
-        (filters.itemType == undefined || item.type == filters.itemType) &&
-        (filters.itemStatus == undefined || item.status == filters.itemStatus) &&
-        (!filters.itemOwner || item.createdBy == filters.itemOwner)
-    )
+        !filters.date ||
+        (Array.isArray(filters.date) && filters.date.length === 0) || isSameDate(new Date(item.createdOn), filters.date)
+    ) &&
+        (filters.itemType == undefined || filters.itemType.includes(item.type)) &&
+        (filters.itemStatus == undefined || filters.itemStatus.includes(item.status)) &&
+        (!filters.itemOwner || filters.itemOwner.includes(item.createdBy))
+
 }
 onMounted(async () => {
     loading.value = true
@@ -153,7 +156,7 @@ onMounted(async () => {
                 </v-btn-toggle>
             </v-col>
             <v-col cols="auto">
-                <date-picker label="Select a date" v-model="filters.date"></date-picker>
+                <date-picker v-model="filters.date"></date-picker>
             </v-col>
             <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus" :users="users"
                 v-model:item-owner="filters.itemOwner">
@@ -173,11 +176,12 @@ onMounted(async () => {
         <v-row v-if="!loading && project && keep && view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">
             <v-col cols="12">
                 <v-row class="border-b bg-primary">
-                    <v-col cols="1">#</v-col>
+                    <v-col cols="1">Task</v-col>
+                    <v-col cols="1">Title</v-col>
                     <v-col>Description</v-col>
-                    <v-col cols="1"> With</v-col>
-                    <v-col cols="1"> By</v-col>
-                    <v-col cols="2">Status</v-col>
+                    <v-col cols="1">Discussed With</v-col>
+                    <v-col cols="1">Discussed By</v-col>
+                    <v-col cols="1">Status</v-col>
                 </v-row>
                 <template v-for="(item, index) of itemToDisplay" :key="index">
                     <item-grid :item="item" :project="project" :keep="keep"></item-grid>

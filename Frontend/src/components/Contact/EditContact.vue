@@ -20,6 +20,7 @@ const editContact = reactive<IContact>({
     email: contact.email
 })
 const updateHandler = async () => {
+    errors.value = {}
     const { valid } = await form.value.validate()
     if (!valid) return
     const index1 = contacts.findIndex(x => x.email == editContact.email)

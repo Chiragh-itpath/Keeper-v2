@@ -23,6 +23,7 @@ export {
 
 export type ListItemsType = {
     title: string,
+    subtitle?: string,
     value: ItemStatus | ItemType
 }
 
@@ -33,6 +34,11 @@ export const StatusList: ListItemsType[] = [
     },
     {
         title: 'Waiting from client side',
+        subtitle: 'Waiting',
+        value: ItemStatus.WAITING
+    },
+    {
+        title: 'Pending',
         value: ItemStatus.PENDING
     },
     {

@@ -85,7 +85,7 @@ onMounted(() => {
                     <v-window-item value="next">
                         <invite-drop-down v-model:users="selectedUser" :error-message="errorMessage"></invite-drop-down>
                         <v-list-item v-if="keepInvitedUsers.length == 0" height="250"
-                            class="border rounded-lg bg-grey-lighten-3 text-center text-grey">
+                            class="border rounded-lg text-center text-grey">
                             No Data
                         </v-list-item>
                         <v-list v-else height="250" class="overflow-y-auto">

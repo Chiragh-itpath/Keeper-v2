@@ -14,7 +14,7 @@ const route = useRoute()
 const router = useRouter()
 const dateHelper = useDate()
 const filters = reactive<{
-    date?: string,
+    date?: Date | Date[],
     selectedTags: string[]
 }>({
     selectedTags: []
@@ -42,10 +42,16 @@ const canCreate = computed((): boolean => {
     if (!projectUser) return false
     return projectUser.permission == Permission.CREATE || projectUser.permission == Permission.ALL
 })
+const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
+    return Array.isArray(date2) ?
+        date2.map(d => dateHelper.format(d, 'keyboardDate'))
+            .includes(dateHelper.format(date1, 'keyboardDate')) :
+        dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
+}
 const filterFunction = (keep: IKeep) => {
     return (
         !filters.date ||
-        dateHelper.format(filters.date, 'keyboardDate') == dateHelper.format(keep.createdOn, 'keyboardDate')) &&
+        (Array.isArray(filters.date) && filters.date.length === 0) || isSameDate(new Date(keep.createdOn), filters.date)) &&
         (filters.selectedTags.length == 0 || filters.selectedTags.includes(keep.tag))
 }
 watch(filters, () => {
@@ -87,7 +93,7 @@ onMounted(async () => {
             <v-col class="d-flex">
                 <tag-selector :items="keepTags" v-model:selected="filters.selectedTags"></tag-selector>
                 <span class="mx-2"></span>
-                <date-picker label="Select a Date" v-model="filters.date"></date-picker>
+                <date-picker v-model="filters.date"></date-picker>
             </v-col>
             <v-col class="my-auto d-flex justify-end">
                 <add-keep :project-id="projectId" v-if="canCreate"></add-keep>

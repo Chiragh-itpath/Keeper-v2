@@ -45,7 +45,7 @@ watch(visible, () => {
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
                         {{ project.users.length }}
                     </v-col>
-                    <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Owner:</v-col>
+                    <v-col cols="12" sm="4" class="text-grey pb-0 pb-sm-3">Created By:</v-col>
                     <v-col cols="12" sm="8" class="pb-0 pb-sm-3">
                         {{ project.createdBy }}
                     </v-col>
