@@ -86,32 +86,35 @@ const emit = defineEmits<{
                                     <span v-else class="text-grey text-h5">-</span>
                                 </div>
                             </div>
-                            <div class="description rounded-lg pa-3 mt-2 ">
+                            <div class="description rounded-lg pa-3">
                                 <div v-if="item.description" v-html="item.description"></div>
                                 <div v-else class="text-grey">No description provided</div>
                             </div>
-                            <div v-if="item.files && item.files.length > 0" class="mt-3">Files:</div>
-                            <v-row class="mt-2">
-                                <v-col v-for="(file, index) in item.files" :key="index" cols="auto">
-                                    <v-card max-width="200" color="primary" variant="tonal"
-                                        class="d-flex justify-center align-center pa-3">
-                                        <v-tooltip location="top">
-                                            <template v-slot:activator="{ props }">
-                                                <span class="text-black text-truncate" v-bind="props">
-                                                    {{ file.fileName }}
-                                                </span>
-                                            </template>
-                                            {{ file.fileName }}
-                                        </v-tooltip>
-                                        <image-preview v-if="file.isImage" v-slot="{ activator }" :image-url="file.fileUrl">
-                                            <v-btn icon="mdi-eye" class="text-primary ms-2" density="compact" variant="flat"
-                                                v-bind="activator" />
-                                        </image-preview>
-                                        <v-btn icon="mdi-download" class="text-primary" density="compact" variant="flat"
-                                            @click="() => downloadFile(file.fileUrl)" />
-                                    </v-card>
-                                </v-col>
-                            </v-row>
+                            <template v-if="item.files && item.files.length > 0">
+                                <div class="mt-3">Files:</div>
+                                <v-row class="mt-2">
+                                    <v-col v-for="(file, index) in item.files" :key="index" cols="auto">
+                                        <v-card max-width="200" color="primary" variant="tonal"
+                                            class="d-flex justify-center align-center pa-3">
+                                            <v-tooltip location="top">
+                                                <template v-slot:activator="{ props }">
+                                                    <span class="text-black text-truncate" v-bind="props">
+                                                        {{ file.fileName }}
+                                                    </span>
+                                                </template>
+                                                {{ file.fileName }}
+                                            </v-tooltip>
+                                            <image-preview v-if="file.isImage" v-slot="{ activator }"
+                                                :image-url="file.fileUrl">
+                                                <v-btn icon="mdi-eye" class="text-primary ms-2" density="compact"
+                                                    variant="flat" v-bind="activator" />
+                                            </image-preview>
+                                            <v-btn icon="mdi-download" class="text-primary" density="compact" variant="flat"
+                                                @click="() => downloadFile(file.fileUrl)" />
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                            </template>
                         </v-window-item>
                         <v-window-item value="comments">
                             <all-comments :item-id="item.id" :comments="item.comments"></all-comments>
@@ -143,12 +146,11 @@ const emit = defineEmits<{
         </v-card>
     </v-dialog>
 </template>
-<style>
+<style scoped>
 .description {
     min-height: 150px;
     max-height: 300px;
-    background-color: #ECEFF1;
-    color: black;
+    border: 0.5px solid grey;
     overflow-x: auto;
 }
 
