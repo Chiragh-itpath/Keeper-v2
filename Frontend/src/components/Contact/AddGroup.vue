@@ -58,7 +58,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-dialog v-model="visible" max-width="600" class="">
+    <v-dialog v-model="visible" max-width="600">
         <template v-slot:activator="{ props }">
             <v-btn color="primary" prepend-icon="mdi-plus" class="rounded" v-bind="props">
                 New Group
@@ -82,22 +82,20 @@ watch(visible, () => {
                     <v-window-item value="contact">
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
                             @update:model-value="searchHandler" />
-                        <v-card max-height="500" elevation="0">
-                            <v-list @update:selected="selectHandler" select-strategy="classic">
-                                <template v-for="(contact, index) in Contacts" :key="index">
-                                    <v-list-item :title="`${contact.firstName} ${contact.lastName}`"
-                                        :subtitle="contact.email" :value="contact.id" class="border rounded-lg mb-3 py-1">
-                                        <template v-slot:prepend="{ isSelected }">
-                                            <v-checkbox density="compact" hide-details color="primary" class="me-2"
-                                                :model-value="isSelected" />
-                                            <v-avatar :text="contact.email.charAt(0).toUpperCase()" color="primary" />
-                                        </template>
-                                    </v-list-item>
-                                </template>
-                                <v-list-item v-if="Contacts.length == 0" title="No Contact found"
-                                    class="bg-grey-lighten-3 text-center text-grey rounded-lg" />
-                            </v-list>
-                        </v-card>
+                        <v-list @update:selected="selectHandler" select-strategy="classic" max-height="300">
+                            <template v-for="(contact, index) in Contacts" :key="index">
+                                <v-list-item :title="`${contact.firstName} ${contact.lastName}`" :subtitle="contact.email"
+                                    :value="contact.id" class="border rounded-lg mb-3 py-1">
+                                    <template v-slot:prepend="{ isSelected }">
+                                        <v-checkbox density="compact" hide-details color="primary" class="me-2"
+                                            :model-value="isSelected" />
+                                        <v-avatar :text="contact.email.charAt(0).toUpperCase()" color="primary" />
+                                    </template>
+                                </v-list-item>
+                            </template>
+                            <v-list-item v-if="Contacts.length == 0" title="No Contact found"
+                                class="bg-grey-lighten-3 text-center text-grey rounded-lg" />
+                        </v-list>
                     </v-window-item>
                 </v-window>
             </v-card-text>

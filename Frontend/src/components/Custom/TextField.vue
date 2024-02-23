@@ -25,7 +25,8 @@ const Props = withDefaults(
         icon?: string,
         maxLimit?: number,
         ValidationRules?: TRule[],
-        errorMessages?: string
+        errorMessages?: string,
+        density?: 'default' | 'compact' | 'comfortable'
     }>(),
     {
         label: '',
@@ -38,7 +39,8 @@ const Props = withDefaults(
         isNumber: false,
         isUrl: false,
         icon: '',
-        maxLimit: 30
+        maxLimit: 30,
+        density: 'comfortable'
     }
 )
 const _value: Ref<string> = ref(Props.modelValue ?? '')
@@ -82,8 +84,8 @@ const emits = defineEmits<{
 <template>
     <v-text-field v-model="_value" :label="Props.label" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
         :append-inner-icon="!isPassword ? '' : isPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :error="error"
-        density="comfortable" :placeholder="placeholder" :error-messages="errorMessages"
-        @click:append-inner="changeVisibility" class="mb-4" @input="() => {
+        :density="density" :placeholder="placeholder" :error-messages="errorMessages" @click:append-inner="changeVisibility"
+        class="mb-4" @input="() => {
             _value = _value.slice(0, Props.maxLimit)
             if (Props.isContact || Props.isNumber) {
                 _value = _value.replace(/[^\d]/g, '')

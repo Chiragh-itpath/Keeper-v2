@@ -4,6 +4,7 @@ using Keeper.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Keeper.Context.Migrations
 {
     [DbContext(typeof(DbKeeperContext))]
-    partial class DbKeeperContextModelSnapshot : ModelSnapshot
+    [Migration("20240223064447_ModifyFieldsOnStatusAndClient")]
+    partial class ModifyFieldsOnStatusAndClient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +51,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clients", (string)null);
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.CommentModel", b =>
@@ -85,7 +87,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ContactGroupLinkerModel", b =>
@@ -106,7 +108,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("ContactGroupLinker", (string)null);
+                    b.ToTable("ContactGroupLinker");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ContactModel", b =>
@@ -134,7 +136,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Contact", (string)null);
+                    b.ToTable("Contact");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.FileModel", b =>
@@ -153,7 +155,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Files", (string)null);
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.GroupModel", b =>
@@ -173,7 +175,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Group", (string)null);
+                    b.ToTable("Group");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ItemFileLinkerModel", b =>
@@ -194,7 +196,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("ItemFileLinker", (string)null);
+                    b.ToTable("ItemFileLinker");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ItemModel", b =>
@@ -255,7 +257,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Items", (string)null);
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ItemStatusModel", b =>
@@ -285,7 +287,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ItemStatus", (string)null);
+                    b.ToTable("ItemStatus");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.KeepModel", b =>
@@ -330,7 +332,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Keeps", (string)null);
+                    b.ToTable("Keeps");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.ProjectModel", b =>
@@ -373,7 +375,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.SharedKeepsModel", b =>
@@ -405,7 +407,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SharedKeeps", (string)null);
+                    b.ToTable("SharedKeeps");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.SharedProjectsModel", b =>
@@ -432,7 +434,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SharedProjects", (string)null);
+                    b.ToTable("SharedProjects");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.TagModel", b =>
@@ -453,7 +455,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.UserModel", b =>
@@ -489,7 +491,7 @@ namespace Keeper.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.CommentModel", b =>

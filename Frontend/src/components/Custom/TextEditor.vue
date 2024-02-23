@@ -3,13 +3,18 @@ import { ref, watch } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 
 const props = defineProps<{
-    modelValue?: string
+    modelValue?: string,
+    height?: number
 }>()
 
+const quill = ref()
 const text = ref(props.modelValue)
 
 watch(text, () => {
-    emits('update:modelValue', text.value)
+    if (quill.value.getText() == '\n')
+        emits('update:modelValue', undefined)
+    else
+        emits('update:modelValue', text.value)
 })
 const emits = defineEmits<{
     (e: 'update:modelValue', modelValue: string | undefined): void
@@ -31,7 +36,9 @@ const toolbar = [
 
 <template>
     <div class="container">
-        <quill-editor :toolbar="toolbar" style="height: 150px;" v-model:content="text" content-type="html" > </quill-editor>
+        <quill-editor ref="quill" :toolbar="toolbar" :style="`height: ${height ?? 150}px;`" v-model:content="text"
+            content-type="html">
+        </quill-editor>
     </div>
 </template>
 <style>

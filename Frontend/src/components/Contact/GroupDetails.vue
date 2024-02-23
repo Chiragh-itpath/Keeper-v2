@@ -47,7 +47,7 @@ watch(visible, () => [
         <template v-slot:activator="{ props }">
             <slot :activator="props"></slot>
         </template>
-        <v-card max-height="500">
+        <v-card>
             <v-card-title class="bg-primary text-center">
                 <span>Group Contacts</span>
                 <span class="float-end">
@@ -57,11 +57,14 @@ watch(visible, () => [
             <v-card-text>
                 <v-row justify="end">
                     <v-col cols="12">
-                        <v-select :items="items" color="primary" multiple chips closable-chips
-                            v-model:model-value="contactsToAdd" hide-selected hide-details>
-                            <template v-slot:chip="{ item, props }">
-                                <v-chip color="primary" v-bind="props">
+                        <v-select :items="items" color="primary" multiple chips v-model:model-value="contactsToAdd"
+                            hide-details>
+                            <template v-slot:chip="{ item, props, index }">
+                                <v-chip color="primary" v-bind="props" v-if="index < 2">
                                     {{ item.title }}
+                                </v-chip>
+                                <v-chip color="primary" v-else-if="index == 2">
+                                    +{{ contactsToAdd.length - index }} Selected
                                 </v-chip>
                             </template>
                             <template v-slot:no-data>
