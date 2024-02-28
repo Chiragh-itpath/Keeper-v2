@@ -9,7 +9,9 @@ const props = defineProps<{
 
 const quill = ref()
 const text = ref(props.modelValue)
-
+watch(props, () => {
+    text.value = props.modelValue
+})
 watch(text, () => {
     if (quill.value.getText() == '\n')
         emits('update:modelValue', undefined)

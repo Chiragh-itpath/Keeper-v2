@@ -1,22 +1,37 @@
 interface IProjectSetting {
-    statusList: Status[]
-    clientList: Client[]
+    statusList: IStatus[]
+    clientList: IClient[]
 }
 
-interface Status {
+interface IStatus {
     id: string
     projectId: string
-    title: string
+    title: string,
+    isSystem: boolean
 }
 
-interface Client {
+interface IClient {
     id: string
     projectId: string
-    fullname: string
+    name: string
 }
+interface RuleBook {
+    projectId: string,
+    text: string
+}
+
+type EditStatus = Omit<IStatus, 'isSystem'>
+type AddStatus = Omit<EditStatus, 'id'>
+type EditClient = IClient
+type AddClient = Omit<EditClient, 'id'>
 
 export type {
     IProjectSetting,
-    Status,
-    Client
+    IStatus,
+    IClient,
+    RuleBook,
+    EditStatus,
+    AddStatus,
+    EditClient,
+    AddClient
 }

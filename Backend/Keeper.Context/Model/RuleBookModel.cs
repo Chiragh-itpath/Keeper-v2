@@ -1,14 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Keeper.Context.Model
 {
-    [Keyless]
     [Table("RuleBook")]
     public class RuleBookModel
     {
-        public string Text { get; set; } = default!;
-        public Guid UpdatedBy { get; set; }
+        public Guid Id { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public Guid ProjectId { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public Guid? UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
     }
 }

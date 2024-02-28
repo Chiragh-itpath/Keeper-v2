@@ -37,8 +37,8 @@ namespace Keeper.Services.Services
         }
         public async Task<StatusViewModel> UpdateStatusAsync(EditStatus editStatus, Guid userId)
         {
-            var status = await _StatusRepo.GetByIdAsync(editStatus.Id) ?? throw new InnerException("Status not found",StatusType.NOT_FOUND);
-            status.Title    = editStatus.Title;
+            var status = await _StatusRepo.GetByIdAsync(editStatus.Id) ?? throw new InnerException("Status not found", StatusType.NOT_FOUND);
+            status.Title = editStatus.Title;
             status.UpdatedOn = DateTime.Now;
             status.UpdatedBy = userId;
             return StatusMapper(await _StatusRepo.UpdateStatusAsync(status));
@@ -46,22 +46,23 @@ namespace Keeper.Services.Services
         public async Task<bool> DeleteStatusAsync(Guid id)
         {
             var status = await _StatusRepo.GetByIdAsync(id) ?? throw new InnerException("Status not found", StatusType.NOT_FOUND);
-            if (status.ProjectId == Guid.Empty) throw new InnerException("Cannot delete system generated status",StatusType.UNAUTHORISED);
+            if (status.ProjectId == Guid.Empty) throw new InnerException("Cannot delete system generated status", StatusType.UNAUTHORISED);
             if (await _StatusRepo.RemoveAsync(status) > 0)
             {
                 return true;
             }
             return false;
         }
-        public async Task<List<StatusViewModel>> GetAll(Guid ProjectId)
+        public async Task<List<StatusViewModel>> GetAll(Guid ProjectId, bool IncludeSystem = false)
         {
             var status = await _StatusRepo.GetAllAsync(ProjectId);
-            return status.Select(x => new StatusViewModel
+            if (IncludeSystem)
             {
-                Id = x.Id,
-                ProjectId = x.ProjectId,
-                Title = x.Title,
-            }).ToList();
+                var defaultStatus = await _StatusRepo.GetAllAsync(Guid.Empty);
+                status.AddRange(defaultStatus);
+            }
+
+            return status.Select(x => StatusMapper(x)).ToList();
         }
     }
 }

@@ -24,6 +24,7 @@ namespace Keeper.Services.Config
             services.AddTransient<IGroupService, GroupService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<IClientSevice, ClientService>();
+            services.AddTransient<IRuleBookService, RuleBookService>();
             return services;
         }
     }

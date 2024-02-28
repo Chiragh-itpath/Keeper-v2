@@ -25,6 +25,7 @@ namespace Keeper.Repos.Config
             services.AddTransient<IGroupLinkerRepo, GroupLinkerRepo>();
             services.AddTransient<IStatusRepo, StatusRepo>();
             services.AddTransient<IClientRepo, ClientRepo>();
+            services.AddTransient<IRuleBookRepo, RuleBookRepo>();
             return services;
         }
     }

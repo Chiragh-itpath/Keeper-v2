@@ -2,16 +2,29 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { IProject } from '@/Models/ProjectModels'
-import { ProjectStore } from '@/stores'
+import { ProjectStore, UserStore } from '@/stores'
 import { ManageUser, StatusList, ClientList, RuleBook } from '@/components/Project'
 
-const window = ref(3)
+const tabs = {
+    manageUser: 'manage user',
+    statusList: 'status list',
+    clientList: 'client List',
+    ruleBook: 'rule book'
+} as const
+
+const window = ref<typeof tabs[keyof typeof tabs]>('status list')
 const route = useRoute()
 const projectStore = ProjectStore()
 const project = ref<IProject>()
+
 const projectId = computed(() => {
     const id = route.params.id
     return Array.isArray(id) ? id.join('') : id
+})
+
+const { User } = UserStore()
+const isOwner = computed(() => {
+    return !!project.value && project.value.createdBy == User.email
 })
 onMounted(async () => {
     project.value = await projectStore.GetSingalProject(projectId.value)
@@ -35,19 +48,19 @@ onMounted(async () => {
                 </v-col>
                 <v-col class="d-flex justify-end">
                     <v-tabs color="primary" v-model="window">
-                        <v-tab value="0">Users</v-tab>
-                        <v-tab value="1">Status List</v-tab>
-                        <v-tab value="2">Client List</v-tab>
-                        <v-tab value="3">Rule Book</v-tab>
+                        <v-tab :value="tabs.manageUser">Users</v-tab>
+                        <v-tab :value="tabs.statusList">Status List</v-tab>
+                        <v-tab :value="tabs.clientList">Client List</v-tab>
+                        <v-tab :value="tabs.ruleBook">Rule Book</v-tab>
                     </v-tabs>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="12">
-                    <manage-user :project="project" v-if="window == 0" />
-                    <status-list v-if="window == 1" />
-                    <client-list v-if="window == 2" />
-                    <rule-book v-if="window == 3" />
+                    <manage-user v-if="window == 'manage user'" :project="project" :is-owner="isOwner" />
+                    <status-list v-if="window == 'status list'" :project-id="project.id" :is-owner="isOwner" />
+                    <client-list v-if="window == 'client List'" :project-id="project.id" />
+                    <rule-book v-if="window == 'rule book'" :project-id="project.id" />
                 </v-col>
             </v-row>
         </template>
