@@ -28,7 +28,7 @@ const KeepStore = defineStore('KeepStore', () => {
     const AddKeep = async (addKeep: IAddKeep): Promise<any> => {
         const response = await keepService.Add(addKeep)
         if (response) {
-            Keeps.value.push(response)
+            Keeps.value.unshift(response)
         }
     }
 

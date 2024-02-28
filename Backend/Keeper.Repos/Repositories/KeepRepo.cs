@@ -2,7 +2,6 @@
 using Keeper.Context.Model;
 using Keeper.Repos.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Keeper.Repos.Repositories
 {
@@ -22,6 +21,8 @@ namespace Keeper.Repos.Repositories
                 .Include(k => k.UpdatedBy)
                 .AsNoTracking()
                 .Where(x => x.ProjectId == ProjectId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedOn)
+                .ThenByDescending(x => x.UpdatedOn)
                 .ToListAsync();
         }
 
@@ -38,6 +39,8 @@ namespace Keeper.Repos.Repositories
                 where !k.IsDeleted && k.ProjectId == projectId
                 select k)
                 .AsNoTracking()
+                .OrderByDescending(x => x.CreatedOn)
+                .ThenByDescending(x => x.UpdatedOn)
                 .ToListAsync();
             return keeps;
         }
