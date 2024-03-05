@@ -96,7 +96,7 @@ namespace Keeper.Services.Services
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddHours(8),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: signIn);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

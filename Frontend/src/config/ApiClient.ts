@@ -5,9 +5,13 @@ import { useToster } from '@/composable/useToaster'
 import { getToken } from '@/Services/TokenService'
 import { StatusType } from '@/Models/enum'
 import type { IResponse } from '@/Models/ResponseModel'
-const baseURL = import.meta.env.DEV ? 'https://localhost:7134/api/' : 'http://ipskeeper.project-demo.info:8073/api'
+const env = {
+    dev: 'https://localhost:7134/api/',
+    test: 'http://ipskeeper-demo.project-demo.info:8075/api',
+    prod: 'http://ipskeeper.project-demo.info:8073/api'
+}
 const http = axios.create({
-    baseURL
+    baseURL: env.test
 })
 
 const loadingEffect = (arg: boolean): void => {
