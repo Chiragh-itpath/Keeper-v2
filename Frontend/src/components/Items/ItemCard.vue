@@ -1,66 +1,76 @@
 <script setup lang="ts">
 import { computed, mergeProps, ref, watch } from 'vue'
-import { EditItem, DeleteItem, TypeList, StatusList, UpdateStatus, InfoItem } from '@/components/Items'
+import { EditItem, DeleteItem, TypeList, UpdateStatus, InfoItem } from '@/components/Items'
 import { ItemType, Permission } from '@/Models/enum'
 import type { IItem } from '@/Models/ItemModels'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
 import { UserStore } from '@/stores'
 import { useMenu } from '@/composable/useMenu'
+import type { IStatus } from '@/Models/ProjectSettings'
 
-const props = defineProps<{
-    project: IProject,
-    keep: IKeep,
-    item: IItem,
+type ListItem = { title: string; subtitle?: string; value: string }
+const { keep, project, item, statusList } = defineProps<{
+    project: IProject
+    keep: IKeep
+    item: IItem
+    clientList: ListItem[],
+    statusList: IStatus[]
 }>()
 const { menu, menuHide, close } = useMenu()
 const { User } = UserStore()
-const item = ref(props.item)
+const _item = ref(item)
 const canEdit = computed((): boolean => {
-    if (props.project.createdBy == User.email) return true
-    if (props.item.createdBy == User.email) return true
-    const projectUser = props.project.users.find(u => u.invitedUser.id == User.id)
+    if (project.createdBy == User.email) return true
+    if (item.createdBy == User.email) return true
+    const projectUser = project.users.find((u) => u.invitedUser.id == User.id)
     if (projectUser) {
         return projectUser.permission == Permission.EDIT || projectUser.permission == Permission.ALL
     }
-    const keepUser = props.keep.users.find(u => u.invitedUser.id == User.id)
+    const keepUser = keep.users.find((u) => u.invitedUser.id == User.id)
     if (keepUser) {
         return keepUser.permission == Permission.EDIT || keepUser.permission == Permission.ALL
     }
     return false
 })
-
 const canDelete = computed((): boolean => {
-    if (props.project.createdBy == User.email) return true
-    if (props.item.createdBy == User.email) return true
-    const projectUser = props.project.users.find(u => u.invitedUser.id == User.id)
+    if (project.createdBy == User.email) return true
+    if (item.createdBy == User.email) return true
+    const projectUser = project.users.find((u) => u.invitedUser.id == User.id)
     if (projectUser) {
         return projectUser.permission == Permission.ALL
     }
-    const keepUser = props.keep.users.find(u => u.invitedUser.id == User.id)
+    const keepUser = keep.users.find((u) => u.invitedUser.id == User.id)
     if (keepUser) {
         return keepUser.permission == Permission.ALL
     }
     return false
 })
-watch(props, () => {
-    item.value = props.item
+watch(item, () => {
+    _item.value = item
 })
+const getStatusTitle = (statusId: string): string => {
+    const status = statusList.find(x => x.id == statusId)
+    return status ? status.title : ''
+}
 </script>
+
 <template>
     <v-hover v-slot="{ props: hover, isHovering }">
         <info-item :item="item">
             <template v-slot:edit>
-                <edit-item v-model:item="item" :keep="keep" :project="project" v-if="canEdit"
+                <edit-item v-model:item="_item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit"
                     v-slot="{ activator: editActivator }">
                     <v-tooltip location="top">
                         <template v-slot:activator="{ props: tooltip }">
-                            <v-icon v-bind="mergeProps(editActivator, tooltip)" size="small">mdi-note-edit-outline</v-icon>
+                            <v-icon v-bind="mergeProps(editActivator, tooltip)" size="small"
+                                icon="mdi-note-edit-outline" />
                         </template>
                         Edit
                     </v-tooltip>
                 </edit-item>
             </template>
+
             <template v-slot="{ activator: info }">
                 <v-card v-bind="mergeProps(hover, info)" :elevation="isHovering ? 8 : 3" class="cursor-pointer"
                     :ripple="false">
@@ -76,8 +86,8 @@ watch(props, () => {
                                             </a>
                                         </v-chip>
                                         <v-icon size="small" v-bind="props"
-                                            v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
-                                            :icon="item.type == ItemType.MAIL ? 'mdi-email' : 'mdi-file'">
+                                            :icon="item.type == ItemType.MAIL ? 'mdi-email' : 'mdi-file'"
+                                            v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL">
                                         </v-icon>
                                     </template>
                                     {{ TypeList[item.type].title }}
@@ -87,10 +97,11 @@ watch(props, () => {
                                 {{ item.title }}
                             </v-col>
                             <v-col v-if="canEdit || canDelete" cols="auto" class="px-1">
-                                <v-menu location="bottom" width="250" v-model="menu" :class="[{ 'invisible': menuHide }]">
+                                <v-menu location="bottom" width="250" v-model="menu" :class="[{ invisible: menuHide }]">
                                     <v-list>
-                                        <edit-item :item="item" :keep="keep" :project="project" v-if="canEdit"
-                                            @close="close" v-slot="{ activator: editeditActivator }">
+                                        <edit-item :item="item" :keep="keep" :project="project"
+                                            :client-list="clientList" v-if="canEdit" @close="close"
+                                            v-slot="{ activator: editeditActivator }">
                                             <v-list-item v-bind="editeditActivator" @click="menuHide = true">
                                                 <v-icon>mdi-note-edit-outline</v-icon>
                                                 <span class="mx-3">Edit</span>
@@ -105,6 +116,7 @@ watch(props, () => {
                                             </v-list-item>
                                         </delete-item>
                                     </v-list>
+
                                     <template v-slot:activator="{ props }">
                                         <v-icon v-bind="props" color="white">mdi-dots-vertical</v-icon>
                                     </template>
@@ -118,24 +130,26 @@ watch(props, () => {
                         </v-sheet>
                     </v-card-text>
                     <v-card-actions>
-                        <update-status :item="item" :status="item.status" v-if="canEdit">
+                        <update-status :item="item" :status-list="statusList" v-if="canEdit">
+
                             <template v-slot="{ props, isActive }">
                                 <v-chip color="primary" variant="flat" v-bind="props">
-                                    {{ StatusList[item.status].subtitle ?? StatusList[item.status].title }}
+                                    {{ getStatusTitle(item.statusId) }}
                                     <template v-slot:append>
-                                        <v-icon>{{ (isActive ? 'mdi-menu-up' : 'mdi-menu-down') }}</v-icon>
+                                        <v-icon :icon="isActive ? 'mdi-menu-up' : 'mdi-menu-down'" />
                                     </template>
                                 </v-chip>
                             </template>
                         </update-status>
                         <v-chip color="primary" variant="flat" v-else>
-                            {{ StatusList[item.status].title }}
+                            {{ getStatusTitle(item.statusId) }}
                         </v-chip>
                         <v-spacer></v-spacer>
                         <div class="me-2">
-                            <span v-if="item.to" class="d-flex cursor-pointer" v-bind="props">
-                                <template v-for="(client, index) in  item.to.split(/,/) " :key="index">
-                                    <span v-if="client.trim() && index < 3" style="width: 22px;">
+                            <span v-if="item.to" class="d-flex cursor-pointer">
+
+                                <template v-for="(client, index) in item.to.split(/,/).map(x => x.trim())" :key="index">
+                                    <span v-if="client.trim() && index < 3" style="width: 22px">
                                         <v-avatar color="primary" size="small" class="avatar-border">
                                             <span v-if="index === 2 && item.to.split(/,/).length > 3">
                                                 {{ `+${item.to.split(/,/).length - index}` }}
@@ -144,13 +158,8 @@ watch(props, () => {
                                                 </v-tooltip>
                                             </span>
                                             <span v-else>
-                                                {{
-                                                    client
-                                                        .split(' ')
-                                                        .splice(0, 2)
-                                                        .map(x => x.charAt(0).toUpperCase())
-                                                        .join('')
-                                                }}
+                                                {{ client.split(' ').splice(0, 2).map((x) =>
+        x[0].toUpperCase()).join('') }}
                                                 <v-tooltip activator="parent" location="top">
                                                     {{ client.trim() }}
                                                 </v-tooltip>
@@ -166,6 +175,7 @@ watch(props, () => {
         </info-item>
     </v-hover>
 </template>
+
 <style>
 .ellipsis {
     display: -webkit-box;
@@ -178,6 +188,6 @@ watch(props, () => {
 }
 
 .avatar-border {
-    border: 1.5px solid #00695C !important;
+    border: 1.5px solid #00695c !important;
 }
 </style>

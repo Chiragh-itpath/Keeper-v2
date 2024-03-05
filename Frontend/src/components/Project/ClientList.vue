@@ -8,7 +8,8 @@ import { ProjectSettingsService } from '@/Services/ProjectSettings'
 type EditableClient = IClient & { isEditing: boolean }
 
 const { projectId } = defineProps<{
-    projectId: string
+    projectId: string,
+    isOwner: boolean
 }>()
 const { dark } = useTheme()
 const disabled = computed(() => newClient.value != undefined || clientList.value.some(x => x.isEditing))

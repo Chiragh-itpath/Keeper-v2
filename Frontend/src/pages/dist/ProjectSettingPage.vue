@@ -12,7 +12,7 @@ const tabs = {
     ruleBook: 'rule book'
 } as const
 
-const window = ref<typeof tabs[keyof typeof tabs]>('status list')
+const window = ref<typeof tabs[keyof typeof tabs]>('manage user')
 const route = useRoute()
 const projectStore = ProjectStore()
 const project = ref<IProject>()
@@ -30,20 +30,21 @@ onMounted(async () => {
     project.value = await projectStore.GetSingalProject(projectId.value)
 })
 </script>
+
 <template>
     <v-container fluid>
         <template v-if="project">
             <v-row no-gutters>
                 <v-col>
                     <v-breadcrumbs divider="/" :items="[
-                        {
-                            title: 'Projects',
-                            to: '/Project'
-                        },
-                        {
-                            title: 'Settings'
-                        }
-                    ]">
+            {
+                title: 'Projects',
+                to: '/Project'
+            },
+            {
+                title: 'Settings'
+            }
+        ]">
                     </v-breadcrumbs>
                 </v-col>
                 <v-col class="d-flex justify-end">
@@ -59,8 +60,8 @@ onMounted(async () => {
                 <v-col cols="12">
                     <manage-user v-if="window == 'manage user'" :project="project" :is-owner="isOwner" />
                     <status-list v-if="window == 'status list'" :project-id="project.id" :is-owner="isOwner" />
-                    <client-list v-if="window == 'client List'" :project-id="project.id" />
-                    <rule-book v-if="window == 'rule book'" :project-id="project.id" />
+                    <client-list v-if="window == 'client List'" :project-id="project.id" :is-owner="isOwner" />
+                    <rule-book v-if="window == 'rule book'" :project-id="project.id" :is-owner="isOwner" />
                 </v-col>
             </v-row>
         </template>

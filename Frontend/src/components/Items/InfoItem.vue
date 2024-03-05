@@ -25,6 +25,7 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: boolean): void
 }>()
 </script>
+
 <template>
     <v-dialog v-model="visible" max-width="800" @update:model-value="(value) => emit('update:modelValue', value)">
         <template v-slot:activator="{ props }">
@@ -34,6 +35,7 @@ const emit = defineEmits<{
             <v-card-title class="bg-primary d-flex align-center">
                 <a :href="item.url" class="text-decoration-none text-white" target="_blank">
                     <v-tooltip location="top">
+
                         <template v-slot:activator="{ props }">
                             <v-chip class="me-1" v-bind="props"
                                 v-if="item.type == ItemType.TICKET || item.type == ItemType.PR">
@@ -51,8 +53,10 @@ const emit = defineEmits<{
                 <v-spacer></v-spacer>
                 <slot name="edit"></slot>
                 <v-tooltip location="top">
+
                     <template v-slot:activator="{ props: tooltip }">
-                        <v-icon color="white" v-bind="tooltip" class="ms-2" @click="(visible = false)">mdi-close</v-icon>
+                        <v-icon color="white" v-bind="tooltip" class="ms-2"
+                            @click="(visible = false)">mdi-close</v-icon>
                     </template>
                     Close
                 </v-tooltip>
@@ -71,6 +75,7 @@ const emit = defineEmits<{
                             <div>
                                 <div class="mb-3">Discuss with:
                                     <span v-if="item.to">
+
                                         <template v-for="(client, index) in item.to.split(/,/)" :key="index">
                                             <v-chip color="primary" class="mx-1" v-if="client.trim()">
                                                 {{ client.trim() }}
@@ -90,6 +95,7 @@ const emit = defineEmits<{
                                 <div v-if="item.description" v-html="item.description"></div>
                                 <div v-else class="text-grey">No description provided</div>
                             </div>
+
                             <template v-if="item.files && item.files.length > 0">
                                 <div class="mt-3">Files:</div>
                                 <v-row class="mt-2">
@@ -109,8 +115,8 @@ const emit = defineEmits<{
                                                 <v-btn icon="mdi-eye" class="text-primary ms-2" density="compact"
                                                     variant="flat" v-bind="activator" />
                                             </image-preview>
-                                            <v-btn icon="mdi-download" class="text-primary" density="compact" variant="flat"
-                                                @click="() => downloadFile(file.fileUrl)" />
+                                            <v-btn icon="mdi-download" class="text-primary" density="compact"
+                                                variant="flat" @click="() => downloadFile(file.fileUrl)" />
                                         </v-card>
                                     </v-col>
                                 </v-row>
@@ -146,6 +152,7 @@ const emit = defineEmits<{
         </v-card>
     </v-dialog>
 </template>
+
 <style scoped>
 .description {
     min-height: 150px;

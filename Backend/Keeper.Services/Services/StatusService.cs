@@ -62,7 +62,10 @@ namespace Keeper.Services.Services
                 status.AddRange(defaultStatus);
             }
 
-            return status.Select(x => StatusMapper(x)).ToList();
+            return status
+                .OrderBy(x => x.CreatedOn)
+                .Select(x => StatusMapper(x))
+                .ToList();
         }
     }
 }

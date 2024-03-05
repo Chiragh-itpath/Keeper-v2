@@ -8,7 +8,10 @@ import type {
     IClient,
     RuleBook,
 } from "@/Models/ProjectSettings"
-
+export type {
+    IClient,
+    IStatus
+}
 export class ProjectSettingsService {
     private readonly baseUrl = '/ProjectSettings'
 

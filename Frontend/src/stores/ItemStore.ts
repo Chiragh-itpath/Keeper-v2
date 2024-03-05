@@ -4,7 +4,6 @@ import type { IItem, IAddItem, IEditItem } from '@/Models/ItemModels'
 import { ItemService } from '@/Services/ItemService'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
 import { useToster } from '@/composable/useToaster'
-import type { ItemStatus } from '@/Models/enum'
 
 const ItemStore = defineStore('item', () => {
     const Items: Ref<IItem[]> = ref([])
@@ -75,7 +74,7 @@ const ItemStore = defineStore('item', () => {
         const comment = await itemService.PostComment(addComment)
         return comment
     }
-    const updateStatus = async (itemId: string, status: ItemStatus): Promise<boolean> => {
+    const updateStatus = async (itemId: string, status: string): Promise<boolean> => {
         const res = await itemService.UpdateStatus(itemId, status)
         if (res) {
             const index = Items.value.findIndex(x => x.id == itemId)

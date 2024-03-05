@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
+import { useTheme } from "@/composable/useTheme"
 
 const props = defineProps<{
     modelValue?: string,
     height?: number
 }>()
 
+const { dark } = useTheme()
 const quill = ref()
 const text = ref(props.modelValue)
 watch(props, () => {
@@ -37,14 +39,33 @@ const toolbar = [
 </script>
 
 <template>
-    <div class="container">
+    <div class="container" :class="[{ 'dark': dark }]">
         <quill-editor ref="quill" :toolbar="toolbar" :style="`height: ${height ?? 150}px;`" v-model:content="text"
             content-type="html">
         </quill-editor>
     </div>
 </template>
+
 <style>
 .ql-tooltip {
     left: 10px !important;
+}
+
+.ql-action {
+    color: #26A69A !important;
+}
+
+.dark>.ql-snow>.ql-tooltip {
+    background-color: rgb(33, 33, 33) !important;
+    color: white;
+}
+
+.dark>.ql-snow .ql-picker {
+    color: white !important;
+}
+
+.dark>.ql-snow .ql-stroke,
+.dark>.ql-snow .ql-fill {
+    stroke: white;
 }
 </style>

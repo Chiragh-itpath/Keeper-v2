@@ -54,6 +54,7 @@ namespace Keeper.Services.Services
                 CreatedOn = DateTime.Now,
                 To = addItem.To,
                 DiscussedBy = addItem.DiscussedBy,
+                StatusId = addItem.StatusId
             };
             var itemId = await _itemRepo.SaveAsync(item);
             if (addItem.Files != null)
@@ -86,7 +87,7 @@ namespace Keeper.Services.Services
         public async Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails, Guid userId)
         {
             var item = await _itemRepo.GetAsync(newStatusDetails.Id) ?? throw new InnerException("No Item found with id", StatusType.NOT_FOUND);
-            item.Status = newStatusDetails.Status;
+            item.StatusId = newStatusDetails.StatusId;
             item.UpdatedById = userId;
             item.UpdatedOn = DateTime.Now;
             await _itemRepo.Update(item);
@@ -114,7 +115,9 @@ namespace Keeper.Services.Services
                 UpdatedBy = item.UpdatedBy?.Email,
                 To = item.To,
                 DiscussedBy = item.DiscussedBy,
-                Status = item.Status
+                Status = item.Status,
+                KeepId = item.KeepId,
+                StatusId = item.StatusId ?? Guid.Empty
             };
         }
     }

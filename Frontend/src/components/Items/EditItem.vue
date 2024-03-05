@@ -9,27 +9,30 @@ import { fileRule } from '@/data/ValidationRules'
 import { ItemType } from '@/Models/enum'
 import { TypeList } from '@/components/Items'
 
-const props = withDefaults(defineProps<{
-    modelValue?: boolean,
+type ListItem = { title: string, subtitle?: string, value: string }
+const { item, keep, project } = defineProps<{
     item: IItem
     project: IProject,
-    keep: IKeep
-}>(), {
-    modelValue: false
-})
-
+    keep: IKeep,
+    clientList: ListItem[]
+}>()
 const visible: Ref<boolean> = ref(false)
+watch(visible, () => {
+    if (!visible.value) {
+        emits('close')
+    }
+})
 const form = ref()
 const editItem = reactive<IEditItem>({
-    id: props.item.id,
-    title: props.item.title,
-    description: props.item.description,
-    url: props.item.url,
-    keepId: props.keep.id,
-    number: props.item.number,
-    type: props.item.type,
-    to: props.item.to,
-    discussedBy: props.item.discussedBy
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    url: item.url,
+    keepId: keep.id,
+    number: item.number,
+    type: item.type,
+    to: item.to,
+    discussedBy: item.discussedBy,
 })
 const { EditItem } = ItemStore()
 const submitHandler = async (): Promise<void> => {
@@ -41,14 +44,14 @@ const submitHandler = async (): Promise<void> => {
 }
 const users = computed(() => {
     return [
-        ...props.project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
+        ...project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
             return {
                 title: u.invitedUser.userName,
                 subtitle: u.invitedUser.email,
                 value: u.invitedUser.userName
             }
         }),
-        ...props.keep.users.filter(u => u.isAccepted).map(u => {
+        ...keep.users.filter(u => u.isAccepted).map(u => {
             return {
                 title: u.invitedUser.userName,
                 subtitle: u.invitedUser.email,
@@ -57,17 +60,14 @@ const users = computed(() => {
         })
     ]
 })
-watch(visible, () => {
-    if (!visible.value) {
-        emits('close')
-    }
-})
+
 const emits = defineEmits<{
     (e: 'close'): void,
     (e: 'update:modelValue', value: boolean): void,
     (e: 'update:item', item: IItem): void
 }>()
 </script>
+
 <template>
     <v-dialog v-model="visible" close-on-back max-width="850"
         @update:model-value="() => emits('update:modelValue', visible)">
@@ -86,6 +86,7 @@ const emits = defineEmits<{
                             <v-col>
                                 <v-select :items="TypeList" label="Type" color="primary" v-model="editItem.type"
                                     density="comfortable">
+
                                     <template v-slot:item="{ item, props }">
                                         <v-list-item v-bind="props" :title="item.title" density="compact"></v-list-item>
                                     </template>
@@ -96,19 +97,21 @@ const emits = defineEmits<{
                                     v-model="editItem.number" />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <text-field label="Item Name*" placeholder="Item title" is-required v-model="editItem.title"
-                                    :max-limit="100" />
+                                <text-field label="Item Name*" placeholder="Item title" is-required
+                                    v-model="editItem.title" :max-limit="100" counter />
                             </v-col>
                             <v-col cols="12" v-if="editItem.type == ItemType.TICKET || editItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url"
                                     :max-limit="200" icon="mdi-link-box-variant-outline" />
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <text-field label="Discuss With" placeholder="Client name" v-model="editItem.to"
-                                    :max-limit="100" />
+                                <searchable-list :search-items="clientList" label="Discuss With" v-model="editItem.to"
+                                    multiple>
+                                </searchable-list>
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <searchable-list :search-items="users" label="Discuss By" v-model="editItem.discussedBy">
+                                <searchable-list :search-items="users" label="Discuss By"
+                                    v-model="editItem.discussedBy">
                                 </searchable-list>
                             </v-col>
                         </v-row>
@@ -126,7 +129,8 @@ const emits = defineEmits<{
                 </v-card>
             </v-card-text>
             <v-card-actions class="justify-end ma-3">
-                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="130" class="mx-2 rounded-xl">
+                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="130"
+                    class="mx-2 rounded-xl">
                     Update
                 </v-btn>
             </v-card-actions>

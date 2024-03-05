@@ -19,7 +19,8 @@ namespace Keeper.Repos.Repositories
                 .Include(i => i.CreatedBy)
                 .Include(i => i.UpdatedBy)
                 .Where(x => x.KeepId == KeepId && !x.IsDeleted)
-                .OrderBy(x => x.CreatedOn)
+                .OrderByDescending(x => x.CreatedOn)
+                .ThenByDescending(x => x.UpdatedOn)
                 .ToListAsync();
         }
 

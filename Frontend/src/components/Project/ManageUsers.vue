@@ -110,13 +110,15 @@ onMounted(() => {
                                 </v-avatar>
                             </template>
                             <template v-slot:append>
-                                <template v-if="isOwner">
-                                    <v-select density="compact" color="primary" hide-details :items="permissions"
-                                        v-model="user.permission" @update:model-value="() => handleValueChanges(index)">
-                                        <template v-slot:item="{ props }">
-                                            <v-list-item v-bind="props" density="compact"></v-list-item>
-                                        </template>
-                                    </v-select>
+                                <div v-if="isOwner" class="d-flex ga-2 align-center">
+                                    <v-sheet width="120">
+                                        <v-select density="compact" color="primary" hide-details :items="permissions"
+                                            v-model="user.permission" @update:model-value="() => handleValueChanges(index)">
+                                            <template v-slot:item="{ props }">
+                                                <v-list-item v-bind="props" density="compact"></v-list-item>
+                                            </template>
+                                        </v-select>
+                                    </v-sheet>
                                     <delete-prompt title="Remove Member"
                                         subtitle="Are you sure you want to remove this user"
                                         @click:yes="() => handleRemove(user.shareId)">
@@ -124,7 +126,7 @@ onMounted(() => {
                                             <v-icon color="danger" v-bind="props">mdi-delete</v-icon>
                                         </template>
                                     </delete-prompt>
-                                </template>
+                                </div>
                                 <v-chip v-else class="cursor-default" color="primary">
                                     {{ permissions[user.permission].title }}
                                 </v-chip>
@@ -144,10 +146,11 @@ onMounted(() => {
             <v-col cols="1"></v-col>
             <v-col>name</v-col>
             <v-col>Email</v-col>
-            <v-col cols="2" lg=1>Permission</v-col>
-            <v-col cols="auto" v-if="isOwner">action</v-col>
+            <v-col cols="2" class="text-end">Permission</v-col>
+            <v-col cols="1" v-if="isOwner" class="text-center">Action</v-col>
         </v-row>
-        <v-row v-for="(user, index) in InvitedUsers" :key="index" :class="[{ 'bg-white': !dark }]">
+        <v-row v-for="(user, index) in InvitedUsers" :key="index" class="border border-t-0"
+            :class="[{ 'bg-white': !dark }]">
             <v-col cols="1">
                 <v-avatar color="primary">
                     {{ user.invitedUser.email.slice(0, 1).toUpperCase() }}
@@ -155,8 +158,8 @@ onMounted(() => {
             </v-col>
             <v-col>{{ user.invitedUser.userName }} </v-col>
             <v-col>{{ user.invitedUser.email }}</v-col>
-            <v-col cols="2" lg=1>
-                <v-sheet width="120" class="mx-3" v-if="isOwner">
+            <v-col cols="2" class="d-flex justify-end">
+                <v-sheet width="120" v-if="isOwner">
                     <v-select density="compact" color="primary" hide-details :items="permissions" v-model="user.permission"
                         @update:model-value="() => handleValueChanges(index)">
                         <template v-slot:item="{ props }">
@@ -168,11 +171,11 @@ onMounted(() => {
                     {{ permissions[user.permission].title }}
                 </v-chip>
             </v-col>
-            <v-col cols="auto" v-if="isOwner">
+            <v-col cols="1" v-if="isOwner" class="d-flex justify-center align-center">
                 <delete-prompt title="Remove Member" subtitle="Are you sure you want to remove this user"
                     @click:yes="() => handleRemove(user.shareId)">
                     <template v-slot:default="{ props }">
-                        <v-icon color="danger" v-bind="props">mdi-delete</v-icon>
+                        <v-icon color="danger" v-bind="props" size="large" icon="mdi-delete" />
                     </template>
                 </delete-prompt>
             </v-col>

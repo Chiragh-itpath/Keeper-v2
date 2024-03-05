@@ -14,6 +14,7 @@ interface CommonItem {
 }
 interface IAddItem extends CommonItem {
     files?: File[]
+    statusId: string
 }
 
 interface IEditItem extends CommonItem {
@@ -29,6 +30,7 @@ interface IItem extends CommonItem {
     updatedBy?: string
     updatedOn?: string
     status: ItemStatus
+    statusId: string
     files: FileModel[]
     comments: IComment[]
 }

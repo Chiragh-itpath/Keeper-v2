@@ -1,6 +1,5 @@
 import { http } from '@/config/ApiClient'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
-import type { ItemStatus } from '@/Models/enum'
 import type { IItem } from '@/Models/ItemModels'
 import type { IResponse } from '@/Models/ResponseModel'
 
@@ -37,10 +36,10 @@ export class ItemService {
         return response
     }
 
-    public UpdateStatus = async (itemId: string, status: ItemStatus): Promise<IItem | null> => {
+    public UpdateStatus = async (itemId: string, statusId: string): Promise<IItem | null> => {
         return await http.put(`${this.baseUrl}/UpdateStatus`, {
             id: itemId,
-            status
+            statusId
         })
     }
     public getAllComments = async (itemid: string): Promise<IComment[] | null> => {
