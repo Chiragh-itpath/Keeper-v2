@@ -89,14 +89,14 @@ const deleteClicked = async (id: string, index: number) => {
 <template>
     <v-form @submit.prevent>
         <v-container fluid>
-            <v-row>
+            <v-row v-if="isOwner">
                 <v-col cols="12" class="d-flex justify-end">
                     <v-btn text="Add Client" prepend-icon="mdi-plus" color="primary" class="rounded" :disabled="disabled"
                         @click="newClient = ''" />
                 </v-col>
             </v-row>
             <v-row class="mt-10 bg-primary px-4">
-                <v-col> Client name</v-col>
+                <v-col>Client name</v-col>
                 <v-col cols="auto">Actions</v-col>
             </v-row>
             <v-row class="border" :class="[{ 'bg-white': !dark }]" v-if="newClient != undefined">
