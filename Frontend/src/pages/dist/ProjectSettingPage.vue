@@ -11,7 +11,15 @@ const tabs = {
     clientList: 'client List',
     ruleBook: 'rule book'
 } as const
-
+const breadcrumbs = [
+    {
+        title: 'Projects',
+        to: '/Project'
+    },
+    {
+        title: 'Settings'
+    }
+]
 const window = ref<typeof tabs[keyof typeof tabs]>('manage user')
 const route = useRoute()
 const projectStore = ProjectStore()
@@ -28,42 +36,33 @@ const isOwner = computed(() => {
 })
 onMounted(async () => {
     project.value = await projectStore.GetSingalProject(projectId.value)
+    breadcrumbs[0].title = project.value?.title ?? 'Projects'
 })
 </script>
 
 <template>
-    <v-container fluid>
-        <template v-if="project">
-            <v-row no-gutters>
-                <v-col>
-                    <v-breadcrumbs divider="/" :items="[
-            {
-                title: 'Projects',
-                to: '/Project'
-            },
-            {
-                title: 'Settings'
-            }
-        ]">
-                    </v-breadcrumbs>
-                </v-col>
-                <v-col class="d-flex justify-end">
-                    <v-tabs color="primary" v-model="window">
-                        <v-tab :value="tabs.manageUser">Users</v-tab>
-                        <v-tab :value="tabs.statusList">Status List</v-tab>
-                        <v-tab :value="tabs.clientList">Client List</v-tab>
-                        <v-tab :value="tabs.ruleBook">Rule Book</v-tab>
-                    </v-tabs>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="12">
-                    <manage-user v-if="window == 'manage user'" :project="project" :is-owner="isOwner" />
-                    <status-list v-if="window == 'status list'" :project-id="project.id" :is-owner="isOwner" />
-                    <client-list v-if="window == 'client List'" :project-id="project.id" :is-owner="isOwner" />
-                    <rule-book v-if="window == 'rule book'" :project-id="project.id" :is-owner="isOwner" />
-                </v-col>
-            </v-row>
-        </template>
-    </v-container>
+    <v-form @submit.prevent>
+        <v-container fluid class="px-10">
+            <template v-if="project">
+                <v-row>
+                    <v-col>
+                        <v-breadcrumbs divider="/" :items="breadcrumbs" class="px-0">
+                        </v-breadcrumbs>
+                    </v-col>
+                    <v-col class="d-flex justify-end">
+                        <v-tabs color="primary" v-model="window">
+                            <v-tab :value="tabs.manageUser">Users</v-tab>
+                            <v-tab :value="tabs.statusList">Status List</v-tab>
+                            <v-tab :value="tabs.clientList">Client List</v-tab>
+                            <v-tab :value="tabs.ruleBook">Rule Book</v-tab>
+                        </v-tabs>
+                    </v-col>
+                </v-row>
+                <manage-user v-if="window == 'manage user'" :project="project" :is-owner="isOwner" />
+                <status-list v-if="window == 'status list'" :project-id="project.id" :is-owner="isOwner" />
+                <client-list v-if="window == 'client List'" :project-id="project.id" :is-owner="isOwner" />
+                <rule-book v-if="window == 'rule book'" :project-id="project.id" :is-owner="isOwner" />
+            </template>
+        </v-container>
+    </v-form>
 </template>

@@ -48,7 +48,23 @@ const keepId = computed(() => {
     const id = route.params.keepId
     return Array.isArray(id) ? id.join('') : id
 })
-const { GetAllItems } = ItemStore()
+const { GetAllItems }: any = ItemStore()
+const breadcrumbs = [
+    {
+        title: 'Projects',
+        disabled: false,
+        to: '/Project'
+    },
+    {
+        title: 'Keeps',
+        disabled: false,
+        to: `/Project/${projectId.value}`
+    },
+    {
+        title: 'Items',
+        disabled: true
+    }
+]
 onMounted(async () => {
     loading.value = true
     project.value = await ProjectStore().GetSingalProject(projectId.value)
@@ -58,6 +74,8 @@ onMounted(async () => {
     StatusList.value = await projectSettings.GetAllStatus(projectId.value) ?? []
     ClientList.value = await projectSettings.GetAllClient(projectId.value) ?? []
     loading.value = false
+    breadcrumbs[0].title = project.value?.title ?? 'Projects'
+    breadcrumbs[1].title = keep.value?.title ?? 'Keeps'
 })
 const hasAccess = computed((): boolean => {
     return (
@@ -120,22 +138,6 @@ const users = computed(() => {
     }
     return _users
 })
-const breadcrumbsItems = [
-    {
-        title: 'Projects',
-        disabled: false,
-        to: '/Project'
-    },
-    {
-        title: 'Keeps',
-        disabled: false,
-        to: `/Project/${projectId.value}`
-    },
-    {
-        title: 'Item',
-        disabled: true
-    }
-]
 const mapToClient = (client: IClient) => {
     return {
         title: client.name,
@@ -145,90 +147,93 @@ const mapToClient = (client: IClient) => {
 </script>
 
 <template>
-    <v-container class="px-10 pt-5" fluid>
-        <v-row v-if="loading">
+    <v-container class="px-10" fluid>
+        <v-row v-if="loading" class="mt-10">
             <v-col v-for=" i  in  4" :key="i" cols="12" md="6">
                 <v-skeleton-loader type="text,image,actions"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading && project && keep" class="align-center flex-wrap">
-            <v-col cols="12">
-                <v-breadcrumbs divider="/" :items="breadcrumbsItems"></v-breadcrumbs>
-            </v-col>
-            <v-col cols="auto" v-if="!mdAndDown">
-                <v-btn-toggle v-model="view" mandatory color="primary" class="rounded-pill" density="compact">
-                    <v-btn value="card" text="card" width="90">
-                        <template v-slot:prepend>
-                            <v-icon>mdi-card-text-outline</v-icon>
-                        </template>
-                    </v-btn>
-                    <v-btn value="grid" text="grid" width="90">
-
-                        <template v-slot:prepend>
-                            <v-icon>mdi-table</v-icon>
-                        </template>
-                    </v-btn>
-                </v-btn-toggle>
-            </v-col>
-            <v-col cols="auto">
-                <date-picker v-model="filters.date"></date-picker>
-            </v-col>
-            <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus" :users="users"
-                v-model:item-owner="filters.itemOwner" :status-list="StatusList">
-            </item-filter>
-            <v-col>
-                <add-item v-if="canCreate()" :keep="keep" :project="project" :users="users" :status-list="StatusList"
-                    :client-list="ClientList.map(mapToClient)">
-                </add-item>
-            </v-col>
-        </v-row>
-        <v-row v-if="!loading && project && keep && view == 'card'">
-
-            <template v-for="(item, index) of itemToDisplay" :key="index">
-                <v-col cols="12" lg="4" md="6">
-                    <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"
-                        :client-list="ClientList.map(mapToClient)">
-                    </item-card>
+        <template v-if="!loading && project && keep">
+            <v-row>
+                <v-col cols="12">
+                    <v-breadcrumbs divider="/" :items="breadcrumbs" class="px-0">
+                    </v-breadcrumbs>
                 </v-col>
-            </template>
-        </v-row>
-        <v-row v-if="!loading && project && keep && view == 'grid' && itemToDisplay.length != 0"
-            class="bg-white mt-5 mb-5">
-            <v-col cols="12">
-                <v-row class="border-b bg-primary">
-                    <v-col cols="1">Task</v-col>
-                    <v-col cols="1">Title</v-col>
-                    <v-col>Description</v-col>
-                    <v-col cols="1">Discussed With</v-col>
-                    <v-col cols="1">Discussed By</v-col>
-                    <v-col cols="2" class="text-end">Status</v-col>
-                </v-row>
+            </v-row>
+            <v-row class="align-center flex-wrap">
+                <v-col cols="auto" v-if="!mdAndDown">
+                    <v-btn-toggle v-model="view" mandatory color="primary" class="rounded-pill" density="compact">
+                        <v-btn value="card" text="card" width="90">
+                            <template v-slot:prepend>
+                                <v-icon>mdi-card-text-outline</v-icon>
+                            </template>
+                        </v-btn>
+                        <v-btn value="grid" text="grid" width="90">
+
+                            <template v-slot:prepend>
+                                <v-icon>mdi-table</v-icon>
+                            </template>
+                        </v-btn>
+                    </v-btn-toggle>
+                </v-col>
+                <v-col cols="auto">
+                    <date-picker v-model="filters.date"></date-picker>
+                </v-col>
+                <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus"
+                    :users="users" v-model:item-owner="filters.itemOwner" :status-list="StatusList">
+                </item-filter>
+                <v-col>
+                    <add-item v-if="canCreate()" :keep="keep" :project="project" :users="users"
+                        :status-list="StatusList" :client-list="ClientList.map(mapToClient)">
+                    </add-item>
+                </v-col>
+            </v-row>
+            <v-row v-if="view == 'card' && itemToDisplay.length != 0">
 
                 <template v-for="(item, index) of itemToDisplay" :key="index">
-                    <item-grid :item="item" :project="project" :keep="keep" :client-list="ClientList.map(mapToClient)"
-                        :status-list="StatusList">
-                    </item-grid>
+                    <v-col cols="12" lg="4" md="6">
+                        <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"
+                            :client-list="ClientList.map(mapToClient)">
+                        </item-card>
+                    </v-col>
                 </template>
-            </v-col>
-        </v-row>
-        <v-row v-if="!loading && (!project || !keep || itemToDisplay.length == 0)" class="mt-10">
-            <no-item>
+            </v-row>
+            <v-row v-if="view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">
+                <v-col cols="12">
+                    <v-row class="border-b bg-primary">
+                        <v-col cols="2">Title</v-col>
+                        <v-col>Description</v-col>
+                        <v-col cols="1">Discussed With</v-col>
+                        <v-col cols="1">Discussed By</v-col>
+                        <v-col cols="2" class="text-end">Status</v-col>
+                    </v-row>
 
-                <template v-slot:title>
-                    <span v-if="!project">No Project found with this id</span>
-                    <span v-else-if="!keep">No Keep found with this id</span>
-                    <span v-else>No Item found</span>
-                </template>
+                    <template v-for="(item, index) of itemToDisplay" :key="index">
+                        <item-grid :item="item" :project="project" :keep="keep"
+                            :client-list="ClientList.map(mapToClient)" :status-list="StatusList">
+                        </item-grid>
+                    </template>
+                </v-col>
+            </v-row>
+            <v-row v-if="itemToDisplay.length == 0" class="mt-10">
+                <no-item>
 
-                <template v-slot:subtitle v-if="!(!project || !keep)">
-                    <span v-if="filters.date || filters.itemOwner || filters.itemStatus || filters.itemType">
-                        No item found with specified filters
-                    </span>
-                    <span v-else>
-                        Please click on add button to insert new record
-                    </span>
-                </template>
-            </no-item>
-        </v-row>
+                    <template v-slot:title>
+                        <span v-if="!project">No Project found with this id</span>
+                        <span v-else-if="!keep">No Keep found with this id</span>
+                        <span v-else>No Item found</span>
+                    </template>
+
+                    <template v-slot:subtitle v-if="!(!project || !keep)">
+                        <span v-if="filters.date || filters.itemOwner || filters.itemStatus || filters.itemType">
+                            No item found with specified filters
+                        </span>
+                        <span v-else>
+                            Please click on add button to insert new record
+                        </span>
+                    </template>
+                </no-item>
+            </v-row>
+        </template>
     </v-container>
 </template>

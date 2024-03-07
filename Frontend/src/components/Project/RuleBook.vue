@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { TextEditor } from '@/components/Custom'
 import { useDisplay } from 'vuetify'
 import { ProjectSettingsService } from '@/Services/ProjectSettings'
@@ -21,9 +21,6 @@ onMounted(async () => {
         newValue.value = oldValue.value = rules.text
     }
 })
-watch(newValue, () => {
-    console.log(newValue.value, oldValue.value, newValue.value == oldValue.value)
-})
 const onSave = async () => {
     const rules = await projectSettings.UpdateRuleBook({
         projectId,
@@ -37,16 +34,22 @@ const onSave = async () => {
 </script>
 
 <template>
-    <v-row>
-        <v-col cols="12" class="d-flex ga-4 justify-end pe-5" v-if="isOwner">
-            <template v-if="editing">
+    <v-row class="justify-end " v-if="isOwner">
+        <template v-if="editing">
+            <v-col cols="auto">
                 <v-btn prepend-icon="mdi-close" text="cancel" color="red" width="120"
                     @click="editing = false; newValue = oldValue" />
+            </v-col>
+            <v-col cols="auto">
                 <v-btn prepend-icon="mdi-file-check" text="save" color="primary" width="120" :disabled="saveDisabled"
                     @click="onSave" />
-            </template>
-            <v-btn prepend-icon="mdi-pencil" text="edit" color="primary" width="120" @click="editing = true;" v-else />
+            </v-col>
+        </template>
+        <v-col cols="auto" class="" v-else>
+            <v-btn prepend-icon="mdi-pencil" text="edit" color="primary" width="120" @click="editing = true;" />
         </v-col>
+    </v-row>
+    <v-row>
         <v-col cols="12" v-if="editing">
             <v-card elevation="0">
                 <text-editor :height="height - 300" v-model="newValue"></text-editor>

@@ -43,7 +43,5 @@ namespace Keeper.Repos.Repositories
                 .AsNoTracking()
                 .FirstAsync(x => x.Id == id);
         }
-
-
     }
 }

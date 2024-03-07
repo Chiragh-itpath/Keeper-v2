@@ -54,38 +54,24 @@ const getStatusTitle = (statusId: string): string => {
 
         <template v-slot="{ activator }">
             <v-row class="border-b" :class="[{ 'bg-background': dark }]" v-bind="activator">
-                <v-col cols="1">
+                <v-col cols="2">
                     <v-tooltip location="top">
-                        <template v-if="item.type == ItemType.TICKET || item.type == ItemType.PR"
-                            v-slot:activator="{ props }">
-                            <v-chip color="primary" variant="flat" v-bind="props">
+                        <template v-slot:activator="{ props }">
+                            <v-chip v-if="item.type == ItemType.TICKET || item.type == ItemType.PR" color="primary"
+                                variant="flat">
                                 <a :href="item.url" target="_blank" rel="noopener noreferrer" class="text-white"
                                     @click.stop>
                                     {{ item.type == ItemType.TICKET ? '#' : '!' }}
                                     {{ item.number }}
                                 </a>
                             </v-chip>
-                        </template>
-
-                        <template
-                            v-else-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL || item.type == ItemType.CUSTOM"
-                            v-slot:activator="{ props }">
-                            <v-icon color="primary" v-bind="props"
-                                v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
-                                :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file-outline'">
+                            <v-icon :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file-outline'"
+                                color="primary" v-bind="props" v-else>
                             </v-icon>
                             {{ item.title }}
                         </template>
                         {{ TypeList[item.type].title }}
                     </v-tooltip>
-                </v-col>
-                <v-col cols="1" class="text-truncate">
-                    <v-tooltip activator="parent" location="top" max-width="250">
-                        <span class="word-wrap">
-                            {{ item.title }}
-                        </span>
-                    </v-tooltip>
-                    {{ item.title }}
                 </v-col>
                 <v-col class="py-1">
                     <v-sheet max-height="110" class="ellipsis bg-transparent" @click.stop>

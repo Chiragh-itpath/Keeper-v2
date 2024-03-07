@@ -81,61 +81,59 @@ const deleteClicked = async (id: string, index: number) => {
         statusList.value.splice(index, 1)
 }
 </script>
+
 <template>
-    <v-form @submit.prevent>
-        <v-container fluid>
-            <v-row v-if="isOwner">
-                <v-col cols="12" class="d-flex justify-end">
-                    <v-btn text="Add Status" prepend-icon="mdi-plus" color="primary" class="rounded" :disabled="disabled"
-                        @click="newStaus = ''" />
-                </v-col>
-            </v-row>
-            <v-row class="px-4 bg-primary mt-10">
-                <v-col>Title</v-col>
-                <v-col cols="2" lg="1" class="text-center" v-if="isOwner">Actions</v-col>
-            </v-row>
-            <v-row class="border" v-if="newStaus != undefined" :class="[{ 'bg-white': !dark }]">
-                <v-col>
-                    <text-field v-model="newStaus" density="compact" :error-messages="error"></text-field>
-                </v-col>
-                <v-col cols="2" lg="1" class="d-flex ga-2 flex-wrap align-center justify-center">
-                    <v-btn density="comfortable" icon="mdi-check" color="primary" size="small" @click="saveClicked" />
-                    <v-btn density="comfortable" icon="mdi-close" color="red" size="small" @click="cancelClicked" />
-                </v-col>
-            </v-row>
-            <v-row class="border" v-else-if="!statusList.length" :class="[{ 'bg-white': !dark }]">
-                <v-col class="text-grey text-center text-capitalize"> no status added</v-col>
-            </v-row>
-            <template v-for="(item, index) in statusList" :key="index">
-                <v-row class="border border-t-0 ps-4" :class="[{ 'bg-white': !dark }]">
-                    <v-col>
-                        <text-field v-model="updatingStaus" density="compact" v-if="item.isEditing"
-                            :error-messages="error" />
-                        <template v-else>
-                            {{ item.title }}
-                        </template>
-                    </v-col>
-                    <v-col cols="2" lg="1" class="d-flex ga-2 flex-wrap align-center justify-center" v-if="isOwner">
-                        <template v-if="!item.isSystem">
-                            <template v-if="item.isEditing">
-                                <v-btn density="comfortable" icon="mdi-check" color="primary" size="small"
-                                    @click="updateClicked(item, index)" />
-                                <v-btn density="comfortable" icon="mdi-close" color="red" size="small"
-                                    @click="cancelClicked(item)" />
-                            </template>
-                            <template v-else>
-                                <v-btn density="comfortable" icon="mdi-pencil" color="primary" size="small"
-                                    @click="editClicked(item)" :disabled="item.isSystem || isEditing" />
-                                <delete-prompt v-slot="{ props }" @click:yes="deleteClicked(item.id, index)"
-                                    title="Delete Status?">
-                                    <v-btn density="comfortable" icon="mdi-delete" color="red" size="small" v-bind="props"
-                                        :disabled="item.isSystem || isEditing" />
-                                </delete-prompt>
-                            </template>
-                        </template>
-                    </v-col>
-                </v-row>
-            </template>
-        </v-container>
-    </v-form>
+    <v-row v-if="isOwner" class="justify-end mb-3">
+        <v-col cols="auto">
+            <v-btn text="Add Status" prepend-icon="mdi-plus" color="primary" class="rounded" :disabled="disabled"
+                @click="newStaus = ''" />
+        </v-col>
+    </v-row>
+    <v-row class="px-4 bg-primary mt-10">
+        <v-col>Title</v-col>
+        <v-col cols="2" lg="1" class="text-center" v-if="isOwner">Actions</v-col>
+    </v-row>
+    <v-row class="border" v-if="newStaus != undefined" :class="[{ 'bg-white': !dark }]">
+        <v-col>
+            <text-field v-model="newStaus" density="compact" :error-messages="error"></text-field>
+        </v-col>
+        <v-col cols="2" lg="1" class="d-flex ga-2 flex-wrap align-center justify-center">
+            <v-btn density="comfortable" icon="mdi-check" color="primary" size="small" @click="saveClicked" />
+            <v-btn density="comfortable" icon="mdi-close" color="red" size="small" @click="cancelClicked" />
+        </v-col>
+    </v-row>
+    <v-row class="border" v-else-if="!statusList.length" :class="[{ 'bg-white': !dark }]">
+        <v-col class="text-grey text-center text-capitalize"> no status added</v-col>
+    </v-row>
+    <template v-for="(item, index) in statusList" :key="index">
+        <v-row class="border border-t-0 ps-4" :class="[{ 'bg-white': !dark }]">
+            <v-col>
+                <text-field v-model="updatingStaus" density="compact" v-if="item.isEditing" :error-messages="error" />
+                <template v-else>
+                    {{ item.title }}
+                </template>
+            </v-col>
+            <v-col cols="2" lg="1" class="d-flex ga-2 flex-wrap align-center justify-center" v-if="isOwner">
+
+                <template v-if="!item.isSystem">
+                    <template v-if="item.isEditing">
+                        <v-btn density="comfortable" icon="mdi-check" color="primary" size="small"
+                            @click="updateClicked(item, index)" />
+                        <v-btn density="comfortable" icon="mdi-close" color="red" size="small"
+                            @click="cancelClicked(item)" />
+                    </template>
+
+                    <template v-else>
+                        <v-btn density="comfortable" icon="mdi-pencil" color="primary" size="small"
+                            @click="editClicked(item)" :disabled="item.isSystem || isEditing" />
+                        <delete-prompt v-slot="{ props }" @click:yes="deleteClicked(item.id, index)"
+                            title="Delete Status?">
+                            <v-btn density="comfortable" icon="mdi-delete" color="red" size="small" v-bind="props"
+                                :disabled="item.isSystem || isEditing" />
+                        </delete-prompt>
+                    </template>
+                </template>
+            </v-col>
+        </v-row>
+    </template>
 </template>

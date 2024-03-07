@@ -57,6 +57,17 @@ const filterFunction = (keep: IKeep) => {
 watch(filters, () => {
     KeepsToDisplay.value = Keeps.value.filter(filterFunction)
 })
+const breadcrumbs = [
+    {
+        title: 'Projects',
+        disabled: false,
+        to: '/Project'
+    },
+    {
+        title: 'Keeps',
+        disabled: true
+    }
+]
 onMounted(async () => {
     loading.value = true
     project.value = await ProjectStore().GetSingalProject(projectId.value)
@@ -64,8 +75,10 @@ onMounted(async () => {
     await KeepStore().GetKeeps(projectId.value)
     KeepsToDisplay.value = Keeps.value
     loading.value = false
+    breadcrumbs[0].title = project.value?.title ?? 'Projects'
 })
 </script>
+
 <template>
     <v-container class="overflow-auto px-10" fluid>
         <v-row v-if="loading" class="mt-10">
@@ -73,41 +86,33 @@ onMounted(async () => {
                 <v-skeleton-loader type="text,actions"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading && project">
-            <v-col cols="12">
-                <v-breadcrumbs divider="/" class="px-0" :items="[
-                    {
-                        title: 'Projects',
-                        disabled: false,
-                        to: '/Project'
-                    },
-                    {
-                        title: 'Keep',
-                        disabled: true
-                    }
-                ]">
-                    <template v-slot:title="{ item }">
-                        {{ item.title }}</template>
-                </v-breadcrumbs>
-            </v-col>
-            <v-col class="d-flex">
-                <tag-selector :items="keepTags" v-model:selected="filters.selectedTags"></tag-selector>
-                <span class="mx-2"></span>
-                <date-picker v-model="filters.date"></date-picker>
-            </v-col>
-            <v-col class="my-auto d-flex justify-end">
-                <add-keep :project-id="projectId" v-if="canCreate"></add-keep>
-            </v-col>
-        </v-row>
-        <v-row v-if="!loading && project" class="mt-10">
-            <v-col cols="12" lg="3" md="4" sm="6" v-for="(keep, index) in KeepsToDisplay" :key="index">
-                <keep-card :keep="keep" :project="project"></keep-card>
-            </v-col>
-        </v-row>
+        <template v-if="!loading && project">
+            <v-row>
+                <v-col cols="12">
+                    <v-breadcrumbs divider="/" :items="breadcrumbs" class="px-0">
+                        <template v-slot:title="{ item }">
+                            {{ item.title }}
+                        </template>
+                    </v-breadcrumbs>
+                </v-col>
+                <v-col class="d-flex">
+                    <tag-selector :items="keepTags" v-model:selected="filters.selectedTags"></tag-selector>
+                    <span class="mx-2"></span>
+                    <date-picker v-model="filters.date"></date-picker>
+                </v-col>
+                <v-col class="my-auto d-flex justify-end">
+                    <add-keep :project-id="projectId" v-if="canCreate"></add-keep>
+                </v-col>
+            </v-row>
+            <v-row class="mt-10">
+                <v-col cols="12" lg="3" md="4" sm="6" v-for="(keep, index) in KeepsToDisplay" :key="index">
+                    <keep-card :keep="keep" :project="project"></keep-card>
+                </v-col>
+            </v-row>
+        </template>
         <v-row v-if="!loading && KeepsToDisplay.length == 0" class="mt-15">
-            <no-item title="No Keep Found"
-                :sub-title="filters.date ? 'No keep found on this date' : 'Please click on add button to insert new record'"
-                :back-button="!project"></no-item>
+            <no-item :back-button="!project" title="No Keep Found"
+                :sub-title="filters.date ? 'No keep found on this date' : 'Please click on add button to insert new record'" />
         </v-row>
     </v-container>
 </template>

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Keeper.Context.Model
 {
@@ -10,9 +9,9 @@ namespace Keeper.Context.Model
         public Guid Id { get; set; }
         [ForeignKey("ItemID")]
         public Guid ItemId { get; set; }
-        public virtual ItemModel Item { get; set; }
+        public virtual ItemModel Item { get; set; } = default!;
         [ForeignKey("FileId")]
         public Guid FileId { get; set; }
-        public virtual FileModel File { get; set; }
+        public virtual FileModel File { get; set; } = default!;
     }
 }

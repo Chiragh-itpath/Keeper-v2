@@ -68,4 +68,8 @@ const toolbar = [
 .dark>.ql-snow .ql-fill {
     stroke: white;
 }
+
+.dark>.ql-snow>.ql-formats>.ql-picker>.ql-picker-options {
+    background-color: rgb(33, 33, 33) !important;
+}
 </style>
