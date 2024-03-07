@@ -176,11 +176,11 @@ onMounted(async () => {
         <v-row v-if="!loading && project && keep && view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">
             <v-col cols="12">
                 <v-row class="border-b bg-primary">
-                    <v-col cols="1">Task</v-col>
-                    <v-col cols="1">Title</v-col>
+                    <v-col cols="2">Task</v-col>
                     <v-col>Description</v-col>
                     <v-col cols="1">Discussed With</v-col>
                     <v-col cols="1">Discussed By</v-col>
+                    <v-col cols="1">Added By</v-col>
                     <v-col cols="1">Status</v-col>
                 </v-row>
                 <template v-for="(item, index) of itemToDisplay" :key="index">

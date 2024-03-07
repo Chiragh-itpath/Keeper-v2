@@ -33,8 +33,9 @@ watch(props, () => {
     item.value = props.item
 })
 </script>
+
 <template>
-    <info-item :item="item">
+    <info-item :item="item" :users="project.users.map(x => x.invitedUser)">
         <template v-slot:edit>
             <edit-item v-model:item="item" :keep="keep" :project="project" v-if="canEdit">
                 <template v-slot="{ activator }">
@@ -42,33 +43,27 @@ watch(props, () => {
                 </template>
             </edit-item>
         </template>
+
         <template v-slot="{ activator }">
             <v-row class="border-b" :class="[{ 'bg-background': dark }]" v-bind="activator">
-                <v-col cols="1">
-                    <v-tooltip location="top">
-                        <template v-if="item.type == ItemType.TICKET || item.type == ItemType.PR"
-                            v-slot:activator="{ props }">
-                            <v-chip color="primary" variant="flat" v-bind="props">
+                <v-col cols="2">
+                    <v-tooltip location="top" v-if="item.type != ItemType.CUSTOM">
+                        <template v-slot:activator="{ props }">
+                            <v-chip color="primary" variant="flat" v-bind="props" class="cursor-default"
+                                v-if="item.type == ItemType.TICKET || item.type == ItemType.PR">
                                 <a :href="item.url" target="_blank" rel="noopener noreferrer" class="text-white"
                                     @click.stop>
                                     {{ item.type == ItemType.TICKET ? '#' : '!' }}
                                     {{ item.number }}
                                 </a>
                             </v-chip>
-                        </template>
-                        <template
-                            v-else-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL || item.type == ItemType.CUSTOM"
-                            v-slot:activator="{ props }">
-                            <v-icon color="primary" v-bind="props"
-                                v-if="item.type == ItemType.MAIL || item.type == ItemType.SUMMARY_MAIL"
+                            <v-icon color="primary" v-bind="props" v-else
                                 :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file-outline'">
                             </v-icon>
-                            {{ item.title }}
+                            <br>
                         </template>
                         {{ TypeList[item.type].title }}
                     </v-tooltip>
-                </v-col>
-                <v-col cols="1">
                     {{ item.title }}
                 </v-col>
                 <v-col class="py-1">
@@ -78,6 +73,7 @@ watch(props, () => {
                 </v-col>
                 <v-col cols="1">
                     <span v-if="item.to" class="d-flex cursor-pointer" v-bind="props">
+
                         <template v-for="(client, index) in  item.to.split(/,/) " :key="index">
                             <span v-if="client.trim() && index < 3" style="width: 22px;">
                                 <v-avatar color="primary" size="small" class="avatar-border">
@@ -90,10 +86,10 @@ watch(props, () => {
                                     <span v-else>
                                         {{
                                             client
-                                                .split(' ')
-                                                .splice(0, 2)
-                                                .map(x => x.charAt(0).toUpperCase())
-                                                .join('')
+                                            .split(' ')
+                                            .splice(0, 2)
+                                            .map(x => x.charAt(0).toUpperCase())
+                                            .join('')
                                         }}
                                         <v-tooltip activator="parent" location="top">
                                             {{ client.trim() }}
@@ -105,6 +101,7 @@ watch(props, () => {
                     </span>
                 </v-col>
                 <v-col cols="1">
+
                     <template v-if="item.discussedBy">
                         <v-avatar color="primary" size="small" class="cursor-pointer avatar-border">
                             <v-tooltip activator="parent" location="top">
@@ -114,8 +111,32 @@ watch(props, () => {
                         </v-avatar>
                     </template>
                 </v-col>
+                <v-col cols="1">
+                    <v-avatar color="primary" size="small" class="cursor-pointer avatar-border">
+                        <v-tooltip activator="parent" location="top">
+                            {{
+                                project.users
+                                .map(x => x.invitedUser)
+                                .find(x => x.email == item.createdBy)?.userName ??
+                                item.createdBy
+                            }}
+                        </v-tooltip>
+                        {{
+                            project.users
+                            .map(x => x.invitedUser)
+                            .find(x => x.email == item.createdBy)?.userName
+                            .split(' ')
+                            .splice(0, 2)
+                            .map(x =>x[0].toUpperCase())
+                            .join('') ??
+                            item.createdBy[0].toUpperCase()
+                        }}
+                    </v-avatar>
+
+                </v-col>
                 <v-col cols="1" class="d-flex justify-end">
                     <update-status :item="item" :status="item.status" v-if="canEdit">
+
                         <template v-slot="{ props, isActive }">
                             <v-chip color="primary" variant="flat" v-bind="props">
                                 {{ StatusList[item.status].subtitle ?? StatusList[item.status].title }}
@@ -133,6 +154,7 @@ watch(props, () => {
         </template>
     </info-item>
 </template>
+
 <style>
 .description>ol,
 .description>ul {

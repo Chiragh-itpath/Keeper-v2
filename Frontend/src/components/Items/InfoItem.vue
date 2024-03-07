@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
 import moment from 'moment'
-
 import { AllComments } from '@/components/Comments/'
 import { TypeList, ImagePreview } from '@/components/Items'
 import type { IItem } from '@/Models/ItemModels'
 import { ItemType } from '@/Models/enum'
+import type { IUser } from '@/Models/UserModels'
 
 const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
 defineProps<{
     item: IItem,
-    modelValue?: boolean
+    modelValue?: boolean,
+    users: IUser[]
 }>()
 const downloadFile = (path: string) => {
     window.open(path, '_blank')
@@ -52,7 +53,8 @@ const emit = defineEmits<{
                 <slot name="edit"></slot>
                 <v-tooltip location="top">
                     <template v-slot:activator="{ props: tooltip }">
-                        <v-icon color="white" v-bind="tooltip" class="ms-2" @click="(visible = false)">mdi-close</v-icon>
+                        <v-icon color="white" v-bind="tooltip" class="ms-2"
+                            @click="(visible = false)">mdi-close</v-icon>
                     </template>
                     Close
                 </v-tooltip>
@@ -69,22 +71,34 @@ const emit = defineEmits<{
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
                             <div>
-                                <div class="mb-3">Discuss with:
-                                    <span v-if="item.to">
-                                        <template v-for="(client, index) in item.to.split(/,/)" :key="index">
-                                            <v-chip color="primary" class="mx-1" v-if="client.trim()">
-                                                {{ client.trim() }}
-                                            </v-chip>
-                                        </template>
-                                    </span>
-                                    <span class="text-grey text-h5" v-else>-</span>
-                                </div>
-                                <div class="mb-3">Discuss by:
-                                    <v-chip color="primary" v-if="item.discussedBy">
-                                        {{ item.discussedBy }}
-                                    </v-chip>
-                                    <span v-else class="text-grey text-h5">-</span>
-                                </div>
+                                <v-row>
+                                    <v-col class="pb-1">Discuss with</v-col>
+                                    <v-col class="pb-1">Discuss by</v-col>
+                                    <v-col class="pb-1">Added by</v-col>
+                                </v-row>
+                                <v-row class="mb-5">
+                                    <v-col class="pt-1">
+                                        <span v-if="item.to">
+                                            <template v-for="(client, index) in item.to.split(/,/)" :key="index">
+                                                <v-chip color="primary" class="mx-1" v-if="client.trim()">
+                                                    {{ client.trim() }}
+                                                </v-chip>
+                                            </template>
+                                        </span>
+                                        <span class="text-grey text-h5" v-else>-</span>
+                                    </v-col>
+                                    <v-col class="pt-1">
+                                        <v-chip color="primary" v-if="item.discussedBy">
+                                            {{ item.discussedBy }}
+                                        </v-chip>
+                                        <span v-else class="text-grey text-h5">-</span>
+                                    </v-col>
+                                    <v-col class="pt-1">
+                                        <v-chip color="primary">
+                                            {{ users.find(x => x.email == item.createdBy)?.userName ?? item.createdBy }}
+                                        </v-chip>
+                                    </v-col>
+                                </v-row>
                             </div>
                             <div class="description rounded-lg pa-3">
                                 <div v-if="item.description" v-html="item.description"></div>
@@ -109,8 +123,8 @@ const emit = defineEmits<{
                                                 <v-btn icon="mdi-eye" class="text-primary ms-2" density="compact"
                                                     variant="flat" v-bind="activator" />
                                             </image-preview>
-                                            <v-btn icon="mdi-download" class="text-primary" density="compact" variant="flat"
-                                                @click="() => downloadFile(file.fileUrl)" />
+                                            <v-btn icon="mdi-download" class="text-primary" density="compact"
+                                                variant="flat" @click="() => downloadFile(file.fileUrl)" />
                                         </v-card>
                                     </v-col>
                                 </v-row>
