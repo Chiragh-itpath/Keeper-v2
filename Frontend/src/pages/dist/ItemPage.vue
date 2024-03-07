@@ -205,6 +205,7 @@ const mapToClient = (client: IClient) => {
                         <v-col>Description</v-col>
                         <v-col cols="1">Discussed With</v-col>
                         <v-col cols="1">Discussed By</v-col>
+                        <v-col cols="1">Added By</v-col>
                         <v-col cols="2" class="text-end">Status</v-col>
                     </v-row>
 

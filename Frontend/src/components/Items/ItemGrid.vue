@@ -43,7 +43,7 @@ const getStatusTitle = (statusId: string): string => {
 </script>
 
 <template>
-    <info-item :item="item">
+    <info-item :item="item" :users="project.users.map(x => x.invitedUser)">
         <template v-slot:edit>
             <edit-item v-model:item="item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit">
                 <template v-slot="{ activator }">
@@ -64,10 +64,12 @@ const getStatusTitle = (statusId: string): string => {
                                     {{ item.type == ItemType.TICKET ? '#' : '!' }}
                                     {{ item.number }}
                                 </a>
+                                
                             </v-chip>
                             <v-icon :icon="item.type == ItemType.MAIL ? 'mdi-email-outline' : 'mdi-file-outline'"
                                 color="primary" v-bind="props" v-else>
                             </v-icon>
+                            <br>
                             {{ item.title }}
                         </template>
                         {{ TypeList[item.type].title }}
@@ -112,6 +114,28 @@ const getStatusTitle = (statusId: string): string => {
                             {{ item.discussedBy.split(' ').splice(0, 2).map(x => x.charAt(0).toUpperCase()).join('') }}
                         </v-avatar>
                     </template>
+                </v-col>
+                <v-col cols="1">
+                    <v-avatar color="primary" size="small" class="cursor-pointer avatar-border">
+                        <v-tooltip activator="parent" location="top">
+                            {{
+                                project.users
+                                .map(x => x.invitedUser)
+                                .find(x => x.email == item.createdBy)?.userName ??
+                                item.createdBy
+                            }}
+                        </v-tooltip>
+                        {{
+                            project.users
+                            .map(x => x.invitedUser)
+                            .find(x => x.email == item.createdBy)?.userName
+                            .split(' ')
+                            .splice(0, 2)
+                            .map(x =>x[0].toUpperCase())
+                            .join('') ??
+                            item.createdBy[0].toUpperCase()
+                        }}
+                    </v-avatar>
                 </v-col>
                 <v-col cols="2" class="d-flex justify-end">
                     <update-status :item="item" :status-list="statusList" v-if="canEdit">

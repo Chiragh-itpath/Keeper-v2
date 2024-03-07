@@ -57,7 +57,7 @@ const getStatusTitle = (statusId: string): string => {
 
 <template>
     <v-hover v-slot="{ props: hover, isHovering }">
-        <info-item :item="item">
+        <info-item :item="item" :users="project.users.map(x => x.invitedUser)"> 
             <template v-slot:edit>
                 <edit-item v-model:item="_item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit"
                     v-slot="{ activator: editActivator }">
