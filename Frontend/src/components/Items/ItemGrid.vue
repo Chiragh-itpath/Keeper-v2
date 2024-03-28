@@ -137,9 +137,8 @@ const getStatusTitle = (statusId: string): string => {
                         }}
                     </v-avatar>
                 </v-col>
-                <v-col cols="2" class="d-flex justify-end">
+                <v-col cols="2" class="d-flex justify-start">
                     <update-status :item="item" :status-list="statusList" v-if="canEdit">
-
                         <template v-slot="{ props, isActive }">
                             <v-chip color="primary" variant="flat" v-bind="props">
                                 <span class="text-truncate overflow-hidden" style="max-width: 100px;">

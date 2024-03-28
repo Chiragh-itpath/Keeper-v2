@@ -11,7 +11,7 @@ const env = {
     prod: 'http://ipskeeper.project-demo.info:8073/api'
 }
 const http = axios.create({
-    baseURL: env.test
+    baseURL: env.dev
 })
 
 const loadingEffect = (arg: boolean): void => {
