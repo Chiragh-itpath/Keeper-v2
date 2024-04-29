@@ -10,7 +10,7 @@ import { ItemType } from '@/Models/enum'
 import { TypeList } from '@/components/Items'
 
 type ListItem = { title: string, subtitle?: string, value: string }
-const { item, keep, project } = defineProps<{
+const { item, keep, project, clientList } = defineProps<{
     item: IItem
     project: IProject,
     keep: IKeep,
@@ -18,9 +18,21 @@ const { item, keep, project } = defineProps<{
 }>()
 const visible: Ref<boolean> = ref(false)
 watch(visible, () => {
+
     if (!visible.value) {
         emits('close')
     }
+})
+const DeletedClients = computed(() => {
+    return item.to != null ? item.to
+        .split(',')
+        .filter(x => !clientList.map(c => c.value).includes(x))
+        .map((x): ListItem => {
+            return {
+                title: x,
+                value: x
+            }
+        }) : []
 })
 const form = ref()
 const editItem = reactive<IEditItem>({
@@ -105,8 +117,8 @@ const emits = defineEmits<{
                                     :max-limit="200" icon="mdi-link-box-variant-outline" />
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <searchable-list :search-items="clientList" label="Discuss With" v-model="editItem.to"
-                                    multiple>
+                                <searchable-list :search-items="[...clientList, ...DeletedClients]" label="Discuss With"
+                                    v-model="editItem.to" multiple>
                                 </searchable-list>
                             </v-col>
                             <v-col cols="12" sm="6">

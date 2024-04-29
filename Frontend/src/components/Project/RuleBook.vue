@@ -14,7 +14,7 @@ const { height } = useDisplay()
 const newValue = ref<string>()
 const oldValue = ref<string>()
 const editing = ref<boolean>(false)
-const saveDisabled = computed(() => !!newValue.value == !!oldValue.value)
+const saveDisabled = computed(() => newValue.value == oldValue.value)
 onMounted(async () => {
     const rules = await projectSettings.GetRuleBook(projectId)
     if (rules) {

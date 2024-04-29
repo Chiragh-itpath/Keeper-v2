@@ -73,6 +73,18 @@ onMounted(async () => {
     await GetAllItems(keepId.value)
     StatusList.value = await projectSettings.GetAllStatus(projectId.value) ?? []
     ClientList.value = await projectSettings.GetAllClient(projectId.value) ?? []
+    // const deletedClients = Items.value
+    //     .map(x => x.to)
+    //     .filter(x => !!x)
+    //     .filter(x => !ClientList.value.map(y => y.name).includes(x!))
+    //     .map((x): IClient => {
+    //         return {
+    //             id: '',
+    //             name: x!,
+    //             projectId: ''
+    //         }
+    //     })
+    // ClientList.value.push(...deletedClients)
     loading.value = false
     breadcrumbs[0].title = project.value?.title ?? 'Projects'
     breadcrumbs[1].title = keep.value?.title ?? 'Keeps'
@@ -169,7 +181,6 @@ const mapToClient = (client: IClient) => {
                             </template>
                         </v-btn>
                         <v-btn value="grid" text="grid" width="90">
-
                             <template v-slot:prepend>
                                 <v-icon>mdi-table</v-icon>
                             </template>
@@ -189,7 +200,6 @@ const mapToClient = (client: IClient) => {
                 </v-col>
             </v-row>
             <v-row v-if="view == 'card' && itemToDisplay.length != 0">
-
                 <template v-for="(item, index) of itemToDisplay" :key="index">
                     <v-col cols="12" lg="4" md="6">
                         <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"

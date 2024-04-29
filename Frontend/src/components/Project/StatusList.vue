@@ -91,6 +91,7 @@ const deleteClicked = async (id: string, index: number) => {
     </v-row>
     <v-row class="px-4 bg-primary mt-10">
         <v-col>Title</v-col>
+        <v-col></v-col>
         <v-col cols="2" lg="1" class="text-center" v-if="isOwner">Actions</v-col>
     </v-row>
     <v-row class="border" v-if="newStaus != undefined" :class="[{ 'bg-white': !dark }]">
@@ -114,7 +115,6 @@ const deleteClicked = async (id: string, index: number) => {
                 </template>
             </v-col>
             <v-col cols="2" lg="1" class="d-flex ga-2 flex-wrap align-center justify-center" v-if="isOwner">
-
                 <template v-if="!item.isSystem">
                     <template v-if="item.isEditing">
                         <v-btn density="comfortable" icon="mdi-check" color="primary" size="small"
@@ -122,7 +122,6 @@ const deleteClicked = async (id: string, index: number) => {
                         <v-btn density="comfortable" icon="mdi-close" color="red" size="small"
                             @click="cancelClicked(item)" />
                     </template>
-
                     <template v-else>
                         <v-btn density="comfortable" icon="mdi-pencil" color="primary" size="small"
                             @click="editClicked(item)" :disabled="item.isSystem || isEditing" />
@@ -133,6 +132,7 @@ const deleteClicked = async (id: string, index: number) => {
                         </delete-prompt>
                     </template>
                 </template>
+                <template v-else>-</template>
             </v-col>
         </v-row>
     </template>
