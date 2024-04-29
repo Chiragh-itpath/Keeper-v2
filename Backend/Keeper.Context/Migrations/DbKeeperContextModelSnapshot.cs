@@ -22,6 +22,36 @@ namespace Keeper.Context.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Keeper.Context.Model.ClientModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Clients");
+                });
+
             modelBuilder.Entity("Keeper.Context.Model.CommentModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -197,10 +227,13 @@ namespace Keeper.Context.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("To")
                         .HasColumnType("nvarchar(max)");
@@ -223,9 +256,41 @@ namespace Keeper.Context.Migrations
 
                     b.HasIndex("KeepId");
 
+                    b.HasIndex("StatusId");
+
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("Items");
+                });
+
+            modelBuilder.Entity("Keeper.Context.Model.ItemStatusModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemStatus");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.KeepModel", b =>
@@ -314,6 +379,36 @@ namespace Keeper.Context.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("Keeper.Context.Model.RuleBookModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RuleBook");
                 });
 
             modelBuilder.Entity("Keeper.Context.Model.SharedKeepsModel", b =>
@@ -531,6 +626,10 @@ namespace Keeper.Context.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Keeper.Context.Model.ItemStatusModel", "StatusModel")
+                        .WithMany()
+                        .HasForeignKey("StatusId");
+
                     b.HasOne("Keeper.Context.Model.UserModel", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
@@ -538,6 +637,8 @@ namespace Keeper.Context.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Keep");
+
+                    b.Navigation("StatusModel");
 
                     b.Navigation("UpdatedBy");
                 });

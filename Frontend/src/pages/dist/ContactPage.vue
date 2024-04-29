@@ -43,6 +43,7 @@ onMounted(async () => {
     loading.value = false
 })
 </script>
+
 <template>
     <v-container class="overflow-auto" fluid>
         <v-row v-if="loading">
@@ -53,7 +54,7 @@ onMounted(async () => {
                 <v-skeleton-loader type="list-item,table-tbody"></v-skeleton-loader>
             </v-col>
         </v-row>
-        <v-row v-if="!loading">
+        <v-row v-else>
             <v-col cols="12">
                 <v-card elevation="0" class="d-flex flex-row-reverse bg-transparent">
                     <v-tabs color="primary" v-model="tabs">
@@ -79,7 +80,7 @@ onMounted(async () => {
                         <add-contact :contacts="Contacts" :projects="Projects" />
                     </v-col>
                 </v-row>
-                <all-contacts :contacts="contactsToDisplay"></all-contacts>
+                <all-contacts :contacts="contactsToDisplay" />
             </v-window-item>
             <v-window-item value="group">
                 <v-row class="mt-10 align-center">
@@ -87,6 +88,7 @@ onMounted(async () => {
                         <v-text-field color="primary" label="Search" placeholder="Enter text to search" clearable
                             hide-details density="comfortable" clear-icon="mdi-close-circle-outline"
                             @update:model-value="groupSearchHandler">
+
                             <template v-slot:prepend-inner>
                                 <v-icon color="primary">mdi-magnify</v-icon>
                             </template>
@@ -98,7 +100,7 @@ onMounted(async () => {
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <all-groups :groups="groupsToDisplay"></all-groups>
+                        <all-groups :groups="groupsToDisplay" />
                     </v-col>
                 </v-row>
             </v-window-item>

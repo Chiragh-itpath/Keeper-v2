@@ -4,6 +4,7 @@ enum RouterEnum {
     SIGNUP = 'SignUp',
     PASSWORD_RESET = 'PasswordReset',
     PROJECT = 'Projects',
+    PROJECT_SETTINGS = 'ProjectSettings',
     KEEP = 'Keeps',
     ITEM = 'Items',
     CONTACT = 'Contact',

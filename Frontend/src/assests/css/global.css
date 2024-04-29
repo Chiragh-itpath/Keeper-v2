@@ -11,6 +11,9 @@
     border-radius: 10px;
     background-image: linear-gradient(#26a69a, #80cbc4, #26a69a);
 }
+.hide-scroll::-webkit-scrollbar {
+    display: none;
+}
 .v-layout {
     height: 100dvh;
 }

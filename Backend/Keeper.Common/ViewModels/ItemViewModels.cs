@@ -13,6 +13,7 @@ namespace Keeper.Common.ViewModels
         public string? To { get; set; }
         public string? DiscussedBy { get; set; }
         public Guid KeepId { get; set; }
+        public Guid StatusId { get; set; }
     }
     public class AddItem : CommonItem
     {
@@ -37,6 +38,6 @@ namespace Keeper.Common.ViewModels
     public class UpdateItemStatus
     {
         public Guid Id { get; set; }
-        public ItemStatus Status { get; set; }
+        public Guid StatusId { get; set; }
     }
 }

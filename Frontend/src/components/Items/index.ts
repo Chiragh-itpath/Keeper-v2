@@ -7,7 +7,7 @@ import ItemFilter from './ItemFilter.vue'
 import ItemCard from './ItemCard.vue'
 import ItemGrid from './ItemGrid.vue'
 import ImagePreview from './ImagePreview.vue'
-import { ItemStatus, ItemType } from '@/Models/enum'
+import { ItemType } from '@/Models/enum'
 
 export {
     AddItem,
@@ -24,36 +24,8 @@ export {
 export type ListItemsType = {
     title: string,
     subtitle?: string,
-    value: ItemStatus | ItemType
+    value: ItemType
 }
-
-export const StatusList: ListItemsType[] = [
-    {
-        title: 'New',
-        value: ItemStatus.NEW
-    },
-    {
-        title: 'Waiting from client side',
-        subtitle: 'Waiting',
-        value: ItemStatus.WAITING
-    },
-    {
-        title: 'Pending',
-        value: ItemStatus.PENDING
-    },
-    {
-        title: 'Follow up',
-        value: ItemStatus.FOLLOW_UP
-    },
-    {
-        title: 'Close',
-        value: ItemStatus.COMPLETED
-    },
-    {
-        title: 'Re-Open',
-        value: ItemStatus.RE_OPEN
-    }
-]
 
 export const TypeList: ListItemsType[] = [
     {

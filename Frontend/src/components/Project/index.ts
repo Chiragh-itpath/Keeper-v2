@@ -5,6 +5,9 @@ import InfoProject from './InfoProject.vue'
 import InviteProject from './InviteProject.vue'
 import ManageUser from './ManageUsers.vue'
 import DeleteProject from './DeleteProject.vue'
+import StatusList from './StatusList.vue'
+import ClientList from './ClientList.vue'
+import RuleBook from './RuleBook.vue'
 
 export {
     AddProject,
@@ -13,5 +16,8 @@ export {
     InfoProject,
     InviteProject,
     ManageUser,
-    DeleteProject
+    DeleteProject,
+    StatusList,
+    ClientList,
+    RuleBook
 }

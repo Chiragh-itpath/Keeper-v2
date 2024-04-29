@@ -1,4 +1,5 @@
 ﻿using Keeper.Context.Model;
+using Keeper.Services.Config;
 using log4net;
 using log4net.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +12,17 @@ namespace Keeper.Repos.Config
 {
     public static class Bootstraper
     {
+        public static IServiceCollection RegisterApplication(this IServiceCollection services)
+        {
+            services
+                .RegisterCORS()
+                .RegisterRepos()
+                .RegisterServices()
+                .AddSwagger()
+                .AddLogger()
+                .ConfigureApiBehavior();
+            return services;
+        }
         public static IServiceCollection RegisterCORS(this IServiceCollection services)
         {
             services.AddCors(option =>

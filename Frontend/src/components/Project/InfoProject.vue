@@ -74,7 +74,6 @@ watch(visible, () => {
 </template>
 <style scoped>
 .description {
-    background-color: #ECEFF1;
     height: 150px;
     overflow: auto;
     text-overflow: ellipsis;

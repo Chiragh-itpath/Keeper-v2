@@ -7,7 +7,6 @@ import { Permission, RouterEnum } from '@/Models/enum'
 import {
     EditProject,
     InfoProject,
-    ManageUser,
     DeleteProject,
     InviteProject
 } from '@/components/Project'
@@ -51,13 +50,11 @@ const canEdit = computed((): boolean => {
                                 <span class="mx-3">Invite</span>
                             </v-list-item>
                         </invite-project>
-                        <manage-user :project="project" v-if="!project.isShared" @close="close"
-                            v-slot="{ activator: manageUserActivator }">
-                            <v-list-item v-bind="manageUserActivator" @click="menuHide = true">
-                                <v-icon>mdi-account-multiple-outline</v-icon>
-                                <span class="mx-3">Manage</span>
-                            </v-list-item>
-                        </manage-user>
+                        <v-list-item
+                            @click="router.push({ name: RouterEnum.PROJECT_SETTINGS, params: { id: project.id } })">
+                            <v-icon>mdi-folder-wrench-outline</v-icon>
+                            <span class="mx-3">Settings</span>
+                        </v-list-item>
                         <edit-project :project="project" v-if="canEdit" @close="close"
                             v-slot="{ activator: editActivator }">
                             <v-list-item v-bind="editActivator" @click="menuHide = true">

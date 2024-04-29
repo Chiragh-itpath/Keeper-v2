@@ -7,13 +7,14 @@ import PageNotFound from '@/pages/dist/PageNotFound.vue'
 import ItemPage from '@/pages/dist/ItemPage.vue'
 import ForgotPasswordPage from '@/pages/dist/ForgotPasswordPage.vue'
 import ContactPage from '@/pages/dist/ContactPage.vue'
-
+import ProjectSettingPage from './dist/ProjectSettingPage.vue'
 export {
     HomePage,
     LoginPage,
     SignUpPage,
     ForgotPasswordPage,
     ProjectPage,
+    ProjectSettingPage,
     KeepPage,
     ItemPage,
     ContactPage,

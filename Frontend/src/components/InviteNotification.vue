@@ -60,8 +60,8 @@ onMounted(async (): Promise<void> => {
         </template>
         <v-card max-width="450">
             <v-card-text class="ma-0 pa-0 px-3">
-                <v-card v-for="(notification, index) in InvitedProjectList" :key="index" class="my-3 custom-card rounded-lg"
-                    elevation="0">
+                <v-card v-for="(notification, index) in InvitedProjectList" :key="index"
+                    class="my-3 custom-card bg-background rounded-lg" elevation="0">
                     <v-card-text class="ma-0 pa-0 px-3 pt-2">
                         <div>
                             <span class="font-weight-bold">
@@ -77,11 +77,11 @@ onMounted(async (): Promise<void> => {
                         <v-progress-circular indeterminate color="primary"
                             v-if="Loading && selectedIndex == notification.inviteId"></v-progress-circular>
                         <template v-else>
-                            <v-icon color="green" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
+                            <v-icon color="green" role="button" size="32" :class="Loading ? 'v-btn--disabled' : ''"
                                 class="mx-4" @click="onProjectInviteReponse(notification, true)">
                                 mdi-check-circle-outline
                             </v-icon>
-                            <v-icon color="red" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
+                            <v-icon color="red" role="button" size="32" :class="Loading ? 'v-btn--disabled' : ''"
                                 @click="onProjectInviteReponse(notification, false)">
                                 mdi-close-circle-outline
                             </v-icon>
@@ -105,11 +105,11 @@ onMounted(async (): Promise<void> => {
                         <v-progress-circular indeterminate color="primary"
                             v-if="Loading && selectedIndex == notification.inviteId"></v-progress-circular>
                         <template v-else>
-                            <v-icon color="green" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
+                            <v-icon color="green" role="button" size="32" :class="Loading ? 'v-btn--disabled' : ''"
                                 class="mx-4" @click="onKeepInviteResponse(notification, true)">
                                 mdi-check-circle-outline
                             </v-icon>
-                            <v-icon color="red" role="button" size="x-large" :class="Loading ? 'v-btn--disabled' : ''"
+                            <v-icon color="red" role="button" size="32" :class="Loading ? 'v-btn--disabled' : ''"
                                 @click="onKeepInviteResponse(notification, false)">
                                 mdi-close-circle-outline
                             </v-icon>
@@ -130,10 +130,5 @@ onMounted(async (): Promise<void> => {
 <style scoped>
 .custom-card {
     border-left: 5px solid #26A69A;
-    background: #ECEFF1;
-}
-
-.v-icon--size-x-large {
-    font-size: calc(var(--v-icon-size-multiplier) * 2rem);
 }
 </style>

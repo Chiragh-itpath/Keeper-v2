@@ -18,6 +18,7 @@ import {
     LoginPage,
     PageNotFound,
     ProjectPage,
+    ProjectSettingPage,
     SignUpPage,
     ContactPage
 } from '@/pages'
@@ -79,6 +80,16 @@ const routes: RouteRecordRaw[] = [
         name: RouterEnum.PROJECT,
         components: {
             default: ProjectPage,
+            NavBar: NavBar,
+            SideBar: SideBar
+        },
+        beforeEnter: requireLoggedIn
+    },
+    {
+        path: '/Project/Settings/:id',
+        name: RouterEnum.PROJECT_SETTINGS,
+        components: {
+            default: ProjectSettingPage,
             NavBar: NavBar,
             SideBar: SideBar
         },

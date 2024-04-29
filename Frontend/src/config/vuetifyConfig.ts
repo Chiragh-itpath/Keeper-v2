@@ -28,7 +28,7 @@ export const vuetify = createVuetify({
                 dark: true,
                 colors: {
                     ...colors,
-                    background: '#212121'
+                    background: '#262626'
                 }
             }
         }

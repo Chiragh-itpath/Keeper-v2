@@ -1,22 +1,13 @@
 using Keeper.Context.Config;
 using Keeper.Main.Middleware;
 using Keeper.Repos.Config;
-using Keeper.Services.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
-
+builder.Services.RegisterApplication();
 builder.Services
-    .RegisterCORS()
     .RegisterDbContext(builder.Configuration)
-    .RegisterRepos()
-    .RegisterServices()
-    .RegisterServices()
-    .AddSwagger()
-    .AddLogger()
-    .ConfigureApiBehavior()
     .ConfigAuth(builder.Configuration)
     .AddMailServices(builder.Configuration);
 

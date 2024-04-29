@@ -10,6 +10,7 @@ defineProps<{
 const { smAndUp } = useDisplay()
 const { DeleteContact } = ContactStore()
 </script>
+
 <template>
     <template v-if="smAndUp">
         <v-card class="mt-10">
@@ -31,8 +32,8 @@ const { DeleteContact } = ContactStore()
                         <v-col cols="1">
                             <v-avatar size="small" color="primary">
                                 {{
-                                    `${contact.firstName.charAt(0).toUpperCase()}${contact.lastName.charAt(0).toUpperCase()}`
-                                }}
+        `${contact.firstName.charAt(0).toUpperCase()}${contact.lastName.charAt(0).toUpperCase()}`
+    }}
                             </v-avatar>
                         </v-col>
                         <v-col cols="12" sm="2">
@@ -52,8 +53,10 @@ const { DeleteContact } = ContactStore()
                                 <delete-prompt width="500" title="Delete Contact"
                                     @click:yes="() => DeleteContact(contact.id)">
                                     <template v-slot="{ props }">
-                                        <v-icon icon="mdi-delete" color="danger" size="large" class="mx-2" v-bind="props" />
+                                        <v-icon icon="mdi-delete" color="danger" size="large" class="mx-2"
+                                            v-bind="props" />
                                     </template>
+
                                     <template v-slot:alert>
                                         <v-alert text="This action will also remove contact from all groups."
                                             color="warning" class="mx-0 mt-1">
@@ -70,6 +73,7 @@ const { DeleteContact } = ContactStore()
             </v-card-text>
         </v-card>
     </template>
+
     <template v-else>
         <v-sheet v-if="contacts.length == 0" height="300" class="mt-10 d-flex align-center justify-center flex-column">
             <v-icon color="grey" icon="mdi-account-off" size="50" />
@@ -82,10 +86,11 @@ const { DeleteContact } = ContactStore()
                     <template v-slot:prepend>
                         <v-avatar size="small" color="primary">
                             {{
-                                `${contact.firstName.charAt(0).toUpperCase()}${contact.lastName.charAt(0).toUpperCase()}`
-                            }}
+        `${contact.firstName.charAt(0).toUpperCase()}${contact.lastName.charAt(0).toUpperCase()}`
+    }}
                         </v-avatar>
                     </template>
+
                     <template v-slot:append>
                         <v-menu location="left">
                             <template v-slot:activator="{ props }">
@@ -99,11 +104,13 @@ const { DeleteContact } = ContactStore()
                                 </edit-contact>
                                 <delete-prompt width="500" title="Delete Contact"
                                     @click:yes="() => DeleteContact(contact.id)">
+
                                     <template v-slot="{ props }">
                                         <v-list-item density="compact" v-bind="props">
                                             <v-icon size="small" icon="mdi-delete" /> Delete
                                         </v-list-item>
                                     </template>
+
                                     <template v-slot:alert>
                                         <v-alert text="This action will also remove contact from all groups."
                                             color="warning" class="mx-0 mt-1">

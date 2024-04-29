@@ -16,21 +16,24 @@ const Props = withDefaults(
         label?: string
         color?: string
         placeholder?: string
+        counter?: boolean
         isRequired?: boolean
         isEmail?: boolean
         isContact?: boolean
         isPassword?: boolean
         isNumber?: boolean
         isUrl?: boolean
-        icon?: string,
-        maxLimit?: number,
-        ValidationRules?: TRule[],
+        icon?: string
+        maxLimit?: number
+        ValidationRules?: TRule[]
         errorMessages?: string
+        density?: 'default' | 'compact' | 'comfortable'
     }>(),
     {
         label: '',
         color: 'primary',
         placeholder: '',
+        counter: false,
         isRequired: false,
         isEmail: false,
         isContact: false,
@@ -38,7 +41,8 @@ const Props = withDefaults(
         isNumber: false,
         isUrl: false,
         icon: '',
-        maxLimit: 30
+        maxLimit: 30,
+        density: 'comfortable'
     }
 )
 const _value: Ref<string> = ref(Props.modelValue ?? '')
@@ -79,22 +83,24 @@ const emits = defineEmits<{
     (e: 'update:modelValue', value: string): void
 }>()
 </script>
+
 <template>
-    <v-text-field v-model="_value" :label="Props.label" :type="type" :color="Props.color" hide-details="auto" :rules="Rules"
+    <v-text-field v-model="_value" :label="Props.label" :type="type" :counter="counter" :color="Props.color"
+        hide-details="auto" :rules="Rules" :density="density" :placeholder="placeholder" :error-messages="errorMessages"
         :append-inner-icon="!isPassword ? '' : isPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :error="error"
-        density="comfortable" :placeholder="placeholder" :error-messages="errorMessages"
         @click:append-inner="changeVisibility" class="mb-4" @input="() => {
-            _value = _value.slice(0, Props.maxLimit)
-            if (Props.isContact || Props.isNumber) {
-                _value = _value.replace(/[^\d]/g, '')
-            }
-        }">
+        _value = _value.slice(0, Props.maxLimit)
+        if (Props.isContact || Props.isNumber) {
+            _value = _value.replace(/[^\d]/g, '')
+        }
+    }">
         <template v-slot:prepend-inner="{ isFocused }">
             <v-icon v-if="Props.icon" :icon="Props.icon"
                 :class="isFocused.value == true ? 'text-primary' : 'text-grey'"></v-icon>
         </template>
     </v-text-field>
 </template>
+
 <style>
 .v-icon {
     --v-medium-emphasis-opacity: 1 !important;
