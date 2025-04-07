@@ -32,6 +32,21 @@ const filters = reactive<{
 
 watch([filters, Items], () => {
     itemToDisplay.value = Items.value.filter(itemFilterCallBack).sort((x, y) => x.status - y.status)
+    const query: Record<string, string> = {};
+    if (filters.date && (!Array.isArray(filters.date) || filters.date.length > 0)) {
+        query.date = Array.isArray(filters.date) ? filters.date.map(d => dateHelper.format(d, 'keyboardDate')).join(',') : dateHelper.format(filters.date, 'keyboardDate');
+    }
+    if (filters.itemType && filters.itemType.length > 0) {
+        query.itemType = filters.itemType.join(',');
+    }
+    if (filters.itemStatus && filters.itemStatus.length > 0) {
+        query.itemStatus = filters.itemStatus.join(',');
+    }
+    if (filters.itemOwner && filters.itemOwner.length > 0) {
+        query.itemOwner = filters.itemOwner.join(',');
+    }
+
+    router.replace({ query });
 }, {
     deep: true
 })
@@ -67,6 +82,8 @@ const breadcrumbs = [
     }
 ]
 onMounted(async () => {
+    const query = { ...route.query };
+    debugger
     loading.value = true
     project.value = await ProjectStore().GetSingalProject(projectId.value)
     keep.value = await KeepStore().getSingleKeep(keepId.value)
@@ -89,6 +106,20 @@ onMounted(async () => {
     loading.value = false
     breadcrumbs[0].title = project.value?.title ?? 'Projects'
     breadcrumbs[1].title = keep.value?.title ?? 'Keeps'
+    if (query.date) {
+        filters.date = query.date.includes(',')
+            ? query.date.toString().split(',').map(d => new Date(d))
+            : new Date(query.date.toString());
+    }
+    if (query.itemType) {
+        filters.itemType = query.itemType.toString().split(',').map(type => parseInt(type));
+    }
+    if (query.itemStatus) {
+        filters.itemStatus = query.itemStatus.toString().split(',').map(status => status);
+    }
+    if (query.itemOwner) {
+        filters.itemOwner = query.itemOwner.toString().split(',');
+    }
 })
 const hasAccess = computed((): boolean => {
     return (
@@ -105,6 +136,7 @@ const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
         dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
 }
 const itemFilterCallBack = (item: IItem): boolean => {
+    console.log(item)
     return (
         !filters.date ||
         (Array.isArray(filters.date) && filters.date.length === 0) || isSameDate(new Date(item.createdOn), filters.date)
@@ -134,7 +166,7 @@ const users = computed(() => {
                 return {
                     title: x.invitedUser.userName,
                     subtitle: x.invitedUser.email,
-                    value: x.invitedUser.userName
+                    value: x.invitedUser.email
                 }
             })
         )
@@ -145,7 +177,7 @@ const users = computed(() => {
                 return {
                     title: x.invitedUser.userName,
                     subtitle: x.invitedUser.email,
-                    value: x.invitedUser.userName
+                    value: x.invitedUser.email
                 }
             })
         )
@@ -189,11 +221,8 @@ const mapToClient = (client: IClient) => {
                         </v-btn>
                     </v-btn-toggle>
                 </v-col>
-                <v-col cols="auto">
-                    <date-picker v-model="filters.date"></date-picker>
-                </v-col>
                 <item-filter v-model:item-type="filters.itemType" v-model:item-status="filters.itemStatus"
-                    :users="users" v-model:item-owner="filters.itemOwner" :status-list="StatusList">
+                    :users="users" v-model:item-owner="filters.itemOwner" :status-list="StatusList" v-model:date="filters.date">
                 </item-filter>
                 <v-col>
                     <add-item v-if="canCreate()" :keep="keep" :project="project" :users="users"

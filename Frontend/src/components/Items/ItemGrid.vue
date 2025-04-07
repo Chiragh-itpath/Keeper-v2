@@ -77,7 +77,7 @@ const getStatusTitle = (statusId: string): string => {
                 </v-col>
                 <v-col class="py-1">
                     <v-sheet max-height="110" class="ellipsis bg-transparent" @click.stop>
-                        <span v-html="item.description" class="description" :class="[{ 'text-white': dark }]"></span>
+                        <span v-html="item.description" :class="[{ 'text-white': dark }]"></span>
                     </v-sheet>
                 </v-col>
                 <v-col cols="1">

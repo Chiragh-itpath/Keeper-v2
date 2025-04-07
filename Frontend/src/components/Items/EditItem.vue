@@ -23,6 +23,11 @@ watch(visible, () => {
         emits('close')
     }
 })
+const fullScreen = ref(false)
+const maxWidth = computed(() => fullScreen.value ? '100%' : '900px')
+const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '400px')
+const editorHeight = computed(() => fullScreen.value ? 400 : 150)
+
 const DeletedClients = computed(() => {
     return item.to != null ? item.to
         .split(',')
@@ -81,7 +86,7 @@ const emits = defineEmits<{
 </script>
 
 <template>
-    <v-dialog v-model="visible" close-on-back max-width="850"
+    <v-dialog v-model="visible" close-on-back :max-width="maxWidth" :fullscreen="fullScreen"
         @update:model-value="() => emits('update:modelValue', visible)">
         <template v-slot:activator="{ props }">
             <slot :activator="props"></slot>
@@ -89,10 +94,14 @@ const emits = defineEmits<{
         <v-card class="position-relative">
             <v-card-title class="bg-primary text-center position-sticky">
                 Update Item
-                <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
+                <div class="float-end d-flex align-center gap-2">
+                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
+                    </v-icon>
+                    <v-icon @click="visible = false">mdi-close</v-icon>
+                </div>
             </v-card-title>
             <v-card-text class="px-0">
-                <v-card max-height="450" elevation="0" class="mx-5 px-2 overflow-y-auto">
+                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto' : !fullScreen }" style="{ 'max-height': cardMaxHeight }">
                     <v-form ref="form" @submit.prevent>
                         <v-row>
                             <v-col>
@@ -110,7 +119,7 @@ const emits = defineEmits<{
                             </v-col>
                             <v-col cols="12" md="6">
                                 <text-field label="Item Name*" placeholder="Item title" is-required
-                                    v-model="editItem.title" :max-limit="100" counter />
+                                    v-model="editItem.title" :max-limit="50" counter />
                             </v-col>
                             <v-col cols="12" v-if="editItem.type == ItemType.TICKET || editItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="editItem.url"
@@ -129,7 +138,7 @@ const emits = defineEmits<{
                         </v-row>
                         <v-row>
                             <v-col cols="12">
-                                <text-editor v-model="editItem.description" />
+                                <text-editor v-model="editItem.description" :height="editorHeight" />
                             </v-col>
                             <v-col cols="12">
                                 <v-file-input color="primary" v-model="editItem.files" label="Select Files"

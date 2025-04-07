@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, type Ref, reactive } from 'vue'
+import { ref, watch, type Ref, reactive, computed } from 'vue'
 import { TextField, TextEditor, SearchableList } from '@/components/Custom/'
 import { ItemStore } from '@/stores'
 import type { IAddItem } from '@/Models/ItemModels'
@@ -19,6 +19,11 @@ const { keep, users, statusList } = defineProps<{
 const visible: Ref<boolean> = ref(false)
 const form = ref()
 const validateOn: Ref<'submit' | 'input'> = ref('submit')
+const fullScreen = ref(false)
+const maxWidth = computed(() => fullScreen.value ? '100%' : '850px')
+const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '500px')
+const editorHeight = computed(() => fullScreen.value ? 400 : 150)
+
 const { AddItem } = ItemStore()
 const addItem = reactive<IAddItem>({
     title: '',
@@ -49,7 +54,7 @@ watch(visible, () => {
 </script>
 
 <template>
-    <v-dialog v-model="visible" close-on-back max-width="850">
+    <v-dialog v-model="visible" close-on-back :max-width="maxWidth" :fullscreen="fullScreen">
         <template v-slot:activator="{ props }">
             <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" v-bind="props" class="float-end">
                 New Item
@@ -58,10 +63,14 @@ watch(visible, () => {
         <v-card>
             <v-card-title class="bg-primary text-center position-sticky">
                 New Item
-                <v-icon class="float-end" @click="visible = false">mdi-close</v-icon>
+                <div class="float-end d-flex align-center gap-2">
+                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
+                    </v-icon>  
+                    <v-icon  @click="visible = false">mdi-close</v-icon>
+                </div>
             </v-card-title>
             <v-card-text class="px-0 ">
-                <v-card max-height="500" class="mx-5 px-3 overflow-y-auto" elevation="0">
+                <v-card class="mx-5 px-3" :class="{ 'overflow-y-auto' : !fullScreen }" elevation="0" :style="{ 'max-height': cardMaxHeight }">
                     <v-form ref="form" @submit.prevent :validate-on="validateOn">
                         <v-row>
                             <v-col>
@@ -80,7 +89,7 @@ watch(visible, () => {
                             </v-col>
                             <v-col cols="12" md="6">
                                 <text-field label="Item Name*" placeholder="Item title" is-required
-                                    v-model="addItem.title" :max-limit="100" counter />
+                                    v-model="addItem.title" :max-limit="50" counter />
                             </v-col>
                             <v-col cols="12" v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
                                 <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
@@ -100,7 +109,7 @@ watch(visible, () => {
                         </v-row>
                         <v-row>
                             <v-col cols="12">
-                                <text-editor v-model="addItem.description"></text-editor>
+                                <text-editor v-model="addItem.description" :height="editorHeight"></text-editor>
                             </v-col>
                             <v-col cols="12">
                                 <v-file-input color="primary" v-model="addItem.files" label="Select Files" multiple

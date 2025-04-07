@@ -21,20 +21,27 @@ const chips = {
 type Chip = typeof chips[keyof typeof chips]
 const Selected = ref<Chip>('Single')
 
+watch(() => props.modelValue, (newValue) => {
+    displayDate.value = newValue
+    date.value = newValue
+}, { immediate: true })
+
 watch(date, () => {
     if (date.value) {
         if (Array.isArray(date.value) && date.value.length == 0) {
             displayDate.value = undefined
+            date.value = undefined
             emits('update:modelValue')
             return
         }
         displayDate.value = date.value
-        emits('update:modelValue', displayDate.value)
+        emits('update:modelValue', date.value)
         if (Selected.value == 'Single') {
             listMenu.value = false
         }
         return
     }
+    displayDate.value = undefined
     emits('update:modelValue')
 })
 const emits = defineEmits<{

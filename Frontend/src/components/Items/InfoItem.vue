@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { ref, watch, type Ref } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import moment from 'moment'
 import { AllComments } from '@/components/Comments/'
 import { TypeList, ImagePreview } from '@/components/Items'
 import type { IItem } from '@/Models/ItemModels'
 import { ItemType } from '@/Models/enum'
 import type { IUser } from '@/Models/UserModels'
+import { useTheme } from '@/composable/useTheme'
 
 const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
+
+const { dark } = useTheme()
+
 defineProps<{
     item: IItem,
     modelValue?: boolean,
@@ -25,10 +29,11 @@ watch(visible, () => {
 const emit = defineEmits<{
     (e: 'update:modelValue', value: boolean): void
 }>()
+
 </script>
 
 <template>
-    <v-dialog v-model="visible" max-width="800" @update:model-value="(value) => emit('update:modelValue', value)">
+    <v-dialog v-model="visible" max-width="850px" @update:model-value="(value : any) => emit('update:modelValue', value)">
         <template v-slot:activator="{ props }">
             <slot :activator="props" :visible="visible"></slot>
         </template>
@@ -104,7 +109,7 @@ const emit = defineEmits<{
                                             class="d-flex justify-center align-center pa-3">
                                             <v-tooltip location="top">
                                                 <template v-slot:activator="{ props }">
-                                                    <span class="text-black text-truncate" v-bind="props">
+                                                    <span class="text-truncate" :class="dark ? 'text-white' : 'text-black'" v-bind="props">
                                                         {{ file.fileName }}
                                                     </span>
                                                 </template>

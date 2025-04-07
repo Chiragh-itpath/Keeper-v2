@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, type Ref } from 'vue'
+import { computed, onMounted, ref, watch, type Ref } from 'vue'
 import { TypeList } from '@/components/Items'
+import { DatePicker } from '@/components/Custom'
 import { ItemType } from '@/Models/enum'
 import type { IStatus } from '@/Models/ProjectSettings'
 
@@ -10,15 +11,18 @@ const props = defineProps<{
     itemType?: ItemType[]
     itemStatus?: string[]
     itemOwner?: string[],
-    statusList: IStatus[]
+    statusList: IStatus[],
+    date?: Date | Date[]
 }>()
-const selectedType = ref([])
-const selectedStatus = ref([])
-const selectedUser = ref([])
+
+const selectedType = ref<ItemType[]>([])
+const selectedStatus = ref<string[]>([])
+const selectedUser = ref<string[]>([])
 const statusList = ref(props.statusList)
 const searchText: Ref<string | undefined> = ref()
 const displayUser = ref(props.users)
 const userMenu: Ref<boolean> = ref(false)
+const dateRef = ref(props.date)
 
 watch(searchText, () => {
     displayUser.value = props.users.filter((x) => {
@@ -29,25 +33,74 @@ watch(searchText, () => {
         )
     })
 })
+watch([() => props.itemType, () => props.itemStatus, () => props.itemOwner], () => {
+    selectedType.value = props.itemType ?? []
+    selectedStatus.value = props.itemStatus ?? []
+    selectedUser.value = props.itemOwner ?? []
+})
 const emits = defineEmits<{
     (e: 'update:itemType', type?: ItemType[]): void
     (e: 'update:itemStatus', type?: string[]): void
     (e: 'update:itemOwner', owner?: string[]): void
+    (e: 'update:date', date?: Date | Date[] | undefined): void
 }>()
+
+const hasFilters = computed(() => {
+    return (
+        selectedType.value.length > 0 ||
+        selectedStatus.value.length > 0 ||
+        selectedUser.value.length > 0 ||
+        props.date
+    )
+})
+
+const clearFilters = () => {
+    selectedType.value = []
+    selectedStatus.value = []
+    selectedUser.value = []
+    dateRef.value = undefined
+    emits('update:itemType', undefined)
+    emits('update:itemStatus', undefined)
+    emits('update:itemOwner', undefined)
+    emits('update:date', undefined)
+}
+
+const updateDate = (date: Date | Date[] | undefined) => {
+    dateRef.value = date
+    if (date) {
+        if (Array.isArray(date) && date.length == 0) {
+            emits('update:date', undefined)
+            return
+        }
+        emits('update:date', date)
+    } else {
+        emits('update:date', undefined)
+    }
+}
+
+onMounted(() => {
+    selectedType.value = props.itemType ?? []
+    selectedStatus.value = props.itemStatus ?? []
+    selectedUser.value = props.itemOwner ?? []
+    console.log(displayUser)
+})
 </script>
 
 <template>
-    <v-col cols="auto" class="px-2">
+    <v-col cols="auto">
+        <date-picker :modelValue="dateRef" @update:modelValue="updateDate"></date-picker>
+    </v-col>
+    <v-col cols="auto">
         <v-menu :transition="false" width="150" :close-on-content-click="false">
             <template v-slot:activator="{ props: menu, isActive }">
                 <v-btn v-bind="menu" class="rounded-lg" variant="outlined" color="primary">
                     {{
-            selectedType.length == 0
-                ? 'Type'
-                : selectedType.length == 1
-                    ? `${TypeList[selectedType[0]].title}`
-                    : `Selected (${selectedType.length})`
-        }}
+                        selectedType.length == 0
+                            ? 'Type'
+                            : selectedType.length == 1
+                                ? `${TypeList[selectedType[0]].title}`
+                                : `Selected (${selectedType.length})`
+                    }}
                     <template v-slot:append>
                         <v-icon icon="mdi-close" v-if="selectedType.length != 0"
                             @click.stop="selectedType = []; emits('update:itemType')" />
@@ -70,9 +123,9 @@ const emits = defineEmits<{
 
             <template v-slot:activator="{ props, isActive }">
                 <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary">
-                    {{ selectedStatus.length == 0 ? 'Status' : selectedStatus.length == 1
-            ? `${statusList.find(x => x.id == selectedStatus[0])?.title}`
-            : `Selected (${selectedStatus.length})` }}
+                    {{selectedStatus.length == 0 ? 'Status' : selectedStatus.length == 1
+                        ? `${statusList.find(x => x.id == selectedStatus[0])?.title}`
+                        : `Selected (${selectedStatus.length})` }}
                     <template v-slot:append>
                         <v-icon icon="mdi-close" v-if="selectedStatus.length != 0"
                             @click.stop="selectedStatus = []; emits('update:itemStatus')" />
@@ -80,7 +133,8 @@ const emits = defineEmits<{
                     </template>
                 </v-btn>
             </template>
-            <v-list max-height="300" density="compact" v-model:selected="selectedStatus" select-strategy="classic" color="primary"
+            <v-list max-height="300" density="compact" v-model:selected="selectedStatus" select-strategy="classic"
+                color="primary"
                 @update:selected="emits('update:itemStatus', selectedStatus.length == 0 ? undefined : selectedStatus)">
 
                 <template v-for="(status, index) in statusList" :key="index">
@@ -97,9 +151,9 @@ const emits = defineEmits<{
             <template v-slot:activator="{ props, isActive }">
                 <v-btn v-bind="props" class="rounded-lg" variant="outlined" color="primary"
                     :class="[{ 'text-lowercase': selectedUser.length }]">
-                    {{ selectedUser.length == 0 ? 'Owner' : selectedUser.length == 1 ?
-            `${displayUser.find((x) => x.value == selectedUser[0])?.title}` :
-            `Selected (${selectedUser.length})` }}
+                    {{selectedUser.length == 0 ? 'Owner' : selectedUser.length == 1 ?
+                        `${displayUser.find((x) => x.value == selectedUser[0])?.title}` :
+                        `Selected (${selectedUser.length})` }}
                     <template v-slot:append>
                         <v-icon icon="mdi-close" v-if="selectedUser.length != 0"
                             @click.stop="selectedUser = []; emits('update:itemOwner')" />
@@ -127,5 +181,10 @@ const emits = defineEmits<{
                 <v-list-item v-if="displayUser.length == 0" title="No user found" class="text-grey"></v-list-item>
             </v-list>
         </v-menu>
+    </v-col>
+    <v-col cols="auto" class="px-2" v-if="hasFilters">
+        <v-btn class="rounded-lg" variant="tonal" color="primary" @click="clearFilters">
+            Clear Filters
+        </v-btn>
     </v-col>
 </template>
