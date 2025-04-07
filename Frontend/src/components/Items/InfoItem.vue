@@ -153,7 +153,7 @@ const emit = defineEmits<{
     </v-dialog>
 </template>
 
-<style scoped>
+<style>
 .description {
     min-height: 150px;
     max-height: 300px;

@@ -22,6 +22,7 @@ const project: Ref<IProject | undefined> = ref()
 const keep: Ref<IKeep | undefined> = ref()
 const StatusList: Ref<IStatus[]> = ref([])
 const ClientList: Ref<IClient[]> = ref([])
+const dateHelper = useDate()
 const filters = reactive<{
     date?: Date | Date[],
     itemType?: ItemType[],
@@ -96,11 +97,12 @@ const hasAccess = computed((): boolean => {
         (keep.value?.users.some(u => u.invitedUser.id == User.id && u.isAccepted) ?? false)
     )
 })
+
 const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
     return Array.isArray(date2) ?
-        date2.map(d => useDate().format(d, 'keyboardDate'))
-            .includes(useDate().format(date1, 'keyboardDate')) :
-        useDate().format(date1, 'keyboardDate') === useDate().format(date2, 'keyboardDate')
+        date2.map(d => dateHelper.format(d, 'keyboardDate'))
+            .includes(dateHelper.format(date1, 'keyboardDate')) :
+        dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
 }
 const itemFilterCallBack = (item: IItem): boolean => {
     return (
