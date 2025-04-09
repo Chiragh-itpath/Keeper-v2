@@ -7,12 +7,24 @@ import type { IItem } from '@/Models/ItemModels'
 import { ItemType } from '@/Models/enum'
 import type { IUser } from '@/Models/UserModels'
 import { useTheme } from '@/composable/useTheme'
+import { useDisplay } from 'vuetify'
 
 const tab: Ref<'info' | 'comments' | 'logs'> = ref('info')
 const visible: Ref<boolean> = ref(false)
 
 const { dark } = useTheme()
+const display = useDisplay()
 
+const maxWidth = computed(() => {
+    if(display.smAndDown.value) {
+        return '100%';
+    }
+    if(display.mdAndDown.value) {
+        return '700px';
+    }
+    
+    return '1000px';
+})
 defineProps<{
     item: IItem,
     modelValue?: boolean,
@@ -33,7 +45,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <v-dialog v-model="visible" max-width="850px" @update:model-value="(value : any) => emit('update:modelValue', value)">
+    <v-dialog v-model="visible" :max-width="maxWidth" @update:model-value="(value : any) => emit('update:modelValue', value)">
         <template v-slot:activator="{ props }">
             <slot :activator="props" :visible="visible"></slot>
         </template>
@@ -75,7 +87,7 @@ const emit = defineEmits<{
                         <v-tab value="logs">logs</v-tab>
                     </v-tabs>
                 </div>
-                <v-card height="450" max-height="450" class="overflow-y-auto mx-2 pa-3 " elevation="0">
+                <v-card height="550" max-height="550" class="overflow-y-auto mx-2 pa-3 " elevation="0">
                     <v-window v-model="tab" class="mt-5">
                         <v-window-item value="info">
                             <div>
@@ -161,7 +173,7 @@ const emit = defineEmits<{
 <style>
 .description {
     min-height: 150px;
-    max-height: 300px;
+    max-height: 350px;
     border: 0.5px solid grey;
     overflow-x: auto;
 }

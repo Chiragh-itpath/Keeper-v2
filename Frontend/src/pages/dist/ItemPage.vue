@@ -3,7 +3,7 @@ import { computed, ref, onMounted, type Ref, reactive, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDate, useDisplay } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'
-import { DatePicker, NoItem } from '@/components/Custom'
+import { NoItem } from '@/components/Custom'
 import { AddItem, ItemFilter, ItemCard, ItemGrid } from '@/components/Items'
 import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
 import type { IKeep } from '@/Models/KeepModels'
@@ -17,7 +17,6 @@ const view: Ref<'card' | 'grid'> = ref('card')
 const projectSettings = new ProjectSettingsService()
 const { User } = UserStore()
 const { Items } = storeToRefs(ItemStore())
-const itemToDisplay: Ref<IItem[]> = ref([])
 const project: Ref<IProject | undefined> = ref()
 const keep: Ref<IKeep | undefined> = ref()
 const StatusList: Ref<IStatus[]> = ref([])
@@ -30,26 +29,34 @@ const filters = reactive<{
     itemOwner?: string[]
 }>({})
 
-watch([filters, Items], () => {
-    itemToDisplay.value = Items.value.filter(itemFilterCallBack).sort((x, y) => x.status - y.status)
+const itemToDisplay = computed(() => {
+    const filtered = Items.value.filter(itemFilterCallBack).sort((x, y) => y.status - x.status);
+
     const query: Record<string, string> = {};
+
     if (filters.date && (!Array.isArray(filters.date) || filters.date.length > 0)) {
-        query.date = Array.isArray(filters.date) ? filters.date.map(d => dateHelper.format(d, 'keyboardDate')).join(',') : dateHelper.format(filters.date, 'keyboardDate');
+        query.date = Array.isArray(filters.date)
+            ? filters.date.map(d => dateHelper.format(d, 'keyboardDate')).join(',')
+            : dateHelper.format(filters.date, 'keyboardDate');
     }
-    if (filters.itemType && filters.itemType.length > 0) {
+
+    if (filters.itemType?.length) {
         query.itemType = filters.itemType.join(',');
     }
-    if (filters.itemStatus && filters.itemStatus.length > 0) {
+
+    if (filters.itemStatus?.length) {
         query.itemStatus = filters.itemStatus.join(',');
     }
-    if (filters.itemOwner && filters.itemOwner.length > 0) {
+
+    if (filters.itemOwner?.length) {
         query.itemOwner = filters.itemOwner.join(',');
     }
 
     router.replace({ query });
-}, {
-    deep: true
-})
+
+    return filtered;
+});
+
 const { mdAndDown } = useDisplay()
 watch(mdAndDown, () => {
     view.value = mdAndDown.value ? 'card' : view.value
@@ -83,10 +90,10 @@ const breadcrumbs = [
 ]
 onMounted(async () => {
     const query = { ...route.query };
-    debugger
     loading.value = true
     project.value = await ProjectStore().GetSingalProject(projectId.value)
     keep.value = await KeepStore().getSingleKeep(keepId.value)
+    await KeepStore().GetKeeps(projectId.value)
     if (!hasAccess.value) router.go(-1)
     await GetAllItems(keepId.value)
     StatusList.value = await projectSettings.GetAllStatus(projectId.value) ?? []
@@ -136,7 +143,6 @@ const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
         dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
 }
 const itemFilterCallBack = (item: IItem): boolean => {
-    console.log(item)
     return (
         !filters.date ||
         (Array.isArray(filters.date) && filters.date.length === 0) || isSameDate(new Date(item.createdOn), filters.date)

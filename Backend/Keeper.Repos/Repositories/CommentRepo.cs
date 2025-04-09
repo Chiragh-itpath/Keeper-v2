@@ -18,9 +18,16 @@ namespace Keeper.Repos.Repositories
             await _db.SaveChangesAsync();
             return comment;
         }
+
+        public async Task AddRangeAsync(List<CommentModel> comments)
+        {
+            await _db.Comment.AddRangeAsync(comments);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<List<CommentModel>> GetAllAsync(Guid itemId)
         {
-            var commentQuery = from c in _db.Comment.Include(c => c.User)
+            var commentQuery = from c in _db.Comment.AsNoTracking().Include(c => c.User)
                                where c.ItemId == itemId && c.CommentId == null
                                orderby c.TimeStamp descending
                                select c;
@@ -33,7 +40,7 @@ namespace Keeper.Repos.Repositories
         }
         private async Task LoadReplies(CommentModel comment)
         {
-            var query = from r in _db.Comment.Include(c => c.User)
+            var query = from r in _db.Comment.AsNoTracking().Include(c => c.User)
                         where r.CommentId == comment.Id
                         orderby r.TimeStamp descending
                         select r;

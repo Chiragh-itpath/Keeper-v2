@@ -1,6 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IItem, IAddItem, IEditItem } from '@/Models/ItemModels'
+import type { IItem, IAddItem, IEditItem, IMoveItem } from '@/Models/ItemModels'
 import { ItemService } from '@/Services/ItemService'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
 import { useToster } from '@/composable/useToaster'
@@ -91,6 +91,22 @@ const ItemStore = defineStore('item', () => {
             Comments.value = res
         }
     }
+    const moveItem = async (moveItem: IMoveItem) : Promise<boolean> => {
+        const res = await itemService.MoveItem(moveItem)
+        const result = res.toLowerCase() === 'true'
+        if(result) {
+            if(moveItem.action === 0) {
+                useToster({ message: 'Item Moved' })
+                const index = Items.value.findIndex(x => x.id == moveItem.itemId)
+                if (index != -1) {
+                    Items.value.splice(index, 1)
+                }
+            } else {
+                useToster({ message: 'Item Copied' })
+            }
+        }
+        return result;
+    }
     return {
         Items,
         Comments,
@@ -102,7 +118,8 @@ const ItemStore = defineStore('item', () => {
         getSingalItem,
         AddComment,
         updateStatus,
-        fetchComments
+        fetchComments,
+        moveItem
     }
 })
 export { ItemStore }

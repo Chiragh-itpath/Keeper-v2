@@ -10,5 +10,6 @@ namespace Keeper.Services.Services.Interfaces
         Task<ItemViewModel> UpdateAsync(EditItem editItem, Guid userId);
         Task<bool> DeleteAsync(Guid id);
         Task<ItemViewModel> UpdateStatus(UpdateItemStatus newStatusDetails, Guid userId);
+        Task<bool> MoveItem(MoveItemModel moveItem);
     }
 }

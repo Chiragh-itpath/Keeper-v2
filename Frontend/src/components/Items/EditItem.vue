@@ -8,6 +8,7 @@ import type { IKeep } from '@/Models/KeepModels'
 import { fileRule } from '@/data/ValidationRules'
 import { ItemType } from '@/Models/enum'
 import { TypeList } from '@/components/Items'
+import { useDisplay } from 'vuetify'
 
 type ListItem = { title: string, subtitle?: string, value: string }
 const { item, keep, project, clientList } = defineProps<{
@@ -24,8 +25,17 @@ watch(visible, () => {
     }
 })
 const fullScreen = ref(false)
-const maxWidth = computed(() => fullScreen.value ? '100%' : '900px')
-const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '400px')
+const display = useDisplay()
+const maxWidth = computed(() => {
+    if(fullScreen.value || display.smAndDown.value) {
+        return '100%';
+    }
+    if(display.mdAndDown.value) {
+        return '700px';
+    }
+    return '1000px';
+})
+const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '550px')
 const editorHeight = computed(() => fullScreen.value ? 400 : 150)
 
 const DeletedClients = computed(() => {
@@ -101,7 +111,7 @@ const emits = defineEmits<{
                 </div>
             </v-card-title>
             <v-card-text class="px-0">
-                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto' : !fullScreen }" style="{ 'max-height': cardMaxHeight }">
+                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto' : !fullScreen }" :style="{ 'max-height': cardMaxHeight }">
                     <v-form ref="form" @submit.prevent>
                         <v-row>
                             <v-col>

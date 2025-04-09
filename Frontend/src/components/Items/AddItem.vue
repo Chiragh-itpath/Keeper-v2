@@ -8,6 +8,7 @@ import { fileRule } from '@/data/ValidationRules'
 import { ItemType } from '@/Models/enum'
 import { TypeList } from '@/components/Items'
 import type { IStatus } from '@/Models/ProjectSettings'
+import { useDisplay } from 'vuetify'
 
 type ListItem = { title: string, subtitle?: string, value: string }
 const { keep, users, statusList } = defineProps<{
@@ -20,11 +21,21 @@ const visible: Ref<boolean> = ref(false)
 const form = ref()
 const validateOn: Ref<'submit' | 'input'> = ref('submit')
 const fullScreen = ref(false)
-const maxWidth = computed(() => fullScreen.value ? '100%' : '850px')
-const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '500px')
+const maxWidth = computed(() => {
+    if(fullScreen.value || display.smAndDown.value) {
+        return '100%';
+    }
+    if(display.mdAndDown.value) {
+        return '700px';
+    }
+    return '1000px';
+})
+const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '550px')
 const editorHeight = computed(() => fullScreen.value ? 400 : 150)
 
 const { AddItem } = ItemStore()
+const display = useDisplay()
+
 const addItem = reactive<IAddItem>({
     title: '',
     description: '',

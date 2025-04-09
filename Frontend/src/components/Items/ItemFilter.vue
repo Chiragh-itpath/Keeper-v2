@@ -82,7 +82,6 @@ onMounted(() => {
     selectedType.value = props.itemType ?? []
     selectedStatus.value = props.itemStatus ?? []
     selectedUser.value = props.itemOwner ?? []
-    console.log(displayUser)
 })
 </script>
 

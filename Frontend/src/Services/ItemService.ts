@@ -1,6 +1,6 @@
 import { http } from '@/config/ApiClient'
 import type { IAddComment, IComment } from '@/Models/CommentModel'
-import type { IItem } from '@/Models/ItemModels'
+import type { IItem, IMoveItem } from '@/Models/ItemModels'
 import type { IResponse } from '@/Models/ResponseModel'
 
 export class ItemService {
@@ -44,6 +44,10 @@ export class ItemService {
     }
     public getAllComments = async (itemid: string): Promise<IComment[] | null> => {
         const response: IComment[] | null = await http.get(`${this.baseUrl}/Comments/${itemid}`)
+        return response
+    }
+    public MoveItem = async (moveItem: IMoveItem): Promise<string> => {
+        const response: string = await http.put(`${this.baseUrl}/MoveItem`, moveItem)
         return response
     }
 }

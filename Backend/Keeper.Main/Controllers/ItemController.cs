@@ -83,5 +83,13 @@ namespace Keeper.Main.Controllers
                 Data = comments
             };
         }
+        [HttpPut("MoveItem")]
+        public async Task<ResponseModel<string>> MoveItem([FromBody] MoveItemModel moveItemModel)
+        {
+            return new()
+            {
+                Data = Convert.ToString(await _itemService.MoveItem(moveItemModel))
+            };
+        }
     }
 }

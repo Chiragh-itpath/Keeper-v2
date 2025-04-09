@@ -14,7 +14,7 @@ watch(props, () => {
 })
 </script>
 <template>
-    <div class="mt-2 bg-white border rounded-lg">
+    <div class="mt-2 border rounded-lg">
         <div class="d-flex align-center">
             <div class="ms-3 mt-2">
                 <v-avatar color="primary" size="32"> {{ comment.user[0]?.toUpperCase() }}</v-avatar>
