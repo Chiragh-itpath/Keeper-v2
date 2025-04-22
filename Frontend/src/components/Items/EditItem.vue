@@ -19,30 +19,31 @@ const { item, keep, project, clientList } = defineProps<{
     clientList: ListItem[]
 }>()
 const visible: Ref<boolean> = ref(false)
-const confirmDialogVisible = ref(false) 
+const confirmDialogVisible = ref(false)
 const { dark } = useTheme()
 const hasUnsavedChanges = computed(() => {
     const normalizeValue = (value: any) => value?.trim() || ''
-    
-    return normalizeValue(editItem.title) !== normalizeValue(item.title) || 
-           normalizeValue(editItem.description) !== normalizeValue(item.description) || 
-           normalizeValue(editItem.number?.toString()) !== normalizeValue(item.number?.toString()) || 
-           normalizeValue(editItem.url) !== normalizeValue(item.url) || 
-           normalizeValue(editItem.to) !== normalizeValue(item.to) || 
-           normalizeValue(editItem.discussedBy) !== normalizeValue(item.discussedBy)
+
+    return normalizeValue(editItem.title) !== normalizeValue(item.title) ||
+        normalizeValue(editItem.description) !== normalizeValue(item.description) ||
+        normalizeValue(editItem.number?.toString()) !== normalizeValue(item.number?.toString()) ||
+        normalizeValue(editItem.url) !== normalizeValue(item.url) ||
+        normalizeValue(editItem.to) !== normalizeValue(item.to) ||
+        normalizeValue(editItem.discussedBy) !== normalizeValue(item.discussedBy)
 })
 
 const resetForm = () => {
+    const { files, ...rest } = item
     Object.assign(editItem, {
-        id: item.id,
-        title: item.title,
-        description: item.description,
-        url: item.url,
+        id: rest.id,
+        title: rest.title,
+        description: rest.description,
+        url: rest.url,
         keepId: keep.id,
-        number: item.number,
-        type: item.type,
-        to: item.to,
-        discussedBy: item.discussedBy,
+        number: rest.number,
+        type: rest.type,
+        to: rest.to,
+        discussedBy: rest.discussedBy,
     })
 }
 
@@ -76,10 +77,10 @@ watch(() => visible.value, (newVal) => {
 const fullScreen = ref(false)
 const display = useDisplay()
 const maxWidth = computed(() => {
-    if(fullScreen.value || display.smAndDown.value) {
+    if (fullScreen.value || display.smAndDown.value) {
         return '100%';
     }
-    if(display.mdAndDown.value) {
+    if (display.mdAndDown.value) {
         return '700px';
     }
     return '1000px';
@@ -116,9 +117,11 @@ const submitHandler = async (): Promise<void> => {
     if (!valid) return
     const savedItem = await EditItem(editItem)
     if (savedItem) {
+        editItem.files = []
+        const { files, ...savedRest } = savedItem
         emits('update:item', savedItem)
-        Object.assign(item, savedItem)
-        Object.assign(editItem, savedItem)
+        Object.assign(item, { files, ...savedRest })
+        Object.assign(editItem, savedRest)
         visible.value = false
         emits('update:modelValue', false)
         emits('close')
@@ -143,8 +146,11 @@ const users = computed(() => {
     ]
 })
 const editItemUsers = computed(() => {
-  return users.value.map(x => ({ ...x, value: x.title }))  
+    return users.value.map(x => ({ ...x, value: x.title }))
 })
+const downloadFile = (path: string) => {
+    window.open(path, '_blank')
+}
 const emits = defineEmits<{
     (e: 'close'): void,
     (e: 'update:modelValue', value: boolean): void,
@@ -162,13 +168,15 @@ const emits = defineEmits<{
             <v-card-title class="bg-primary text-center position-sticky">
                 Update Item
                 <div class="float-end d-flex align-center gap-2">
-                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
+                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+                        class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
                     </v-icon>
                     <v-icon @click="closeHandler">mdi-close</v-icon>
                 </div>
             </v-card-title>
             <v-card-text class="px-0">
-                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto' : !fullScreen }" :style="{ 'max-height': cardMaxHeight }">
+                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto': !fullScreen }"
+                    :style="{ 'max-height': cardMaxHeight }">
                     <v-form ref="form" @submit.prevent>
                         <v-row>
                             <v-col>
@@ -221,7 +229,8 @@ const emits = defineEmits<{
                                                 class="d-flex justify-center align-center pa-3">
                                                 <v-tooltip location="top">
                                                     <template v-slot:activator="{ props }">
-                                                        <span class="text-truncate" :class="dark ? 'text-white' : 'text-black'" v-bind="props">
+                                                        <span class="text-truncate"
+                                                            :class="dark ? 'text-white' : 'text-black'" v-bind="props">
                                                             {{ file.fileName }}
                                                         </span>
                                                     </template>
@@ -253,6 +262,7 @@ const emits = defineEmits<{
     </v-dialog>
 
     <!-- ConfirmDialog for unsaved changes -->
-    <confirm-dialog v-model="confirmDialogVisible" text="Confirm Close" description="You have unsaved changes. Are you sure you want to close?" 
-        @yes="confirmClose" @cancel="confirmDialogVisible = false" />
+    <confirm-dialog v-model="confirmDialogVisible" text="Confirm Close"
+        description="You have unsaved changes. Are you sure you want to close?" @yes="confirmClose"
+        @cancel="confirmDialogVisible = false" />
 </template>
