@@ -20,7 +20,7 @@ const emits = defineEmits<{
 
 </script>
 <template>
-    <v-dialog v-model="visible" max-width="500" v-if="keep">
+    <v-dialog v-model="visible" max-width="500" v-if="keep" persistent>
         <template v-slot:activator="{ props }">
             <slot :activator="props"></slot>
         </template>

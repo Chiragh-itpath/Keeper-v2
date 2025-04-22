@@ -190,6 +190,11 @@ const users = computed(() => {
     }
     return _users
 })
+
+const addItemUsers = computed(() => {
+    return users.value.map(x => ({ ...x, value: x.title }))
+})
+
 const mapToClient = (client: IClient) => {
     return {
         title: client.name,
@@ -231,7 +236,7 @@ const mapToClient = (client: IClient) => {
                     :users="users" v-model:item-owner="filters.itemOwner" :status-list="StatusList" v-model:date="filters.date">
                 </item-filter>
                 <v-col>
-                    <add-item v-if="canCreate()" :keep="keep" :project="project" :users="users"
+                    <add-item v-if="canCreate()" :keep="keep" :project="project" :users="addItemUsers"
                         :status-list="StatusList" :client-list="ClientList.map(mapToClient)">
                     </add-item>
                 </v-col>

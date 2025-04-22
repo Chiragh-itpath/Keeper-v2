@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, type Ref, reactive, computed } from 'vue'
-import { TextField, TextEditor, SearchableList } from '@/components/Custom/'
+import { ref, type Ref, reactive, computed } from 'vue'
+import { TextField, TextEditor, SearchableList, ConfirmDialog } from '@/components/Custom/'
 import { ItemStore } from '@/stores'
 import type { IAddItem } from '@/Models/ItemModels'
 import type { IKeep } from '@/Models/KeepModels'
@@ -45,99 +45,126 @@ const addItem = reactive<IAddItem>({
     number: '',
     statusId: statusList[0].id
 })
+const confirmDialogVisible = ref(false)
+const hasUnsavedChanges = computed(() => {
+    return addItem.title || addItem.description || addItem.number || addItem.url || addItem.discussedBy || addItem.to
+})
+
+const closeHandler = () => {
+    if (hasUnsavedChanges.value) {
+        confirmDialogVisible.value = true
+        visible.value = true
+    } else {
+        visible.value = false
+        resetForm()
+    }
+}
+
+const confirmClose = () => {
+    confirmDialogVisible.value = false
+    visible.value = false
+    resetForm()
+}
+
 const submitHandler = async (): Promise<void> => {
     validateOn.value = 'input'
     const { valid } = await form.value.validate()
     if (!valid) return
     await AddItem(addItem)
     visible.value = false
+    resetForm()
 }
-watch(visible, () => {
-    if (!visible.value) {
+
+const resetForm = () => {
+    if(form.value)
         form.value.reset()
-        addItem.description = ''
-        addItem.keepId = keep.id
-        addItem.type = ItemType.TICKET
-        addItem.discussedBy = ''
-    }
+    addItem.description = ''
+    addItem.keepId = keep.id
+    addItem.type = ItemType.TICKET
+    addItem.discussedBy = ''
+    addItem.to = ''
     validateOn.value = 'submit'
-})
+}
 </script>
 
 <template>
-    <v-dialog v-model="visible" close-on-back :max-width="maxWidth" :fullscreen="fullScreen">
-        <template v-slot:activator="{ props }">
-            <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" v-bind="props" class="float-end">
-                New Item
-            </v-btn>
-        </template>
-        <v-card>
-            <v-card-title class="bg-primary text-center position-sticky">
-                New Item
-                <div class="float-end d-flex align-center gap-2">
-                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
-                    </v-icon>  
-                    <v-icon  @click="visible = false">mdi-close</v-icon>
-                </div>
-            </v-card-title>
-            <v-card-text class="px-0 ">
-                <v-card class="mx-5 px-3" :class="{ 'overflow-y-auto' : !fullScreen }" elevation="0" :style="{ 'max-height': cardMaxHeight }">
-                    <v-form ref="form" @submit.prevent :validate-on="validateOn">
-                        <v-row>
-                            <v-col>
-                                <v-select :items="TypeList" label="Type" color="primary" v-model="addItem.type"
-                                    density="comfortable" hide-details>
-
-                                    <template v-slot:item="{ item, props }">
-                                        <v-list-item :title="item.title" :value="item.value" density="compact"
-                                            v-bind="props"></v-list-item>
-                                    </template>
-                                </v-select>
-                            </v-col>
-                            <v-col v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
-                                <text-field label="Number*" placeholder="Ticker | PR number" is-required is-number
-                                    v-model="addItem.number" :max-limit="10" />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <text-field label="Item Name*" placeholder="Item title" is-required
-                                    v-model="addItem.title" :max-limit="50" counter />
-                            </v-col>
-                            <v-col cols="12" v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
-                                <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
-                                    :max-limit="200" icon="mdi-link-box-variant-outline" />
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" sm="6">
-                                <searchable-list :search-items="clientList" label="Discuss With" v-model="addItem.to"
-                                    multiple>   
-                                </searchable-list>
-                            </v-col>
-                            <v-col cols="12" sm="6">
-                                <searchable-list :search-items="users" label="Discuss By" v-model="addItem.discussedBy">
-                                </searchable-list>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <text-editor v-model="addItem.description" :height="editorHeight"></text-editor>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-file-input color="primary" v-model="addItem.files" label="Select Files" multiple
-                                    prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
-                                    :rules="[fileRule]">
-                                </v-file-input>
-                            </v-col>
-                        </v-row>
-                    </v-form>
-                </v-card>
-            </v-card-text>
-            <v-card-actions class="justify-end ma-3">
-                <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="130"
-                    class="mx-2 rounded-xl">
-                    Add
+    <div>
+        <v-dialog :model-value="visible" @update:model-value="closeHandler" persistent :max-width="maxWidth" :fullscreen="fullScreen">
+            <template v-slot:activator="{ props }">
+                <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" class="float-end" @click="() => (visible = true)">
+                    New Item
                 </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+            </template>
+            <v-card>
+                <v-card-title class="bg-primary text-center position-sticky">
+                    New Item
+                    <div class="float-end d-flex align-center gap-2">
+                        <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
+                        </v-icon>  
+                        <v-icon @click="closeHandler">mdi-close</v-icon>
+                    </div>
+                </v-card-title>
+                <v-card-text class="px-0 ">
+                    <v-card class="mx-5 px-3" :class="{ 'overflow-y-auto' : !fullScreen }" elevation="0" :style="{ 'max-height': cardMaxHeight }">
+                        <v-form ref="form" @submit.prevent :validate-on="validateOn">
+                            <v-row>
+                                <v-col>
+                                    <v-select :items="TypeList" label="Type" color="primary" v-model="addItem.type"
+                                        density="comfortable" hide-details>
+    
+                                        <template v-slot:item="{ item, props }">
+                                            <v-list-item :title="item.title" :value="item.value" density="compact"
+                                                v-bind="props"></v-list-item>
+                                        </template>
+                                    </v-select>
+                                </v-col>
+                                <v-col v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
+                                    <text-field label="Number*" placeholder="Ticker | PR number" is-required is-number
+                                        v-model="addItem.number" :max-limit="10" />
+                                </v-col>
+                                <v-col cols="12" md="6">
+                                    <text-field label="Item Name*" placeholder="Item title" is-required
+                                        v-model="addItem.title" :max-limit="50" counter />
+                                </v-col>
+                                <v-col cols="12" v-if="addItem.type == ItemType.TICKET || addItem.type == ItemType.PR">
+                                    <text-field label="URL" placeholder="URL for Ticket | PR" is-url v-model="addItem.url"
+                                        :max-limit="200" icon="mdi-link-box-variant-outline" />
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col cols="12" sm="6">
+                                    <searchable-list :search-items="clientList" label="Discuss With" v-model="addItem.to"
+                                        multiple>   
+                                    </searchable-list>
+                                </v-col>
+                                <v-col cols="12" sm="6">
+                                    <searchable-list :search-items="users" label="Discuss By" :multiple="false" v-model="addItem.discussedBy">
+                                    </searchable-list>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col cols="12">
+                                    <text-editor v-model="addItem.description" :height="editorHeight"></text-editor>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-file-input color="primary" v-model="addItem.files" label="Select Files" multiple
+                                        prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips
+                                        :rules="[fileRule]">
+                                    </v-file-input>
+                                </v-col>
+                            </v-row>
+                        </v-form>
+                    </v-card>
+                </v-card-text>
+                <v-card-actions class="justify-end ma-3">
+                    <v-btn @click="submitHandler" color="primary" variant="elevated" min-width="130"
+                        class="mx-2 rounded-xl">
+                        Add
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    
+        <confirm-dialog v-model="confirmDialogVisible" @yes="confirmClose" @cancel="confirmDialogVisible = false" />
+    </div>
 </template>

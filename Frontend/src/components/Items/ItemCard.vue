@@ -197,13 +197,19 @@ const handleMove = (action: string, moveItem: IMoveItem): void => {
     </v-hover>
     <v-dialog v-model="showMoveDialog" persistent max-width="400">
         <v-card>
-            <v-card-title class="text-h6 bg-primary">Confirm {{ moveAction?.action }}</v-card-title>
+            <v-card-title class="text-h6 bg-primary d-flex align-center">
+                <span>Confirm {{ moveAction?.action }}</span>
+                <v-spacer></v-spacer>
+                <v-btn icon="mdi-close" variant="text" size="small" @click="showMoveDialog = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </v-card-title>
             <v-card-text>
                 Are you sure you want to {{ moveAction?.action }} this item?
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text="Cancel" variant="outlined" color="success" class="rounded-xl mx-2" width="100" />
+                <v-btn text="Cancel" variant="outlined" color="success" class="rounded-xl mx-2" width="100" @click="showMoveDialog = false" />
                 <v-btn text="Confirm" variant="elevated" color="success" class="rounded-xl mx-2" width="100" @click="confirmMove" />
             </v-card-actions>
         </v-card>

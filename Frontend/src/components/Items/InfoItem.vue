@@ -45,7 +45,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <v-dialog v-model="visible" :max-width="maxWidth" @update:model-value="(value : any) => emit('update:modelValue', value)">
+    <v-dialog v-model="visible" :max-width="maxWidth" persistent @update:model-value="(value : any) => emit('update:modelValue', value)">
         <template v-slot:activator="{ props }">
             <slot :activator="props" :visible="visible"></slot>
         </template>
@@ -140,7 +140,7 @@ const emit = defineEmits<{
                             </template>
                         </v-window-item>
                         <v-window-item value="comments">
-                            <all-comments :item-id="item.id" :comments="item.comments"></all-comments>
+                            <all-comments :item-id="item.id"></all-comments>
                         </v-window-item>
                         <v-window-item value="logs">
                             <v-row>

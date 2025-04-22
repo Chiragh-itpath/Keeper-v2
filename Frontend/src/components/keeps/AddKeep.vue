@@ -36,7 +36,7 @@ watch(visible, () => {
 
 </script>
 <template>
-    <v-dialog v-model="visible" max-width="700">
+    <v-dialog v-model="visible" max-width="700" persistent>
         <template v-slot:activator="{ props }">
             <v-btn v-bind="props" color="primary" variant="elevated" prepend-icon="mdi-plus">
                 New Keep

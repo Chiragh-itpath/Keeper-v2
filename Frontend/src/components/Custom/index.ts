@@ -9,6 +9,7 @@ import TextEditor from './TextEditor.vue'
 import TextField from './TextField.vue'
 import SearchableList from './SearchableList.vue'
 import ThemeChanger from './ThemeChanger.vue'
+import ConfirmDialog from './ConfirmDialog.vue'
 
 export {
     DatePicker,
@@ -21,5 +22,6 @@ export {
     TextEditor,
     TextField,
     SearchableList,
-    ThemeChanger
+    ThemeChanger,
+    ConfirmDialog
 }
