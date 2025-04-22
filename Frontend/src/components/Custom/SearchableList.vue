@@ -65,9 +65,9 @@ const onKeydown = (e: KeyboardEvent) => {
     <v-autocomplete v-model="selected" :items="searchItems" item-title="title" item-value="value" :multiple="multiple"
         :label="label" :placeholder="placeholder" v-model:search="search" :return-object="false" @keydown="onKeydown"
         item-color="primary" color="primary" :clearable="!multiple">
-        <template #selection="{ index, item, props }">
+        <template #selection="{ index, item }">
             <template v-if="index < 2">
-                <v-chip color="primary" :closable="multiple" class="me-1" v-bind="props">
+                <v-chip color="primary" class="me-1">
                     {{ item.title }}
                 </v-chip>
             </template>
