@@ -6,8 +6,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { NoItem } from '@/components/Custom'
 import { AddItem, ItemFilter, ItemCard, ItemGrid } from '@/components/Items'
 import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
-import type { IKeep } from '@/Models/KeepModels'
-import type { IProject } from '@/Models/ProjectModels'
+import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
+import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
 import type { IItem } from '@/Models/ItemModels'
 import { ItemType, Permission } from '@/Models/enum'
 import { ProjectSettingsService, type IClient, type IStatus } from "@/Services/ProjectSettings"
@@ -30,7 +30,7 @@ const filters = reactive<{
 }>({})
 
 const itemToDisplay = computed(() => {
-    const filtered = Items.value.filter(itemFilterCallBack).sort((x, y) => y.status - x.status);
+    const filtered = Items.value.filter(itemFilterCallBack);
 
     const query: Record<string, string> = {};
 
@@ -165,30 +165,16 @@ const canCreate = (): boolean => {
     )
 }
 const users = computed(() => {
-    const _users: { title: string, subtitle: string, value: string }[] = []
-    if (project.value) {
-        _users.push(
-            ...project.value.users.filter(x => x.isAccepted || !x.shareId).map(x => {
-                return {
-                    title: x.invitedUser.userName,
-                    subtitle: x.invitedUser.email,
-                    value: x.invitedUser.email
-                }
-            })
-        )
-    }
-    if (keep.value) {
-        _users.push(
-            ...keep.value.users.filter(x => x.isAccepted).map(x => {
-                return {
-                    title: x.invitedUser.userName,
-                    subtitle: x.invitedUser.email,
-                    value: x.invitedUser.email
-                }
-            })
-        )
-    }
-    return _users
+    const mapUser = (x: IProjectMembers | IKeepMembers) => ({
+        title: x.invitedUser.userName,
+        subtitle: x.invitedUser.email,
+        value: x.invitedUser.email
+    })
+
+    return [
+        ...(project.value?.users.filter(x => x.isAccepted || !x.shareId) ?? []),
+        ...(keep.value?.users.filter(x => x.isAccepted) ?? [])
+    ].map(mapUser)
 })
 
 const addItemUsers = computed(() => {
@@ -244,10 +230,10 @@ const mapToClient = (client: IClient) => {
             <v-row v-if="view == 'card' && itemToDisplay.length != 0">
                 <template v-for="(item, index) of itemToDisplay" :key="index">
                     <v-col cols="12" lg="4" md="6">
-                        <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"
+                            <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"
                             :client-list="ClientList.map(mapToClient)">
-                        </item-card>
-                    </v-col>
+                            </item-card>
+                        </v-col>
                 </template>
             </v-row>
             <v-row v-if="view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">

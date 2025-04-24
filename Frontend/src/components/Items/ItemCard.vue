@@ -21,7 +21,6 @@ const { menu, menuHide, close } = useMenu()
 const { User } = UserStore()
 const itemStore = ItemStore()
 
-const _item = ref(item)
 const canEdit = computed((): boolean => {
     if (project.createdBy == User.email) return true
     if (item.createdBy == User.email) return true
@@ -50,9 +49,6 @@ const canDelete = computed((): boolean => {
 })
 const keepStore = KeepStore()
 const keeps = computed(() => keepStore.Keeps ?? [])
-watch(item, () => {
-    _item.value = item
-})
 const getStatusTitle = (statusId: string): string => {
     const status = statusList.find(x => x.id == statusId)
     return status ? status.title : ''
@@ -78,7 +74,7 @@ const handleMove = (action: string, moveItem: IMoveItem): void => {
     <v-hover v-slot="{ props: hover, isHovering }">
         <info-item :item="item" :users="project.users.map(x => x.invitedUser)"> 
             <template v-slot:edit>
-                <edit-item v-model:item="_item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit"
+                <edit-item :item="item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit"
                     v-slot="{ activator: editActivator }">
                     <v-tooltip location="top">
                         <template v-slot:activator="{ props: tooltip }">

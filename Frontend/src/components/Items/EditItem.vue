@@ -3,8 +3,8 @@ import { reactive, ref, watch, type Ref, computed } from 'vue'
 import { ItemStore } from '@/stores'
 import { TextField, TextEditor, SearchableList, ConfirmDialog } from '@/components/Custom/' // Import ConfirmDialog
 import type { IEditItem, IItem } from '@/Models/ItemModels'
-import type { IProject } from '@/Models/ProjectModels'
-import type { IKeep } from '@/Models/KeepModels'
+import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
+import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
 import { fileRule } from '@/data/ValidationRules'
 import { ItemType } from '@/Models/enum'
 import { TypeList, ImagePreview } from '@/components/Items'
@@ -128,26 +128,18 @@ const submitHandler = async (): Promise<void> => {
     }
 }
 const users = computed(() => {
+    const mapUser = (u: IProjectMembers | IKeepMembers) => ({
+        title: u.invitedUser.userName,
+        subtitle: u.invitedUser.email,
+        value: u.invitedUser.userName
+    });
     return [
-        ...project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
-            return {
-                title: u.invitedUser.userName,
-                subtitle: u.invitedUser.email,
-                value: u.invitedUser.userName
-            }
-        }),
-        ...keep.users.filter(u => u.isAccepted).map(u => {
-            return {
-                title: u.invitedUser.userName,
-                subtitle: u.invitedUser.email,
-                value: u.invitedUser.userName
-            }
-        })
-    ]
+        ...project.users.filter(u => u.isAccepted || !u.shareId),
+        ...keep.users.filter(u => u.isAccepted)
+    ].map(mapUser);
 })
-const editItemUsers = computed(() => {
-    return users.value.map(x => ({ ...x, value: x.title }))
-})
+const editItemUsers = computed(() => users.value.map(x => ({ ...x, value: x.title })))
+
 const downloadFile = (path: string) => {
     window.open(path, '_blank')
 }
