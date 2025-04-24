@@ -41,7 +41,7 @@ watch(visible, (newVal: boolean) => {
 })
 </script>
 <template>
-    <v-dialog v-model="visible" max-width="700">
+    <v-dialog v-model="visible" max-width="700" persistent>
         <template v-slot:activator="{ props }">
             <slot :activator="props"></slot>
         </template>

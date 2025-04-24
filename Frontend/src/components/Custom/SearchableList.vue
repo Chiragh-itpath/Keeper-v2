@@ -1,75 +1,86 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue'
-import { VTextField } from 'vuetify/components'
-const { modelValue, placeholder, label, searchItems, multiple } = defineProps<{
-    modelValue?: string,
-    label?: string,
-    placeholder?: string,
-    searchItems: { title: string, subtitle?: string, value: string }[],
+import { ref, watch } from 'vue'
+
+const props = defineProps<{
+    modelValue?: string
+    label?: string
+    placeholder?: string
+    searchItems: { title: string; subtitle?: string; value: string }[]
     multiple?: boolean
-}>();
-const search: Ref<string> = ref(modelValue ?? '')
-const selected = ref<string[]>([])
-const menu: Ref<boolean> = ref(false)
-const displayList = ref(searchItems)
-const inputHandler = () => {
-    if (search.value == '') {
-        displayList.value = searchItems
-    } else {
-        menu.value = true
-        displayList.value = searchItems.filter(x =>
-            x.title.toLowerCase().startsWith(search.value.toLowerCase()) ||
-            x.subtitle?.toLowerCase().startsWith(search.value.toLowerCase()) ||
-            x.value.toLowerCase().startsWith(search.value.toLowerCase())
-        )
-    }
-}
-const itemClickHandler = (item: { title: string, value: string }) => {
-    if (multiple) {
-        const index = selected.value.findIndex(x => x == item.value)
-        if (index > -1) {
-            selected.value.splice(index, 1)
-        } else {
-            selected.value.push(item.value)
-        }
-        search.value = selected.value.join(', ')
-    } else {
-        search.value = item.value
-        menu.value = false
-        displayList.value = searchItems
-    }
-    emit('update:modelValue', search.value)
-}
+}>()
+
 const emit = defineEmits<{
     (e: 'update:modelValue', value: string | undefined): void
 }>()
-onMounted(() => {
-    if (modelValue)
-        selected.value = modelValue
-            .split(',')
-            .map(x => x.trim())
+
+const selected = ref<string | string[] | undefined>(props.multiple ? [] : undefined)
+const search = ref('')
+
+watch(
+    () => props.modelValue,
+    (val) => {
+        if (!val) {
+            selected.value = props.multiple ? [] : undefined
+            return
+        }
+        selected.value = props.multiple
+            ? val.split(',').map(x => x.trim())
+            : val.trim()
+    },
+    { immediate: true }
+)
+
+watch(selected, (val) => {
+    const value = props.multiple
+        ? (val as string[])?.join(', ')
+        : val as string
+    emit('update:modelValue', value)
+
+    if (props.multiple) {
+        search.value = ''
+    }
 })
+
+const onKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Tab') {
+        const match = props.searchItems.find(x =>
+            x.title.toLowerCase().includes(search.value.toLowerCase()) ||
+            x.subtitle?.toLowerCase().includes(search.value.toLowerCase()) ||
+            x.value.toLowerCase().includes(search.value.toLowerCase())
+        )
+        if (match && search.value) {
+            if (props.multiple) {
+                e.preventDefault()
+                const currentSelected = selected.value as string[]
+                if (!currentSelected.includes(match.value)) {
+                    selected.value = [...currentSelected, match.value]
+                }
+            }
+        }
+    }
+}
 </script>
 
 <template>
-    <v-menu v-model="menu" :close-on-content-click="false" max-height="250">
-        <template v-slot:activator="{ props: menu, isActive: activator }">
-            <v-text-field color="primary" density="comfortable" hide-details :label="label" :placeholder="placeholder"
-                v-bind="menu" v-model="search" @input="inputHandler">
-                <template v-slot:append-inner>
-                    <v-icon :icon="activator ? 'mdi-menu-up' : 'mdi-menu-down'" class="cursor-pointer"></v-icon>
-                </template>
-            </v-text-field>
-        </template>
-        <v-list>
-
-            <template v-for="(item, index) in displayList" :key="index">
-                <v-list-item density="compact" :active="selected.some(x => x == item.value)" color="primary"
-                    :title="item.title" :subtitle="item.subtitle" :value="item.value"
-                    @click="() => itemClickHandler(item)">
-                </v-list-item>
+    <v-autocomplete v-model="selected" :items="searchItems" item-title="title" item-value="value" :multiple="multiple"
+        :label="label" :placeholder="placeholder" v-model:search="search" :return-object="false" @keydown="onKeydown"
+        item-color="primary" color="primary" :clearable="!multiple">
+        <template #selection="{ index, item }">
+            <template v-if="index < 2">
+                <v-chip color="primary" class="me-1">
+                    {{ item.title }}
+                </v-chip>
             </template>
-            <v-list-item v-if="displayList.length == 0" title="No data" density="compact" disabled></v-list-item>
-        </v-list>
-    </v-menu>
+            <template v-else-if="index === 2">
+                <v-chip color="primary">
+                    +{{ selected.length - 2 }}
+                </v-chip>
+            </template>
+        </template>
+    </v-autocomplete>
 </template>
+<style>
+.mdi-close-circle {
+    color: rgb(38, 166, 154);
+}
+</style>

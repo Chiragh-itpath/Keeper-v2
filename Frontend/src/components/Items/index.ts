@@ -7,6 +7,8 @@ import ItemFilter from './ItemFilter.vue'
 import ItemCard from './ItemCard.vue'
 import ItemGrid from './ItemGrid.vue'
 import ImagePreview from './ImagePreview.vue'
+import MoveItem from './MoveItem.vue'
+
 import { ItemType } from '@/Models/enum'
 
 export {
@@ -18,7 +20,8 @@ export {
     ItemFilter,
     ItemCard,
     ItemGrid,
-    ImagePreview
+    ImagePreview,
+    MoveItem
 }
 
 export type ListItemsType = {

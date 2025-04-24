@@ -115,28 +115,6 @@ const getStatusTitle = (statusId: string): string => {
                         </v-avatar>
                     </template>
                 </v-col>
-                <v-col cols="1">
-                    <v-avatar color="primary" size="small" class="cursor-pointer avatar-border">
-                        <v-tooltip activator="parent" location="top">
-                            {{
-                                project.users
-                                .map(x => x.invitedUser)
-                                .find(x => x.email == item.createdBy)?.userName ??
-                                item.createdBy
-                            }}
-                        </v-tooltip>
-                        {{
-                            project.users
-                            .map(x => x.invitedUser)
-                            .find(x => x.email == item.createdBy)?.userName
-                            .split(' ')
-                            .splice(0, 2)
-                            .map(x =>x[0].toUpperCase())
-                            .join('') ??
-                            item.createdBy[0].toUpperCase()
-                        }}
-                    </v-avatar>
-                </v-col>
                 <v-col cols="2" class="d-flex justify-start">
                     <update-status :item="item" :status-list="statusList" v-if="canEdit">
                         <template v-slot="{ props, isActive }">

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, mergeProps, ref, watch } from 'vue'
-import { EditItem, DeleteItem, TypeList, UpdateStatus, InfoItem } from '@/components/Items'
+import { EditItem, DeleteItem, TypeList, UpdateStatus, InfoItem, MoveItem } from '@/components/Items'
 import { ItemType, Permission } from '@/Models/enum'
-import type { IItem } from '@/Models/ItemModels'
+import type { IItem, IMoveItem } from '@/Models/ItemModels'
 import type { IKeep } from '@/Models/KeepModels'
 import type { IProject } from '@/Models/ProjectModels'
-import { UserStore } from '@/stores'
+import { UserStore, KeepStore, ItemStore } from '@/stores'
 import { useMenu } from '@/composable/useMenu'
 import type { IStatus } from '@/Models/ProjectSettings'
 
@@ -19,7 +19,8 @@ const { keep, project, item, statusList } = defineProps<{
 }>()
 const { menu, menuHide, close } = useMenu()
 const { User } = UserStore()
-const _item = ref(item)
+const itemStore = ItemStore()
+
 const canEdit = computed((): boolean => {
     if (project.createdBy == User.email) return true
     if (item.createdBy == User.email) return true
@@ -46,20 +47,34 @@ const canDelete = computed((): boolean => {
     }
     return false
 })
-watch(item, () => {
-    _item.value = item
-})
+const keepStore = KeepStore()
+const keeps = computed(() => keepStore.Keeps ?? [])
 const getStatusTitle = (statusId: string): string => {
     const status = statusList.find(x => x.id == statusId)
     return status ? status.title : ''
 }
+const showMoveDialog = ref(false);
+const moveAction = ref<null | { action: string; moveItem: IMoveItem }>(null);
+
+const confirmMove = () => {
+    if (moveAction.value) {
+        itemStore.moveItem(moveAction.value.moveItem);
+        showMoveDialog.value = false;
+        moveAction.value = null;
+    }
+};
+
+const handleMove = (action: string, moveItem: IMoveItem): void => {
+    moveAction.value = { action, moveItem };
+    showMoveDialog.value = true;
+};
 </script>
 
 <template>
     <v-hover v-slot="{ props: hover, isHovering }">
         <info-item :item="item" :users="project.users.map(x => x.invitedUser)"> 
             <template v-slot:edit>
-                <edit-item v-model:item="_item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit"
+                <edit-item :item="item" :keep="keep" :project="project" :client-list="clientList" v-if="canEdit"
                     v-slot="{ activator: editActivator }">
                     <v-tooltip location="top">
                         <template v-slot:activator="{ props: tooltip }">
@@ -115,6 +130,8 @@ const getStatusTitle = (statusId: string): string => {
                                                 <span class="mx-3">Delete</span>
                                             </v-list-item>
                                         </delete-item>
+                                        <move-item v-if="canEdit" action="move" :keeps="keeps" :item-id="item.id" :keep-id="item.keepId" @move="(moveItem) => handleMove('move', moveItem)" /> 
+                                        <move-item v-if="canEdit" action="copy" :keeps="keeps" :item-id="item.id" :keep-id="item.keepId" @move="(moveItem) => handleMove('copy', moveItem)" />
                                     </v-list>
 
                                     <template v-slot:activator="{ props }">
@@ -174,6 +191,25 @@ const getStatusTitle = (statusId: string): string => {
             </template>
         </info-item>
     </v-hover>
+    <v-dialog v-model="showMoveDialog" persistent max-width="400">
+        <v-card>
+            <v-card-title class="text-h6 bg-primary d-flex align-center">
+                <span>Confirm {{ moveAction?.action }}</span>
+                <v-spacer></v-spacer>
+                <v-btn icon="mdi-close" variant="text" size="small" @click="showMoveDialog = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </v-card-title>
+            <v-card-text>
+                Are you sure you want to {{ moveAction?.action }} this item?
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text="Cancel" variant="outlined" color="success" class="rounded-xl mx-2" width="100" @click="showMoveDialog = false" />
+                <v-btn text="Confirm" variant="elevated" color="success" class="rounded-xl mx-2" width="100" @click="confirmMove" />
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <style>

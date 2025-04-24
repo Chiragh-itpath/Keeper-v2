@@ -11,12 +11,16 @@ namespace Keeper.Services.Services
     {
         private readonly IItemRepo _itemRepo;
         private readonly IFileService _fileService;
+        private readonly IFileRepo _fileRepo;
         private readonly ICommentService _commentService;
-        public ItemService(IItemRepo itemRepo, IFileService file, ICommentService comment)
+        private readonly ICommentRepo _commentRepo;
+        public ItemService(IItemRepo itemRepo, IFileService file, ICommentService comment, IFileRepo fileRepo, ICommentRepo commentRepo)
         {
             _itemRepo = itemRepo;
             _fileService = file;
             _commentService = comment;
+            _fileRepo = fileRepo;
+            _commentRepo = commentRepo;
         }
         public async Task<List<ItemViewModel>> GetAllAsync(Guid keepId)
         {
@@ -97,6 +101,57 @@ namespace Keeper.Services.Services
         {
             var res = await _itemRepo.GetAsync(id) ?? throw new InnerException("", StatusType.NOT_FOUND);
             await _itemRepo.Delete(res);
+            return true;
+        }
+        public async Task<bool> MoveItem(MoveItemModel moveItem)
+        {
+            var item = await _itemRepo.GetAsync(moveItem.ItemId) ?? throw new InnerException("Item not found", StatusType.NOT_FOUND);
+
+            if (moveItem.Action == MoveAction.Copy)
+            {
+                ItemModel newItem = new()
+                {
+                    Title = item.Title,
+                    Description = item.Description,
+                    Type = item.Type,
+                    URL = item.URL,
+                    Number = item.Number,
+                    To = item.To,
+                    DiscussedBy = item.DiscussedBy,
+                    StatusId = item.StatusId,
+                    KeepId = moveItem.TargetKeepId,
+                    CreatedById = item.CreatedById,
+                    CreatedOn = DateTime.Now
+                };
+
+                await _itemRepo.SaveAsync(newItem);
+                var files = await _fileRepo.GetFilesAsync(item.Id);
+                if (files != null && files.Any())
+                {
+                    var itemFiles = files.Select(x => new ItemFileLinkerModel
+                    {
+                        FileId = x.Id,
+                        ItemId = newItem.Id
+                    }).ToList();
+                    await _fileRepo.AddFileLinksRange(itemFiles);
+                }
+                var comments = await _commentRepo.GetAllAsync(moveItem.ItemId);
+                if(comments != null && comments.Any())
+                {
+                    comments.ForEach(x =>
+                    {
+                        x.ItemId = newItem.Id;
+                    });
+                    await _commentRepo.AddRangeAsync(comments);
+                }
+            }
+            else if (moveItem.Action == MoveAction.Move)
+            {
+                item.KeepId = moveItem.TargetKeepId;
+                item.UpdatedOn = DateTime.Now;
+                await _itemRepo.Update(item);
+            }
+
             return true;
         }
         private static ItemViewModel Mapper(ItemModel item)

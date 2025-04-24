@@ -80,7 +80,7 @@ const inviteHandler = async () => {
 }
 </script>
 <template>
-    <v-dialog v-model="visible" max-width="700" :close-on-back="!Loading">
+    <v-dialog v-model="visible" max-width="700" :close-on-back="!Loading" persistent>
         <template v-slot:activator="{ props }">
             <v-btn color="primary" class="cursor-pointer" prepend-icon="mdi-plus" v-bind="props">New Contact</v-btn>
         </template>

@@ -3,11 +3,11 @@ import { computed, ref, onMounted, type Ref, reactive, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDate, useDisplay } from 'vuetify'
 import { useRoute, useRouter } from 'vue-router'
-import { DatePicker, NoItem } from '@/components/Custom'
+import { NoItem } from '@/components/Custom'
 import { AddItem, ItemFilter, ItemCard, ItemGrid } from '@/components/Items'
 import { ItemStore, ProjectStore, KeepStore, UserStore } from '@/stores'
-import type { IKeep } from '@/Models/KeepModels'
-import type { IProject } from '@/Models/ProjectModels'
+import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
+import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
 import type { IItem } from '@/Models/ItemModels'
 import { ItemType, Permission } from '@/Models/enum'
 import { ProjectSettingsService, type IClient, type IStatus } from "@/Services/ProjectSettings"
@@ -17,7 +17,6 @@ const view: Ref<'card' | 'grid'> = ref('card')
 const projectSettings = new ProjectSettingsService()
 const { User } = UserStore()
 const { Items } = storeToRefs(ItemStore())
-const itemToDisplay: Ref<IItem[]> = ref([])
 const project: Ref<IProject | undefined> = ref()
 const keep: Ref<IKeep | undefined> = ref()
 const StatusList: Ref<IStatus[]> = ref([])
@@ -30,26 +29,34 @@ const filters = reactive<{
     itemOwner?: string[]
 }>({})
 
-watch([filters, Items], () => {
-    itemToDisplay.value = Items.value.filter(itemFilterCallBack).sort((x, y) => x.status - y.status)
+const itemToDisplay = computed(() => {
+    const filtered = Items.value.filter(itemFilterCallBack);
+
     const query: Record<string, string> = {};
+
     if (filters.date && (!Array.isArray(filters.date) || filters.date.length > 0)) {
-        query.date = Array.isArray(filters.date) ? filters.date.map(d => dateHelper.format(d, 'keyboardDate')).join(',') : dateHelper.format(filters.date, 'keyboardDate');
+        query.date = Array.isArray(filters.date)
+            ? filters.date.map(d => dateHelper.format(d, 'keyboardDate')).join(',')
+            : dateHelper.format(filters.date, 'keyboardDate');
     }
-    if (filters.itemType && filters.itemType.length > 0) {
+
+    if (filters.itemType?.length) {
         query.itemType = filters.itemType.join(',');
     }
-    if (filters.itemStatus && filters.itemStatus.length > 0) {
+
+    if (filters.itemStatus?.length) {
         query.itemStatus = filters.itemStatus.join(',');
     }
-    if (filters.itemOwner && filters.itemOwner.length > 0) {
+
+    if (filters.itemOwner?.length) {
         query.itemOwner = filters.itemOwner.join(',');
     }
 
     router.replace({ query });
-}, {
-    deep: true
-})
+
+    return filtered;
+});
+
 const { mdAndDown } = useDisplay()
 watch(mdAndDown, () => {
     view.value = mdAndDown.value ? 'card' : view.value
@@ -83,10 +90,10 @@ const breadcrumbs = [
 ]
 onMounted(async () => {
     const query = { ...route.query };
-    debugger
     loading.value = true
     project.value = await ProjectStore().GetSingalProject(projectId.value)
     keep.value = await KeepStore().getSingleKeep(keepId.value)
+    await KeepStore().GetKeeps(projectId.value)
     if (!hasAccess.value) router.go(-1)
     await GetAllItems(keepId.value)
     StatusList.value = await projectSettings.GetAllStatus(projectId.value) ?? []
@@ -136,7 +143,6 @@ const isSameDate = (date1: Date, date2: Date | Date[]): boolean => {
         dateHelper.format(date1, 'keyboardDate') === dateHelper.format(date2, 'keyboardDate')
 }
 const itemFilterCallBack = (item: IItem): boolean => {
-    console.log(item)
     return (
         !filters.date ||
         (Array.isArray(filters.date) && filters.date.length === 0) || isSameDate(new Date(item.createdOn), filters.date)
@@ -159,31 +165,22 @@ const canCreate = (): boolean => {
     )
 }
 const users = computed(() => {
-    const _users: { title: string, subtitle: string, value: string }[] = []
-    if (project.value) {
-        _users.push(
-            ...project.value.users.filter(x => x.isAccepted || !x.shareId).map(x => {
-                return {
-                    title: x.invitedUser.userName,
-                    subtitle: x.invitedUser.email,
-                    value: x.invitedUser.email
-                }
-            })
-        )
-    }
-    if (keep.value) {
-        _users.push(
-            ...keep.value.users.filter(x => x.isAccepted).map(x => {
-                return {
-                    title: x.invitedUser.userName,
-                    subtitle: x.invitedUser.email,
-                    value: x.invitedUser.email
-                }
-            })
-        )
-    }
-    return _users
+    const mapUser = (x: IProjectMembers | IKeepMembers) => ({
+        title: x.invitedUser.userName,
+        subtitle: x.invitedUser.email,
+        value: x.invitedUser.email
+    })
+
+    return [
+        ...(project.value?.users.filter(x => x.isAccepted || !x.shareId) ?? []),
+        ...(keep.value?.users.filter(x => x.isAccepted) ?? [])
+    ].map(mapUser)
 })
+
+const addItemUsers = computed(() => {
+    return users.value.map(x => ({ ...x, value: x.title }))
+})
+
 const mapToClient = (client: IClient) => {
     return {
         title: client.name,
@@ -225,7 +222,7 @@ const mapToClient = (client: IClient) => {
                     :users="users" v-model:item-owner="filters.itemOwner" :status-list="StatusList" v-model:date="filters.date">
                 </item-filter>
                 <v-col>
-                    <add-item v-if="canCreate()" :keep="keep" :project="project" :users="users"
+                    <add-item v-if="canCreate()" :keep="keep" :project="project" :users="addItemUsers"
                         :status-list="StatusList" :client-list="ClientList.map(mapToClient)">
                     </add-item>
                 </v-col>
@@ -233,10 +230,10 @@ const mapToClient = (client: IClient) => {
             <v-row v-if="view == 'card' && itemToDisplay.length != 0">
                 <template v-for="(item, index) of itemToDisplay" :key="index">
                     <v-col cols="12" lg="4" md="6">
-                        <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"
+                            <item-card :item="item" :project="project" :keep="keep" :status-list="StatusList"
                             :client-list="ClientList.map(mapToClient)">
-                        </item-card>
-                    </v-col>
+                            </item-card>
+                        </v-col>
                 </template>
             </v-row>
             <v-row v-if="view == 'grid' && itemToDisplay.length != 0" class="bg-white mt-5 mb-5">
@@ -246,7 +243,6 @@ const mapToClient = (client: IClient) => {
                         <v-col>Description</v-col>
                         <v-col cols="1">Discussed With</v-col>
                         <v-col cols="1">Discussed By</v-col>
-                        <v-col cols="1">Added By</v-col>
                         <v-col cols="2">Status</v-col>
                     </v-row>
 

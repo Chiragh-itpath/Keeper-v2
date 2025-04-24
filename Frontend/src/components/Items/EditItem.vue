@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { reactive, ref, watch, type Ref, computed } from 'vue'
 import { ItemStore } from '@/stores'
-import { TextField, TextEditor, SearchableList } from '@/components/Custom/'
+import { TextField, TextEditor, SearchableList, ConfirmDialog } from '@/components/Custom/' // Import ConfirmDialog
 import type { IEditItem, IItem } from '@/Models/ItemModels'
-import type { IProject } from '@/Models/ProjectModels'
-import type { IKeep } from '@/Models/KeepModels'
+import type { IProject, IProjectMembers } from '@/Models/ProjectModels'
+import type { IKeep, IKeepMembers } from '@/Models/KeepModels'
 import { fileRule } from '@/data/ValidationRules'
 import { ItemType } from '@/Models/enum'
-import { TypeList } from '@/components/Items'
+import { TypeList, ImagePreview } from '@/components/Items'
+import { useDisplay } from 'vuetify'
+import { useTheme } from '@/composable/useTheme'
 
 type ListItem = { title: string, subtitle?: string, value: string }
 const { item, keep, project, clientList } = defineProps<{
@@ -17,15 +19,73 @@ const { item, keep, project, clientList } = defineProps<{
     clientList: ListItem[]
 }>()
 const visible: Ref<boolean> = ref(false)
-watch(visible, () => {
+const confirmDialogVisible = ref(false)
+const { dark } = useTheme()
+const hasUnsavedChanges = computed(() => {
+    const normalizeValue = (value: any) => value?.trim() || ''
 
-    if (!visible.value) {
+    return normalizeValue(editItem.title) !== normalizeValue(item.title) ||
+        normalizeValue(editItem.description) !== normalizeValue(item.description) ||
+        normalizeValue(editItem.number?.toString()) !== normalizeValue(item.number?.toString()) ||
+        normalizeValue(editItem.url) !== normalizeValue(item.url) ||
+        normalizeValue(editItem.to) !== normalizeValue(item.to) ||
+        normalizeValue(editItem.discussedBy) !== normalizeValue(item.discussedBy)
+})
+
+const resetForm = () => {
+    const { files, ...rest } = item
+    Object.assign(editItem, {
+        id: rest.id,
+        title: rest.title,
+        description: rest.description,
+        url: rest.url,
+        keepId: keep.id,
+        number: rest.number,
+        type: rest.type,
+        to: rest.to,
+        discussedBy: rest.discussedBy,
+    })
+}
+
+const closeHandler = () => {
+    if (hasUnsavedChanges.value) {
+        confirmDialogVisible.value = true
+    } else {
+        resetForm()
+        visible.value = false
+        emits('update:modelValue', false)
         emits('close')
+    }
+}
+
+const confirmClose = () => {
+    resetForm()
+    confirmDialogVisible.value = false
+    visible.value = false
+    emits('update:modelValue', false)
+    emits('close')
+}
+
+// Add a watch to reset form when dialog opens
+watch(() => visible.value, (newVal) => {
+    if (newVal) {
+        resetForm()
+    } else {
+        closeHandler()
     }
 })
 const fullScreen = ref(false)
-const maxWidth = computed(() => fullScreen.value ? '100%' : '900px')
-const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '400px')
+const display = useDisplay()
+const maxWidth = computed(() => {
+    if (fullScreen.value || display.smAndDown.value) {
+        return '100%';
+    }
+    if (display.mdAndDown.value) {
+        return '700px';
+    }
+    return '1000px';
+})
+const cardMaxHeight = computed(() => fullScreen.value ? 'auto' : '550px')
 const editorHeight = computed(() => fullScreen.value ? 400 : 150)
 
 const DeletedClients = computed(() => {
@@ -55,29 +115,34 @@ const { EditItem } = ItemStore()
 const submitHandler = async (): Promise<void> => {
     const { valid } = await form.value.validate()
     if (!valid) return
-    const item = await EditItem(editItem)
-    if (item) emits('update:item', item)
-    visible.value = false
+    const savedItem = await EditItem(editItem)
+    if (savedItem) {
+        editItem.files = []
+        const { files, ...savedRest } = savedItem
+        emits('update:item', savedItem)
+        Object.assign(item, { files, ...savedRest })
+        Object.assign(editItem, savedRest)
+        visible.value = false
+        emits('update:modelValue', false)
+        emits('close')
+    }
 }
 const users = computed(() => {
+    const mapUser = (u: IProjectMembers | IKeepMembers) => ({
+        title: u.invitedUser.userName,
+        subtitle: u.invitedUser.email,
+        value: u.invitedUser.userName
+    });
     return [
-        ...project.users.filter(u => u.isAccepted || !u.shareId).map(u => {
-            return {
-                title: u.invitedUser.userName,
-                subtitle: u.invitedUser.email,
-                value: u.invitedUser.userName
-            }
-        }),
-        ...keep.users.filter(u => u.isAccepted).map(u => {
-            return {
-                title: u.invitedUser.userName,
-                subtitle: u.invitedUser.email,
-                value: u.invitedUser.userName
-            }
-        })
-    ]
+        ...project.users.filter(u => u.isAccepted || !u.shareId),
+        ...keep.users.filter(u => u.isAccepted)
+    ].map(mapUser);
 })
+const editItemUsers = computed(() => users.value.map(x => ({ ...x, value: x.title })))
 
+const downloadFile = (path: string) => {
+    window.open(path, '_blank')
+}
 const emits = defineEmits<{
     (e: 'close'): void,
     (e: 'update:modelValue', value: boolean): void,
@@ -86,7 +151,7 @@ const emits = defineEmits<{
 </script>
 
 <template>
-    <v-dialog v-model="visible" close-on-back :max-width="maxWidth" :fullscreen="fullScreen"
+    <v-dialog v-model="visible" persistent :max-width="maxWidth" :fullscreen="fullScreen"
         @update:model-value="() => emits('update:modelValue', visible)">
         <template v-slot:activator="{ props }">
             <slot :activator="props"></slot>
@@ -95,13 +160,15 @@ const emits = defineEmits<{
             <v-card-title class="bg-primary text-center position-sticky">
                 Update Item
                 <div class="float-end d-flex align-center gap-2">
-                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
+                    <v-icon color="white" :icon="fullScreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+                        class="cursor-pointer" @click="() => (fullScreen = !fullScreen)">
                     </v-icon>
-                    <v-icon @click="visible = false">mdi-close</v-icon>
+                    <v-icon @click="closeHandler">mdi-close</v-icon>
                 </div>
             </v-card-title>
             <v-card-text class="px-0">
-                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto' : !fullScreen }" style="{ 'max-height': cardMaxHeight }">
+                <v-card elevation="0" class="mx-5 px-2" :class="{ 'overflow-y-auto': !fullScreen }"
+                    :style="{ 'max-height': cardMaxHeight }">
                     <v-form ref="form" @submit.prevent>
                         <v-row>
                             <v-col>
@@ -131,7 +198,7 @@ const emits = defineEmits<{
                                 </searchable-list>
                             </v-col>
                             <v-col cols="12" sm="6">
-                                <searchable-list :search-items="users" label="Discuss By"
+                                <searchable-list :search-items="editItemUsers" label="Discuss By"
                                     v-model="editItem.discussedBy">
                                 </searchable-list>
                             </v-col>
@@ -145,6 +212,34 @@ const emits = defineEmits<{
                                     prepend-inner-icon="mdi-paperclip" prepend-icon="" show-size chips multiple
                                     :rules="[fileRule]" />
                             </v-col>
+                            <v-col cols="12">
+                                <template v-if="item.files && item.files.length > 0">
+                                    <div class="mt-3">Files:</div>
+                                    <v-row class="mt-2">
+                                        <v-col v-for="(file, index) in item.files" :key="index" cols="auto">
+                                            <v-card max-width="200" color="primary" variant="tonal"
+                                                class="d-flex justify-center align-center pa-3">
+                                                <v-tooltip location="top">
+                                                    <template v-slot:activator="{ props }">
+                                                        <span class="text-truncate"
+                                                            :class="dark ? 'text-white' : 'text-black'" v-bind="props">
+                                                            {{ file.fileName }}
+                                                        </span>
+                                                    </template>
+                                                    {{ file.fileName }}
+                                                </v-tooltip>
+                                                <image-preview v-if="file.isImage" v-slot="{ activator }"
+                                                    :image-url="file.fileUrl">
+                                                    <v-btn icon="mdi-eye" class="text-primary ms-2" density="compact"
+                                                        variant="flat" v-bind="activator" />
+                                                </image-preview>
+                                                <v-btn icon="mdi-download" class="text-primary" density="compact"
+                                                    variant="flat" @click="() => downloadFile(file.fileUrl)" />
+                                            </v-card>
+                                        </v-col>
+                                    </v-row>
+                                </template>
+                            </v-col>
                         </v-row>
                     </v-form>
                 </v-card>
@@ -157,4 +252,9 @@ const emits = defineEmits<{
             </v-card-actions>
         </v-card>
     </v-dialog>
+
+    <!-- ConfirmDialog for unsaved changes -->
+    <confirm-dialog v-model="confirmDialogVisible" text="Confirm Close"
+        description="You have unsaved changes. Are you sure you want to close?" @yes="confirmClose"
+        @cancel="confirmDialogVisible = false" />
 </template>

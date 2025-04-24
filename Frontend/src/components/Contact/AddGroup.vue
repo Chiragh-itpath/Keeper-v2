@@ -58,7 +58,7 @@ watch(visible, () => {
 })
 </script>
 <template>
-    <v-dialog v-model="visible" max-width="600">
+    <v-dialog v-model="visible" max-width="600" persistent>
         <template v-slot:activator="{ props }">
             <v-btn color="primary" prepend-icon="mdi-plus" class="rounded" v-bind="props">
                 New Group

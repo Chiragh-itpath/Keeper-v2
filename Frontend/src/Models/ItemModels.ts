@@ -39,4 +39,12 @@ interface FileModel {
     fileUrl: string
     isImage: boolean
 }
-export type { IItem, IAddItem, IEditItem, ItemType }
+
+interface IMoveItem {
+    itemId: string
+    currentKeepId: string
+    targetKeepId: string
+    action: number
+}
+
+export type { IItem, IAddItem, IEditItem, ItemType, IMoveItem }

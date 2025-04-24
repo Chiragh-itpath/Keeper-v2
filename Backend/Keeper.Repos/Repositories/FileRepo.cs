@@ -31,5 +31,11 @@ namespace Keeper.Repos.Repositories
         {
             return await _db.Files.AsNoTracking().FirstAsync(x => x.Id == id);
         }
+
+        public async Task AddFileLinksRange(List<ItemFileLinkerModel> itemFiles)
+        {
+            await _db.ItemFileLinker.AddRangeAsync(itemFiles);
+            await _db.SaveChangesAsync();
+        }
     }
 }

@@ -29,7 +29,7 @@ watch(visible, (newVal) => {
 })
 </script>
 <template>
-    <v-dialog v-model="visible" width="700">
+    <v-dialog v-model="visible" width="700" persistent>
         <template v-slot:activator="{ props }">
             <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" class="w-sm-100" v-bind="props">
                 New Project
